@@ -23,7 +23,7 @@ Etap M1 (karta eksploracji danych): dokumenty są szkicami do redakcji, dane jes
 | `09_ujawnienie_AI_i_wklad.md` | ujawnienie użycia AI i tabela wkładu |
 | `10_playbook_po_otrzymaniu_danych.md` | kolejność działań po otrzymaniu danych |
 | `WORKFLOW.md` | zasady pracy w repozytorium: gałęzie, commity, własność miejsc, dane, sesje z AI |
-| `tools/` | narzędzia w Pythonie (schemat zmiennych, audyt danych, losowanie, liczebność, zgodność annotatorów, ocena, estymatory, czas życia i intensywność, dziennik uruchomień, kontrole spójności) |
+| `tools/` | narzędzia w Pythonie (schemat zmiennych, ładowanie JSON z TikToka, audyt danych, losowanie, liczebność, zgodność annotatorów, ocena, estymatory, czas życia i intensywność, dziennik uruchomień, kontrole spójności) |
 | `tests/` | testy narzędzi na danych syntetycznych |
 | `templates/` | arkusz annotacji (CSV), dziennik zmian codebooka |
 | `prompts/` | prompty annotatora ocenianego (puste do zamrożenia codebooka) |
@@ -47,6 +47,7 @@ python tools/checks.py consistency            # schema.yaml, codebook i szablon 
 python tools/checks.py placeholders           # placeholdery w dokumentach i rejestr
 python tools/audit_dataset.py dane.csv        # audyt tabeli dostarczonej przez inżyniera danych
 python tools/sampling.py dane.csv --stratum S --advertiser A --cap 5 --n 30 --seed 1 --out proba.csv
+python tools/load_tiktok_json.py plik.json --retrieval-date 2026-10-12 --out poza_repo/ads_flat.csv   # JSON z TikToka -> tabela (poza repozytorium)
 python tools/sample_size.py positives         # szerokość CI a liczba pozytywów
 python tools/outcomes.py dane.csv --class-col gold --weight-col weight   # mediana czasu życia, udział I >= próg, pasmo dla reklam aktywnych
 python tools/agreement.py arkusz.csv --vars celeb_mention scam_type

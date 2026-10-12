@@ -9,7 +9,7 @@ Kroki w kolejności. Każdy krok kończy się wpisem w rejestrze placeholderów 
 
 ## Krok 1. Audyt tabeli
 
-`python tools/audit_dataset.py dane.csv` → wpisz do P01, P02, P03, P05, P06, P10, P11. Zapisz hash pliku wejściowego w dzienniku.
+Jeśli dane przyszły jako JSON z TikToka: `python tools/load_tiktok_json.py plik.json --retrieval-date RRRR-MM-DD --out poza_repo/ads_flat.csv` (wynik poza repozytorium). Następnie `python tools/audit_dataset.py poza_repo/ads_flat.csv` → wpisz do P01, P02, P03, P05, P06, P10, P11. Zapisz hash pliku wejściowego w dzienniku.
 
 Reakcje:
 - brakuje kolumn wymaganych → zwróć do inżyniera danych z listą (03, sekcja 2);

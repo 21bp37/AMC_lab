@@ -6,7 +6,7 @@
 
 **Hipoteza (z ustaleń zespołu):** Mediana czasu życia reklam typu deepfake scam nie przekracza 2 dni kalendarzowych, lecz mimo tak krótkiej obecności ponad 50% z nich osiąga szacunkowo 25 tys. impresji na dzień aktywności, co jest zgodne z taktyką agresywnego budżetu startowego (*burst-and-burn*). Progi (2 dni, 25 tys., 50%) mogą się jeszcze zmienić i są w kodzie parametrami.
 
-**Źródło danych (z ustaleń zespołu):** głównie TikTok (Commercial Content Library i API; dane z UE). **Ograniczenie danych:** tylko wartości zagregowane (suma wyświetleń za okres podzielona przez liczbę dni), bez rozkładu godzinowego.
+**Źródło danych (z ustaleń zespołu):** głównie TikTok (Commercial Content Library i API; dane z UE). **Ograniczenie danych:** tylko wartości zagregowane (zasięg za okres podzielony przez liczbę dni), bez rozkładu godzinowego. Z próbki pilotażowej (44 reklamy): zasięg to unikalni użytkownicy w przedziałach, a nie impresje; reklamy usunięte przez TikTok nie mają kreacji ani reklamodawcy (R23).
 
 **Status:** zakres: codebook, gold standard, walidacja annotatora ocenianego, analiza błędów. Treści od leada i inżyniera danych wpisano tylko tam, gdzie wynikają one z ustaleń zespołu lub z oficjalnych stron TikToka; reszta pozostaje placeholderami.
 
@@ -35,9 +35,10 @@
 | Pytanie badawcze i hipoteza (P26), definicja dziennej intensywności (P27) | wpisane z ustaleń zespołu | [LEAD] |
 | Czas życia: jednostka (dni kalendarzowe) | wpisane; konwencja „włącznie” do potwierdzenia | [LEAD] |
 | Źródło (TikTok), kraje (UE), retencja (do roku od ostatniego wyświetlenia) | wpisane z oficjalnych stron | [INŻ. DANYCH] |
-| Znaczenie pól dat i wyświetleń, kreacje w API, warunki zapisu danych (P04, P06, P07) | otwarte | [INŻ. DANYCH] |
-| Ramka, okno dat, języki, liczebności, statystyki opisowe (P01, P02, P10, P11, P17, P29) | otwarte | [INŻ. DANYCH] |
-| Reklamy aktywne i obcięte (P28), zawężenie populacji (P30), reguła decyzyjna (P32), skład annotatorów (P21), stan wiedzy (P31) | otwarte | [LEAD] |
+| Pola dat i zasięgu (P06), język (P10), adres docelowy (P05) | wpisane z próbki pilotażowej (44 reklamy); do potwierdzenia na pełnym zbiorze | [INŻ. DANYCH] |
+| Kreacje w API i warunki zapisu danych (P04, P07) | otwarte | [INŻ. DANYCH] |
+| Ramka, okno dat i liczebności pełnego zbioru (P01, P02, P29) | otwarte | [INŻ. DANYCH] |
+| Reklamy aktywne i obcięte (P28), zawężenie populacji (P30), reguła decyzyjna (P32), miara intensywności (P33), skład annotatorów (P21), stan wiedzy (P31) | otwarte | [LEAD] |
 | Pilotaż, α, wyniki annotatora ocenianego, prevalence (P09, P13, P14, P15) | czekają na dane | [PIPELINE] |
 | Model przeżycia, korekty końcowe (P12) | czekają na dane | [ANALITYK] |
 
@@ -52,6 +53,7 @@
 - 07. Bibliografia z adnotacjami i statusem weryfikacji
 - 09. Ujawnienie użycia AI i dziennik wkładu
 - 10. Playbook: co robić po otrzymaniu danych
+
 
 
 
@@ -78,23 +80,23 @@ Reguły: (1) placeholder zostaje w tekście, dopóki ktoś nie wpisze wartości 
 
 | ID | Co trzeba wpisać | Właściciel | Zależy od | Punkt decyzyjny | Status |
 |---|---|---|---|---|---|
-| P01 | Okno dat i języki próby. **Wpisane:** źródło = TikTok Commercial Content Library / API; kraje = UE (zakres źródła) | [INŻ. DANYCH] | wybór źródła, dostępność | D2, D8 | częściowo |
-| P02 | Liczba rekordów: reklam, unikatowych kreacji, reklamodawców (po deduplikacji) | [INŻ. DANYCH] | pobranie danych | D2, D7 | otwarty |
+| P01 | Okno dat pełnego pobrania. **Wpisane:** źródło = TikTok Commercial Content Library / API; kraje = UE; próbka pilotażowa (44 reklamy, pobrana 2026-10-12): pierwszy dzień emisji 2025-09-30 do 2026-10-03 | [INŻ. DANYCH] | wybór źródła, dostępność | D2, D8 | częściowo |
+| P02 | Liczba reklam, kreacji, reklamodawców w pełnym zbiorze (po deduplikacji). **Próbka pilotażowa:** 44 reklamy, 14 rozpoznawalnych reklamodawców, 8 reklam bez reklamodawcy | [INŻ. DANYCH] | pełne pobranie | D2, D7 | częściowo |
 | P03 | Data pobrania (jest zmienną). **Wpisane:** retencja źródła = do roku od ostatniego wyświetlenia reklamy (oficjalna strona API) | [INŻ. DANYCH] | pobranie danych | D2, D6 | częściowo |
 | P04 | Czy kreacje (obraz/wideo) są legalnie dostępne i na jakiej podstawie | [INŻ. DANYCH] | regulamin źródła, ewentualna zgoda prowadzącego | D1 | otwarty |
-| P05 | Czy dostępny jest adres docelowy reklamy (domena); opcjonalny, tylko jako pole opisowe | [INŻ. DANYCH] | pola źródła | — | otwarty |
-| P06 | Pola czasu emisji i wyświetleń w TikTok Commercial Content Library / API: czy daty to pierwszy i ostatni dzień wyświetlania, jak oznaczone są reklamy aktywne, czy „liczba osób, które zobaczyły reklamę” to wyświetlenia czy unikatowi odbiorcy, wartość czy przedział, suma za okres czy rozbicie. **Wpisane:** strona API wymienia datę publikacji, „last seen date” i liczbę osób; **ustalone przez zespół:** dane tylko zagregowane (suma za okres, nie rozkład godzinowy) | [INŻ. DANYCH] | oficjalna dokumentacja źródła | D6 | częściowo |
+| P05 | Adres docelowy reklamy. **Ustalone na próbce pilotażowej:** pola nie ma w danych; zewnętrznej listy scamów nie używamy, więc nie jest potrzebne | [INŻ. DANYCH] | pola źródła | — | wpisane (do potwierdzenia na pełnym zbiorze) |
+| P06 | Znaczenie pól czasu emisji i zasięgu. **Ustalone na próbce pilotażowej:** daty `first_shown_date` i `last_shown_date` (RRRRMMDD) są u wszystkich reklam; zasięg `unique_users_seen` to unikalni użytkownicy jako przedział; status „active”/„inactive” z komunikatem o usunięciu; dane zagregowane (suma za okres) | [INŻ. DANYCH] | dokumentacja źródła | D6 | wpisane z próbki (do potwierdzenia w dokumentacji) |
 | P07 | Macierz legalności: źródło, podstawa prawna/ToS/licencja, pola, retencja, wolno zapisać | [INŻ. DANYCH] | lektura regulaminów | D1, D6 | otwarty |
 | P08 | Data statement: link i wersja | [INŻ. DANYCH] | P07 | wszystkie | otwarty |
 | P09 | Prevalence scamu i podejrzenia deepfake'a w próbie eksploracyjnej, z CI | [PIPELINE] | dane, pilotaż | D2 | otwarty |
-| P10 | Rozkład języków i udział reklam po polsku | [INŻ. DANYCH] | dane | D8 | otwarty |
-| P11 | Liczba klastrów (reklamodawców) i udział 10 największych | [INŻ. DANYCH] | dane | D7 | otwarty |
+| P10 | Rozkład języków. **Ustalone:** źródło nie podaje języka reklamy (pole targetowania puste dla 43 z 44); język ustalany z kreacji | [INŻ. DANYCH] | kodowanie | D8 | wpisane (język z kodowania) |
+| P11 | Liczba klastrów i udział 10 największych. **Próbka pilotażowa:** 14 reklamodawców + 8 reklam bez reklamodawcy; 3 największych ma 25 z 44 reklam (57%); w pełnym zbiorze do powtórzenia | [INŻ. DANYCH] | dane | D7 | częściowo |
 | P12 | Szacunek ICC i efektu projektu (deff) | [PIPELINE] / [ANALITYK] | dane z etykietami | D7 | otwarty |
 | P13 | Wynik pilotażu annotacji: alpha per zmienna z CI | [PIPELINE] | pilotaż | D3 | otwarty |
 | P14 | Wynik pierwszego testu annotatora ocenianego względem gold standardu | [PIPELINE] | pilotaż, wybór annotatora ocenianego | D5 | otwarty |
 | P15 | Wybrany annotator oceniany: nazwa, wersja, parametry | [PIPELINE] | D1, D5, P20 | D5 | otwarty |
 | P16 | Koszt i limity przetwarzania całości danych | [PIPELINE] | P02, P15 | D5 | otwarty |
-| P17 | Wyniki eksploracji: rozkłady reklam w czasie, wstępne rozkłady czasu życia L i dziennej intensywności I | [INŻ. DANYCH] | dane | D2 | otwarty |
+| P17 | Wyniki eksploracji: rozkłady reklam w czasie, wstępne rozkłady L i I. **Próbka pilotażowa:** zob. M1_karta_eksploracji_danych.md, sekcja 4 (cała ramka, bez klasyfikacji) | [INŻ. DANYCH] | dane | D2 | częściowo |
 | P18 | (wycofane: źródło Lista Ostrzeżeń CERT Polska usunięte decyzją zespołu) | — | — | — | wycofane |
 | P19 | (wycofane: pokrycie listy CERT; źródło usunięte) | — | — | — | wycofane |
 | P20 | Ścieżka dostępu: wniosek o TikTok Commercial Content API (konto deweloperskie, wniosek badawczy) i środowisko analizy. **Wpisane:** API otwarte dla publiczności i badaczy po wniosku (strona produktu) | [LEAD] / [INŻ. DANYCH] | uczelnia, wniosek | D1, D5 | częściowo |
@@ -105,11 +107,12 @@ Reguły: (1) placeholder zostaje w tekście, dopóki ktoś nie wpisze wartości 
 | P25 | Lista osób publicznych dla baseline'u słownikowego: źródło, licencja, wersja | [PIPELINE] / [INŻ. DANYCH] | licencja źródła listy | D5 | otwarty |
 | P26 | Hipoteza i brzmienie pytania badawczego. **Wpisane z ustaleń leada (2026-10-12):** pytanie o medianę czasu życia i dzienną intensywność; hipoteza: mediana ≤ 2 dni, ponad 50% reklam ≥ 25 tys. wyświetleń na dzień (liczby mogą się zmienić; parametry T_L, T_I, p_min w 01) | [LEAD] | decyzja zespołu | — | wpisane (do potwierdzenia liczb) |
 | P27 | Definicja wielkości mierzonych. **Wpisane z ustaleń leada:** dzienna intensywność = skumulowane impresje / liczba aktywnych dni; jednostka = reklama. Skala (liczba reklam) nie jest wielkością szukaną | [LEAD] | decyzja zespołu, P06 | D2, D6 | wpisane |
-| P28 | Czas życia reklamy. **Wpisane:** dni kalendarzowe (włącznie z pierwszym i ostatnim: pipeline, do potwierdzenia). **Otwarte:** traktowanie reklam wciąż aktywnych w dniu pobrania i reklam rozpoczętych przed oknem źródła | [LEAD] / [INŻ. DANYCH] | P06, P03 | D6 | częściowo |
+| P28 | Czas życia reklamy. **Wpisane:** dni kalendarzowe (włącznie z pierwszym i ostatnim: pipeline, do potwierdzenia). **Otwarte:** definicja reklamy wciąż aktywnej (status „active” nie oznacza emisji w toku: 24 z 36 reklam „active” miało ostatni dzień emisji ponad 30 dni przed pobraniem) i reklam rozpoczętych przed oknem źródła | [LEAD] / [INŻ. DANYCH] | P06, P03 | D6 | częściowo |
 | P29 | Ramka: jak zbudowano zbiór reklam kandydujących (kryteria, zapytania, lista) | [INŻ. DANYCH] / [LEAD] | źródło, P01 | D9 | otwarty |
 | P30 | Czy populacja jest zawężona do deepfake'ów z wizerunkiem osoby publicznej (pytanie projektowe), czy obejmuje wszystkie deepfake scamy (pytanie badawcze); **wpisane:** deepfake (podejrzenie) jest kryterium populacji | [LEAD] | decyzja zespołu, D1 | D1 | częściowo |
 | P31 | Stan wiedzy i uzasadnienie wartości badania | [LEAD] | lektura | — | otwarty |
 | P32 | Reguła rozstrzygnięcia hipotezy (jej składowych: czas życia i intensywność; położenie przedziału ufności względem progów) | [LEAD] / [ANALITYK] | P13, P12 | D2 | otwarty |
+| P33 | Miara intensywności: źródło daje unikalnych użytkowników (przedziały), nie impresje; czy hipoteza i próg 25 tys. dotyczą tej miary i jak obsłużyć przedziały (dolna/górna granica) | [LEAD] | P06 | D6 | otwarty |
 
 ## Punkty decyzyjne
 
@@ -122,7 +125,7 @@ Każdy punkt ma postać: jeśli (wynik z danych), to (zmiana planu). Progi pocho
 | D3 | Czy zmienne osiągają α ≥ 0,80 (wiarygodne) lub ≥ 0,667 (tylko wnioski wstępne)? (P13) | użyj zmiennej w analizie z odpowiednim zastrzeżeniem | popraw definicję i powtórz pilotaż; po drugiej nieudanej rundzie usuń zmienną z pomiaru |
 | D4 | (wycofany: dowód zewnętrzny z listy CERT; źródło usunięte decyzją zespołu) | — | scam wyłącznie z oceny annotatorów referencyjnych według codebooka, z jawnym zastrzeżeniem o błędzie etykiety (06, R03) |
 | D5 | Czy annotator oceniany jest wystarczająco zgodny z gold standardem? (P14) | użyj do całości z korektą błędu (05) | kodowanie ręczne mniejszej próby (wariant E w 04) lub zmiana annotatora ocenianego |
-| D6 | Czy dostępne są daty początku i końca emisji (czas życia) oraz skumulowane wyświetlenia za okres (dzienna intensywność)? (P06, P28) | zmienne wynikowe L i I z metadanych (`tools/outcomes.py`) | pomiar czasu życia lub intensywności niemożliwy; wynik negatywny o pomiarze (01, sekcja 8) |
+| D6 | Czy dostępne są daty początku i końca emisji (czas życia) oraz zasięg za okres (dzienna intensywność)? (P06, P28, P33) | zmienne wynikowe L i I z metadanych (`tools/outcomes.py`) | pomiar czasu życia lub intensywności niemożliwy; wynik negatywny o pomiarze (01, sekcja 8) |
 | D7 | Czy liczba klastrów jest wystarczająca? (P11, P12) | bootstrap klastrowy lub efekty losowe | agreguj do poziomu reklamodawcy lub kampanii; przy bardzo małej liczbie klastrów wnioskowanie tylko opisowe [cameron2015] |
 | D8 | Czy udział reklam po polsku jest wystarczający? (P10) | analiza łączna | analizy osobno per język, wnioski ograniczone do języka z próbą |
 | D9 | Czy ramka (P29) jest zbudowana niezależnie od wyniku annotatora ocenianego i od kryterium „scam”? | wyniki można interpretować względem ramki | wyniki raportujemy wyłącznie dla ramki, bez uogólnienia na populację reklam |
@@ -148,17 +151,19 @@ Karta M1 jest oceniana za: konkretność pytania, jakość eksploracji i spójno
 | Parametr | Wartość teraz | Użycie |
 |---|---|---|
 | T_L: próg mediany czasu życia | 2 dni kalendarzowe | składowa o czasie życia: mediana L ≤ T_L |
-| T_I: próg dziennej intensywności | 25 000 wyświetleń na dzień | składowa o intensywności: udział reklam z I ≥ T_I |
+| T_I: próg dziennej intensywności | 25 000 na dzień (jednostka do potwierdzenia: P33) | składowa o intensywności: udział reklam z I ≥ T_I |
 | p_min: wymagany udział | 50% | składowa o intensywności: udział reklam z I ≥ T_I jest większy niż p_min |
 
 **Operacjonalizacja przyjęta przez pipeline** (do potwierdzenia przez leada i analityka):
 
 - **L (czas życia)** = liczba dni kalendarzowych od pierwszego do ostatniego dnia emisji, **włącznie z oboma** (`delivery_stop − delivery_start + 1`); reklama wyświetlana jednego dnia ma L = 1. To ważne dla progu T_L = 2, bo zmiana konwencji o jeden dzień zmienia wniosek.
-- **I (dzienna intensywność)** = skumulowane wyświetlenia (`reach_total`) / L. Liczba „aktywnych dni” jest przybliżona rozpiętością od pierwszej do ostatniej emisji (źródło nie ujawnia dni przerwy, jeśli były).
+- **I (dzienna intensywność)** = zasięg za okres emisji (`reach_total`) / L. W próbce pilotażowej jedyną dostępną miarą jest liczba **unikalnych użytkowników** w przedziale (nie impresje), więc I liczymy dla dolnej i górnej granicy przedziału i dla jego środka. Liczba „aktywnych dni” jest przybliżona rozpiętością od pierwszej do ostatniej emisji (źródło nie ujawnia dni przerwy, jeśli były).
+>
+> **[LEAD – DO WYPEŁNIENIA]** Czy hipoteza i próg T_I odnoszą się do unikalnych użytkowników na dzień, i jak obsłużyć przedziały: {{P33: miara intensywności i obsługa przedziałów | zależy od: lead, P06 | domyślnie: brak}}
 - **Hipoteza jest jedna, o dwóch składowych:** (a) mediana L w populacji badanej ≤ T_L; (b) udział reklam populacji z I ≥ T_I jest większy niż p_min (równoważnie: mediana I ≥ T_I). Hipotezę uznajemy za wspartą w całości dopiero, gdy wspierane są obie składowe.
 - Obie wielkości są liczone **na populacji badanej**, czyli na reklamach sklasyfikowanych jako deepfake scam (sekcja 4), z korektą błędu klasyfikacji (05, sekcja 6).
 
-**Czego dane nie pozwolą ocenić (uczciwe zastrzeżenie dla karty M1).** Źródło daje **sumę wyświetleń za cały okres emisji**, a nie przebieg godzina po godzinie ani dzień po dniu. Dzienna intensywność jest więc wartością *średnią* (suma podzielona przez liczbę dni). Wysoka średnia intensywność przy krótkim życiu jest **zgodna z** taktyką *burst-and-burn*, ale jej nie dowodzi: ta taktyka dotyczy rozkładu w czasie (duży budżet na początku, potem wygaszenie), którego nie obserwujemy. Zdanie „co potwierdza stosowanie taktyki” w hipotezie jest interpretacją wykraczającą poza dane; w preprincie proponujemy sformułowanie „co jest zgodne z” (decyzja leada, R20). Dodatkowo krótkie życie może wynikać z szybkiego usuwania reklam przez platformę, a nie z decyzji reklamodawcy (R02).
+**Czego dane nie pozwolą ocenić (uczciwe zastrzeżenie dla karty M1).** Źródło daje **zasięg za cały okres emisji** (unikalni użytkownicy, w przedziale), a nie przebieg godzina po godzinie ani dzień po dniu. Dzienna intensywność jest więc wartością *średnią* (zasięg podzielony przez liczbę dni). Wysoka średnia intensywność przy krótkim życiu jest **zgodna z** taktyką *burst-and-burn*, ale jej nie dowodzi: ta taktyka dotyczy rozkładu w czasie (duży budżet na początku, potem wygaszenie), którego nie obserwujemy. Zdanie „co potwierdza stosowanie taktyki” w hipotezie jest interpretacją wykraczającą poza dane; w preprincie proponujemy sformułowanie „co jest zgodne z” (decyzja leada, R20). Dodatkowo krótkie życie może wynikać z szybkiego usuwania reklam przez platformę, a nie z decyzji reklamodawcy (R02).
 
 > **[LEAD – DO WYPEŁNIENIA]** Reguła rozstrzygnięcia hipotez (np. co uznajemy za wsparcie hipotezy i jej składowych: położenie przedziału ufności względem T_L, T_I i p_min): {{P32: reguła decyzyjna dla hipotezy (np. położenie przedziału ufności względem T_L, T_I i p_min) | zależy od: lead, analityk, P13 | domyślnie: brak}}
 >
@@ -236,9 +241,9 @@ Szczegóły: 02 (codebook), 04 (annotator oceniany), 05 (próba i walidacja).
 | Pytanie | Co wiemy | Kto rozstrzyga | Co rozstrzygną dane |
 |---|---|---|---|
 | Czy jest legalne źródło reklam? | TikTok Commercial Content Library i API: publiczny dostęp, API po wniosku dla badaczy, dane z UE [tiktokcca; tiktokcclnews2023]; warunki dla zapisu i publikacji danych do sprawdzenia w regulaminie | [INŻ. DANYCH] | P07, P20 |
-| Czy dostępne są daty początku i końca emisji? | Strona API wymienia datę publikacji i „last seen date”; **nie potwierdzono**, że to pierwszy i ostatni dzień wyświetlania i jak oznaczane są reklamy wciąż aktywne | [INŻ. DANYCH] | D6, P06, P28 |
-| Czy dostępna jest liczba wyświetleń? | Strona API wymienia „liczbę osób, które zobaczyły reklamę”; **nie potwierdzono**, czy to wyświetlenia czy unikatowi odbiorcy, czy podawana jest wartość czy przedział i czy jest to suma za okres | [INŻ. DANYCH] | D6, P06 |
-| Czy dostępne są kreacje (wideo), potrzebne do wskazania deepfake'a? | Biblioteka zawiera kreacje; **nie potwierdzono** zakresu w API ani prawa do zapisu i przetwarzania | [INŻ. DANYCH] | D1, P04 |
+| Czy dostępne są daty początku i końca emisji? | **Tak, w próbce pilotażowej** (44 reklamy): `first_shown_date` i `last_shown_date` u wszystkich; status „active” nie oznacza emisji w toku (P28) | [INŻ. DANYCH] | potwierdzenie na pełnym zbiorze; D6, P28 |
+| Czy dostępny jest zasięg? | **Tak, ale jako przedział unikalnych użytkowników**, nie impresje; 24 z 44 przedziałów ma rozpiętość co najmniej 5-krotną | [LEAD] | P33, D6 |
+| Czy dostępne są kreacje (wideo), potrzebne do wskazania deepfake'a? | **Częściowo:** są dla reklam aktywnych (35 wideo z 36); **brak dla 8 reklam usuniętych**, które są najkrótsze (R23); prawo do zapisu i przetwarzania nieustalone | [INŻ. DANYCH] | D1, P04, P07 |
 | Czy jest dość reklam deepfake scam do oszacowania mediany i udziału? | Nieznane; zależy od prevalence deepfake scamów w ramce | [PIPELINE] | D2, P09, P02 |
 | Czy annotator oceniany zadziała? | Literatura dla tekstu, angielskiego; **brak równorzędnej walidacji dla reklam wideo i dla wykrywania deepfake'ów** [gilardi2023; ziems2024] | [PIPELINE] | D5, P14 |
 
@@ -247,9 +252,9 @@ Szczegóły: 02 (codebook), 04 (annotator oceniany), 05 (próba i walidacja).
 ## 9. Wyniki wstępnej eksploracji (uzupełnić po otrzymaniu danych)
 
 > **[INŻ. DANYCH – DO WYPEŁNIENIA]** statystyki opisowe zbioru:
-> - Zakres i rozkład w czasie: {{P17: rozkład reklam w czasie, w tym wstępne rozkłady L i I | zależy od: dane | domyślnie: brak}}
-> - Języki: {{P10: rozkład języków | zależy od: dane | domyślnie: brak}}
-> - Koncentracja reklamodawców: {{P11: liczba klastrów i udział 10 największych | zależy od: dane | domyślnie: brak}}
+> - Zakres i rozkład w czasie (próbka pilotażowa, 44 reklamy, pobrane 2026-10-12): pierwszy dzień emisji 2025-09-30 do 2026-10-03; mediana L 10 dni, 36% reklam z L ≤ 2; szczegóły w M1_karta_eksploracji_danych.md, sekcja 4. Do powtórzenia na pełnym zbiorze.
+> - Języki: źródło nie podaje języka reklamy (pole puste dla 43 z 44); język ustalany z kreacji w kodowaniu; reklamy z próbki są dostarczane głównie do Polski (36 z 44).
+> - Koncentracja reklamodawców (próbka pilotażowa): 14 rozpoznawalnych reklamodawców, 3 największych ma 25 z 44 reklam (57%); 8 reklam (wszystkie usunięte) bez danych reklamodawcy. Do powtórzenia na pełnym zbiorze.
 
 > **[PIPELINE – DO WYPEŁNIENIA po pilotażu]**
 > - Prevalence scamu i podejrzenia deepfake'a (z ręcznie przejrzanych 50–100 losowych rekordów, z CI): {{P09: prevalence | zależy od: dane, pilotaż | domyślnie: brak}}
@@ -505,7 +510,7 @@ Kolumny **wymagane** to minimum do wykonania planu pomiaru (01). Kolumny **warun
 | `language` | język tekstu (metoda detekcji opisana) | tak | D8 |
 | `cta_label` | etykieta przycisku wezwania do działania | jeśli dostępna | |
 | `dest_url` lub `dest_domain` | adres docelowy | opcjonalna | tylko pole opisowe (zewnętrznej listy scamów nie używamy); P05 |
-| `reach_total` | skumulowana liczba wyświetleń (lub osób, które zobaczyły reklamę) za cały okres emisji, jako liczba lub przedział | tak | dzienna intensywność I = reach_total / L (P27); ustalono, że źródło daje tylko sumę za okres, bez rozkładu godzinowego ani dziennego. Czy to wyświetlenia czy unikatowi odbiorcy, wartość czy przedział: P06. Przy przedziałach: kolumny `reach_min`, `reach_max` |
+| `reach_total`, `reach_min`, `reach_max` | zasięg za cały okres emisji: **liczba unikalnych użytkowników podana jako przedział** (`unique_users_seen`, np. „400K–500K”); `reach_min` i `reach_max` to granice, `reach_total` to środek przedziału | tak | dzienna intensywność I = zasięg / L (P27, P33). Ustalone na próbce pilotażowej: to unikalni użytkownicy, nie impresje; dane zagregowane (suma za okres, bez rozkładu godzinowego). Ładowanie: `tools/load_tiktok_json.py` |
 | `reach_*` (inne) | rozbicia zasięgu (kraj, wiek, płeć), jeśli źródło je zwraca | jeśli dostępne | opis, nie wymagane do pytania |
 | `frame_source` | kryterium lub zapytanie, przez które reklama trafiła do ramki | warunkowa | niezależność ramki od annotatora ocenianego (D9, P29) |
 | `creative_available` | czy kreacja (obraz/wideo) jest legalnie dostępna | tak | D1 |
@@ -513,7 +518,7 @@ Kolumny **wymagane** to minimum do wykonania planu pomiaru (01). Kolumny **warun
 | `source_removed_flag` | czy źródło oznacza reklamę jako usuniętą/naruszającą zasady | jeśli dostępne | dowód zewnętrzny, nie wynik; R03 |
 | `source_name`, `source_version` | skąd i w jakiej wersji | tak | odtwarzalność |
 
-Dostępność poszczególnych pól (według oficjalnej dokumentacji, nie scraperów): {{P06: znaczenie pól czasu emisji i wyświetleń w TikTok Commercial Content Library / API | zależy od: oficjalna dokumentacja źródła | domyślnie: nieznane}}. Wiadomo z oficjalnej strony API: pola daty publikacji i „last seen date”, „liczba osób, które zobaczyły reklamę”, targetowanie dla reklam płatnych, metadane reklamy i reklamodawcy; dane tylko z UE; dostęp do roku od ostatniego wyświetlenia [tiktokcca].
+Dostępność pól (ustalona na próbce pilotażowej z 44 reklam, do potwierdzenia na pełnym zbiorze i w oficjalnej dokumentacji): daty pierwszego i ostatniego dnia emisji (RRRRMMDD), zasięg jako przedział unikalnych użytkowników z rozbiciem po krajach, wieku i płci, status „active”/„inactive” z komunikatem o usunięciu, targetowanie, adresy wideo i obrazów (podpisane, wygasające linki) dla reklam aktywnych. **Brak:** tekstu reklamy, adresu docelowego, języka reklamy; dla reklam usuniętych brak mediów i danych reklamodawcy (R23). Oficjalna strona API [tiktokcca] wymienia datę publikacji, „last seen date”, liczbę osób, targetowanie i metadane. Dane osobowe: nazwy reklamodawców mogą identyfikować osoby fizyczne (jednoosobowa działalność); zapisujemy tylko `business_id`.
 
 ## 3. Macierz legalności: szkielet
 
@@ -775,12 +780,13 @@ Ryzyka są wpisem do karty M1 (jawne ograniczenia i źródła błędu to kryteri
 | R20 | **[LEAD / PIPELINE]** **Dane zagregowane: brak rozkładu w czasie.** Źródło daje sumę wyświetleń za okres, a nie wartości godzinowe czy dzienne; dzienna intensywność to średnia. Interpretacja *burst-and-burn* dotyczy przebiegu (budżet na początku), którego nie obserwujemy | Hipoteza o taktyce nie może być potwierdzona danymi, tylko uznana za zgodną lub niezgodną z nimi | wysokie | wysoki | Formułować wniosek jako „zgodne z” (decyzja leada, P26); nie używać słowa „potwierdza”; jeśli źródło daje rozbicie po dniach, wykorzystać je (P06) | dostępność wartości dziennych (P06) |
 | R21 | **[PIPELINE / ANALITYK]** **Zależność mechaniczna L i I**: I = suma / L, więc dla L = 1 intensywność równa jest całej sumie; krótkie reklamy mają większą i bardziej zmienną I; konwencja liczenia dni (włącznie lub nie) zmienia wniosek przy progu 2 dni | Przeszacowanie lub niedoszacowanie udziału I ≥ T_I; wrażliwość składowej o czasie życia na konwencję | wysokie | wysoki | Konwencja jawna (01); raportowanie także skumulowanych wyświetleń; analiza wrażliwości na konwencję (L bez dnia pierwszego) i na minimalną długość emisji | rozkład L; udział reklam z L = 1; mediana `reach_total` |
 | R22 | **[INŻ. DANYCH / PIPELINE]** **Definicja i dokładność pola wyświetleń**: „liczba osób, które zobaczyły reklamę” może być zasięgiem unikatowym, nie wyświetleniami; wartość może być przedziałem lub zaokrągleniem; próg 25 tys. może wypaść wewnątrz przedziału | Niepewna klasyfikacja reklam względem T_I; nazwa „impresje” może być nieścisła | średnie | wysoki | Ustalić znaczenie pola (P06); przy przedziałach policzyć udział dla dolnej i górnej granicy; nazwać wielkość tak, jak definiuje ją źródło | udział przedziałów obejmujących T_I; wartości zero lub brakujące |
+| R23 | **[INŻ. DANYCH / PIPELINE]** **Reklamy usunięte przez platformę nie mają kreacji ani reklamodawcy**: w próbce pilotażowej 8 z 44 reklam ma status „inactive” (usunięte), wszystkie z L ≤ 2, bez mediów i bez danych reklamodawcy | Populacja możliwa do zakodowania z kreacji jest obciążona w stronę reklam dłużej żyjących (mediana L zawyżona); usuniętych nie da się przypisać do klastra | wysokie | wysoki | Jawne zastrzeżenie; analiza wrażliwości z założeniem skrajnym (usunięte reklamy dodane do populacji); pytanie o legalny dostęp do kreacji usuniętych (P04, P07); nie definiować scamu przez usunięcie (R03) | udział reklam bez mediów i bez reklamodawcy według statusu (`audit_dataset.py`) |
 
 ## Wnioski do karty M1
 
-1. Najpoważniejsze zagrożenia dla pytania o medianę czasu życia i dzienną intensywność to R19 (deepfake tylko podejrzewany, a jest kryterium populacji), R20 (dane zagregowane), R21 (zależność L i I), R02 i R03 (egzekwowanie platformy a czas życia), R17 (cenzurowanie) i R18 (ramka). Są strukturalne (wynikają z konstrukcji badania i danych), nie techniczne.
+1. Najpoważniejsze zagrożenia dla pytania o medianę czasu życia i dzienną intensywność to R19 (deepfake tylko podejrzewany, a jest kryterium populacji), R20 (dane zagregowane), R21 (zależność L i I), R02 i R03 (egzekwowanie platformy a czas życia), R17 (cenzurowanie), R18 (ramka) i R23 (usunięte reklamy bez kreacji). Są strukturalne (wynikają z konstrukcji badania i danych), nie techniczne.
 2. Część z nich nie jest usuwalna; jest jawnie opisywana jako ograniczenie, a sformułowanie wniosków (decyzja leada, P26) ma to odzwierciedlać, zwłaszcza w kwestii *burst-and-burn*.
-3. Ryzyka R10, R16, R17 i R22 mogą zawęzić albo uniemożliwić badanie; plan zakłada rozstrzygnięcie ich przed zbieraniem danych (D1, D6, macierz legalności).
+3. Ryzyka R10, R16, R17, R22 i R23 mogą zawęzić albo uniemożliwić badanie; plan zakłada rozstrzygnięcie ich przed zbieraniem danych (D1, D6, macierz legalności).
 
 ---
 
@@ -908,7 +914,7 @@ Kroki w kolejności. Każdy krok kończy się wpisem w rejestrze placeholderów 
 
 ## Krok 1. Audyt tabeli
 
-`python tools/audit_dataset.py dane.csv` → wpisz do P01, P02, P03, P05, P06, P10, P11. Zapisz hash pliku wejściowego w dzienniku.
+Jeśli dane przyszły jako JSON z TikToka: `python tools/load_tiktok_json.py plik.json --retrieval-date RRRR-MM-DD --out poza_repo/ads_flat.csv` (wynik poza repozytorium). Następnie `python tools/audit_dataset.py poza_repo/ads_flat.csv` → wpisz do P01, P02, P03, P05, P06, P10, P11. Zapisz hash pliku wejściowego w dzienniku.
 
 Reakcje:
 - brakuje kolumn wymaganych → zwróć do inżyniera danych z listą (03, sekcja 2);

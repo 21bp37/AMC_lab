@@ -23,7 +23,7 @@ Kolumny **wymagane** to minimum do wykonania planu pomiaru (01). Kolumny **warun
 | `language` | język tekstu (metoda detekcji opisana) | tak | D8 |
 | `cta_label` | etykieta przycisku wezwania do działania | jeśli dostępna | |
 | `dest_url` lub `dest_domain` | adres docelowy | opcjonalna | tylko pole opisowe (zewnętrznej listy scamów nie używamy); P05 |
-| `reach_total` | skumulowana liczba wyświetleń (lub osób, które zobaczyły reklamę) za cały okres emisji, jako liczba lub przedział | tak | dzienna intensywność I = reach_total / L (P27); ustalono, że źródło daje tylko sumę za okres, bez rozkładu godzinowego ani dziennego. Czy to wyświetlenia czy unikatowi odbiorcy, wartość czy przedział: P06. Przy przedziałach: kolumny `reach_min`, `reach_max` |
+| `reach_total`, `reach_min`, `reach_max` | zasięg za cały okres emisji: **liczba unikalnych użytkowników podana jako przedział** (`unique_users_seen`, np. „400K–500K”); `reach_min` i `reach_max` to granice, `reach_total` to środek przedziału | tak | dzienna intensywność I = zasięg / L (P27, P33). Ustalone na próbce pilotażowej: to unikalni użytkownicy, nie impresje; dane zagregowane (suma za okres, bez rozkładu godzinowego). Ładowanie: `tools/load_tiktok_json.py` |
 | `reach_*` (inne) | rozbicia zasięgu (kraj, wiek, płeć), jeśli źródło je zwraca | jeśli dostępne | opis, nie wymagane do pytania |
 | `frame_source` | kryterium lub zapytanie, przez które reklama trafiła do ramki | warunkowa | niezależność ramki od annotatora ocenianego (D9, P29) |
 | `creative_available` | czy kreacja (obraz/wideo) jest legalnie dostępna | tak | D1 |
@@ -31,7 +31,7 @@ Kolumny **wymagane** to minimum do wykonania planu pomiaru (01). Kolumny **warun
 | `source_removed_flag` | czy źródło oznacza reklamę jako usuniętą/naruszającą zasady | jeśli dostępne | dowód zewnętrzny, nie wynik; R03 |
 | `source_name`, `source_version` | skąd i w jakiej wersji | tak | odtwarzalność |
 
-Dostępność poszczególnych pól (według oficjalnej dokumentacji, nie scraperów): {{P06: znaczenie pól czasu emisji i wyświetleń w TikTok Commercial Content Library / API | zależy od: oficjalna dokumentacja źródła | domyślnie: nieznane}}. Wiadomo z oficjalnej strony API: pola daty publikacji i „last seen date”, „liczba osób, które zobaczyły reklamę”, targetowanie dla reklam płatnych, metadane reklamy i reklamodawcy; dane tylko z UE; dostęp do roku od ostatniego wyświetlenia [@tiktokcca].
+Dostępność pól (ustalona na próbce pilotażowej z 44 reklam, do potwierdzenia na pełnym zbiorze i w oficjalnej dokumentacji): daty pierwszego i ostatniego dnia emisji (RRRRMMDD), zasięg jako przedział unikalnych użytkowników z rozbiciem po krajach, wieku i płci, status „active”/„inactive” z komunikatem o usunięciu, targetowanie, adresy wideo i obrazów (podpisane, wygasające linki) dla reklam aktywnych. **Brak:** tekstu reklamy, adresu docelowego, języka reklamy; dla reklam usuniętych brak mediów i danych reklamodawcy (R23). Oficjalna strona API [@tiktokcca] wymienia datę publikacji, „last seen date”, liczbę osób, targetowanie i metadane. Dane osobowe: nazwy reklamodawców mogą identyfikować osoby fizyczne (jednoosobowa działalność); zapisujemy tylko `business_id`.
 
 ## 3. Macierz legalności: szkielet
 

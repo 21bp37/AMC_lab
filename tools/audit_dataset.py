@@ -15,7 +15,7 @@ import pandas as pd
 
 REQUIRED = ["ad_id", "creative_id", "advertiser_id", "platform", "retrieval_date", "ad_text", "language",
             "creative_available", "source_name", "source_version"]
-CONDITIONAL = ["delivery_start", "delivery_stop", "dest_url", "dest_domain", "creative_path", "source_removed_flag", "frame_source"]
+CONDITIONAL = ["delivery_start", "delivery_stop", "reach_total", "dest_url", "dest_domain", "creative_path", "source_removed_flag", "frame_source"]
 
 
 def concentration(counts: pd.Series) -> dict:
@@ -39,6 +39,7 @@ def audit(df: pd.DataFrame, advertiser_col: str = "advertiser_id", lang_col: str
         out["n_unique_creatives"] = int(df["creative_id"].nunique())
     if advertiser_col in df:
         out["n_advertisers"] = int(df[advertiser_col].nunique())
+        out["advertiser_missing_share"] = float(df[advertiser_col].isna().mean())
         out["concentration"] = concentration(df[advertiser_col].value_counts())
     for c in ("delivery_start", "delivery_stop", "retrieval_date"):
         if c in df:
@@ -68,7 +69,7 @@ def format_report(a: dict) -> str:
     L = ["# Audyt danych", f"- wierszy: {a['n_rows']}"]
     L.append(f"- brakujące kolumny wymagane: {a['missing_required_columns'] or 'brak'}")
     L.append(f"- obecne kolumny warunkowe: {a['present_conditional_columns'] or 'brak'}")
-    L.append(f"- kolumny zasięgu: {a['reach_columns'] or 'brak (zasięg niedostępny; czy jest potrzebny, rozstrzyga lead: P27)'}")
+    L.append(f"- kolumny zasięgu: {a['reach_columns'] or 'brak (wyświetlenia/zasięg niedostępne: dzienna intensywność niemierzalna, D6)'}")
     if "duplicate_ad_id" in a:
         L.append(f"- zduplikowane ad_id: {a['duplicate_ad_id']}")
     if "n_unique_creatives" in a:
@@ -77,18 +78,20 @@ def format_report(a: dict) -> str:
         c = a["concentration"]
         L.append(f"- reklamodawców: {c['n_clusters']}; udział 10 największych: {c['top10_share']:.1%}; największy: {c['largest_share']:.1%}; "
                  f"HHI: {c['hhi']:.4f}; efektywna liczba klastrów: {c['effective_clusters']:.1f}  → P02, P11, D7")
+    if a.get("advertiser_missing_share", 0) > 0:
+        L.append(f"- reklamy bez identyfikatora reklamodawcy: {a['advertiser_missing_share']:.1%} (poza klastrami; sprawdź, czy dotyczą reklam usuniętych)  → R23")
     for k in ("delivery_start", "delivery_stop", "retrieval_date"):
         if k in a:
             L.append(f"- {k}: {a[k]['min']} do {a[k]['max']}, braki {a[k]['missing_share']:.1%}  → P03")
     if "open_ended_share" in a:
         L.append(f"- reklamy bez daty końca emisji (aktywne albo brak danych; cenzurowanie prawostronne): {a['open_ended_share']:.1%}; "
                  f"wiersze z ujemnym czasem emisji: {a['negative_duration_rows']}  → P28, D6")
-        L.append(f"- czas emisji reklam zakończonych (dni): {a['closed_duration_days']}  (opis; bez korekty cenzurowania)")
+        L.append(f"- czas emisji reklam zakończonych (dni): {a['closed_duration_days']}  (opis; bez korekty cenzurowania; liczone jako stop − start, czyli o 1 mniej niż czas życia L w tools/outcomes.py)")
     if "language_share" in a:
         L.append(f"- języki: {a['language_share']}  → P10, D8")
     for k in ("dest_url_nonnull_share", "dest_domain_nonnull_share"):
         if k in a:
-            L.append(f"- {k}: {a[k]:.1%}  → P05, D4")
+            L.append(f"- {k}: {a[k]:.1%}  → P05")
     if "creative_available_share" in a:
         L.append(f"- kreacje dostępne: {a['creative_available_share']:.1%}  → P04, D1")
     return "\n".join(L)
@@ -98,7 +101,9 @@ def main(argv=None):
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("csv"); p.add_argument("--advertiser", default="advertiser_id"); p.add_argument("--lang", default="language")
     a = p.parse_args(argv)
-    print(format_report(audit(pd.read_csv(a.csv), a.advertiser, a.lang)))
+    # identyfikatory jako tekst: długie identyfikatory liczbowe tracą precyzję przy wczytaniu jako float
+    id_cols = {c: str for c in ("ad_id", "creative_id", "advertiser_id", a.advertiser)}
+    print(format_report(audit(pd.read_csv(a.csv, dtype=id_cols), a.advertiser, a.lang)))
 
 
 if __name__ == "__main__":

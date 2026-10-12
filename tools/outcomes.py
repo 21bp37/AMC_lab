@@ -71,7 +71,13 @@ def median_lifetime_bounds(d: pd.DataFrame, weight: str = "weight") -> tuple[flo
 def _boot(d: pd.DataFrame, fn, cluster: str | None, boot: int, seed: int, level: float):
     rng = np.random.default_rng(seed)
     d = d.reset_index(drop=True)
-    groups = [g.index.to_numpy() for _, g in d.groupby(cluster)] if cluster and cluster in d else [np.array([i]) for i in range(len(d))]
+    if cluster and cluster in d:
+        # reklamy bez identyfikatora reklamodawcy (puste) traktujemy jako osobne klastry jednoelementowe, żeby nie znikały z bootstrapu
+        key = d[cluster].replace("", np.nan)
+        key = key.where(key.notna(), pd.Series([f"_brak_{i}" for i in d.index], index=d.index))
+        groups = [g.index.to_numpy() for _, g in d.groupby(key.astype(str))]
+    else:
+        groups = [np.array([i]) for i in range(len(d))]
     k = len(groups)
     vals = [fn(d.loc[np.concatenate([groups[i] for i in rng.integers(0, k, k)])]) for _ in range(boot)]
     a = (1 - level) / 2
@@ -90,7 +96,7 @@ def summarize(d: pd.DataFrame, thr_days: float = 2, thr_intensity: float = 25000
     med = lambda x: weighted_quantile(x["lifetime_days"], x[weight], 0.5)
     out["median_lifetime_days"] = dict(zip(("estimate", "ci_lo", "ci_hi"), _boot(d, med, cluster, boot, seed, 0.95)))
     out["median_lifetime_bounds"] = dict(zip(("lower_open_as_observed", "upper_open_as_infinite"), median_lifetime_bounds(d, weight)))
-    # H1 (mediana L <= T_L) jest równoważna temu, że udział reklam z L <= T_L wynosi co najmniej 50%
+    # składowa hipotezy o czasie życia (mediana L <= T_L) jest równoważna temu, że udział reklam z L <= T_L wynosi co najmniej 50%
     sl = lambda x: weighted_share_at_least(-x["lifetime_days"], x[weight], -thr_days)
     out["share_lifetime_le_threshold"] = dict(zip(("estimate", "ci_lo", "ci_hi"), _boot(d, sl, cluster, boot, seed, 0.95)))
     if "intensity_per_day" in d:
