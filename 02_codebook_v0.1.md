@@ -26,7 +26,7 @@ Jeśli kodowanie wykonuje jedna osoba, α między kodującymi nie da się policz
 ## Zasady ogólne
 
 1. **Jednostka kodowania:** pojedyncza unikatowa kreacja (`creative_id`); kopie tej samej kreacji u tego samego reklamodawcy są deduplikowane przed losowaniem (03, 05).
-2. **Kodowanie na ślepo:** annotator nie widzi zasięgu, czasu emisji, wyniku annotatora ocenianego ani dowodów zewnętrznych (lista CERT, usunięcie przez platformę). Powód: znajomość wyniku obciążałaby kodowanie kryteriów populacji.
+2. **Kodowanie na ślepo:** annotator nie widzi zasięgu, czasu emisji, wyniku annotatora ocenianego ani informacji zewnętrznych (usunięcie reklamy przez platformę). Powód: znajomość wyniku obciążałaby kodowanie kryteriów populacji.
 3. **Kodujemy to, co widać w reklamie**, nie to, co annotator wie z zewnątrz. Wyjątek: rozpoznanie osoby po opisie (`implied`) wymaga jednoznaczności opisu, a nie wiedzy specjalnej.
 4. **Kategoria `unsure` jest pełnoprawna.** Wybieraj ją zamiast zgadywać. Odsetek `unsure` jest raportowany; wysoki odsetek oznacza zbyt niejasną definicję.
 5. **Dwa poziomy:**
@@ -104,7 +104,7 @@ Zmienna oznacza *typ oferty*, a nie dowód oszustwa. `not_scam` i `unclear` pozw
 
 ### `scam_judgement`
 
-Ocena annotatora, czy reklama wygląda na oszukańczą (`scam`, `not_scam`, `unclear`) na podstawie wyłącznie reklamy. **Nie zastępuje dowodu zewnętrznego.** Służy jako zmienna pomocnicza i do analizy zgodności między oceną annotatora referencyjnego a dowodem zewnętrznym (sprawdzian, czy łatwo odróżnić scam od legalnej reklamy).
+Ocena annotatora, czy reklama wygląda na oszukańczą (`scam`, `not_scam`, `unclear`) na podstawie wyłącznie reklamy. Razem z `scam_type` (wartość inna niż `not_scam` i `unclear`) tworzy etykietę scamu, bo nie ma zewnętrznego dowodu. Reguła: reklama jest scamem, gdy annotator referencyjny zakoduje `scam_judgement` = `scam`; `scam_type` opisuje jego rodzaj. Niezgodność `scam_judgement` = `scam` i `scam_type` = `not_scam` jest błędem kodowania do wyjaśnienia na pilotażu. Brak niezależnego dowodu oznacza, że etykieta jest tak wiarygodna, jak zgodność annotatorów (α), i jest to jawne ograniczenie (06, R03).
 
 ### `urgency_cue` (dodatkowa)
 
@@ -186,9 +186,9 @@ Zmienna pomocnicza do `media_synthetic_suspected`: **główna przesłanka**, na 
 
 Reguły spójności (sprawdza `python tools/checks.py sheet`): przy `yes` i `suspected` wartość `none` i `na` jest niedozwolona; przy `no` i `na_no_media` przesłanka musi być `none` lub `na` (albo pusta).
 
-## Pola z dowodami zewnętrznymi (nie kodowane przez annotatorów)
+## Pola zewnętrzne (nie kodowane przez annotatorów)
 
-Wypełnia pipeline na podstawie danych i list publicznych, po zakończeniu kodowania kryteriów populacji: `dest_domain`, `domain_on_cert_list`, `cert_list_interval`, `platform_removal` (definicje w `tools/schema.yaml`). Dostępność zależy od P05, P18, P19.
+Wypełnia pipeline na podstawie danych źródła, po zakończeniu kodowania kryteriów populacji: `dest_domain` (opcjonalnie, jeśli źródło ją podaje), `platform_removal` (definicje w `tools/schema.yaml`). Dostępność zależy od P05 i P06. Zewnętrznej listy scamów nie używamy.
 
 ## Procedura
 

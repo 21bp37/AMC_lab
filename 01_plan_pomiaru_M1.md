@@ -43,7 +43,6 @@ Karta M1 jest oceniana za: konkretność pytania, jakość eksploracji i spójno
 |---|---|---|
 | Przynależność reklamy do populacji badanej: (a) scam, (b) podejrzenie deepfake'a | annotator oceniany, zwalidowany na gold standardzie; kreacja (wideo) wymaga D1 | [PIPELINE] |
 | Typ scamu, obecność osoby publicznej (warstwy do podziałów) | j.w. | [PIPELINE] |
-| Dowód zewnętrzny scamu (domena docelowa, Lista Ostrzeżeń CERT) | dane i lista | [INŻ. DANYCH] dostarcza, [PIPELINE] zestawia |
 | Czas życia L (początek i koniec emisji) | metadane źródła (daty pierwszego i ostatniego wyświetlenia) | [INŻ. DANYCH] dostarcza; obróbka (cenzurowanie, przeżycie): [ANALITYK] |
 | Skumulowane wyświetlenia → dzienna intensywność I | metadane źródła (liczba osób lub wyświetleń za okres) | [INŻ. DANYCH] dostarcza; I = suma / L liczy `tools/outcomes.py` |
 | Mediana L, udział I ≥ T_I, przedziały ufności | liczone na populacji badanej z korektą błędu klasyfikacji | [PIPELINE] estymata prosta, [ANALITYK] modele |
@@ -66,12 +65,9 @@ Annotator oceniany nie mierzy ani czasu życia, ani intensywności. Mierzy **prz
 
 Deepfake nie jest tu ustalany, tylko **podejrzewany** na podstawie kreacji (R19). Pytanie „typu deepfake scam” w obecnym brzmieniu wymaga dostępu do kreacji (wideo): bez D1 populacji nie da się zidentyfikować (sekcja 8). Wizerunek osoby publicznej (`celeb_mention`, `celeb_face_visible`, `celeb_category`) jest warstwą opisową, chyba że lead zawęży populację (P30).
 
-**Scam.** Dwie warstwy, rozdzielone celowo:
-1. *Typ oferty* z treści reklamy (`scam_type`, kodowany przez annotatorów, łącznie z wartościami `not_scam` i `unclear`).
-2. *Dowód zewnętrzny*: łańcuch reklama, domena docelowa, Lista Ostrzeżeń CERT Polska [@certlist]. Lista zawiera domeny wprowadzające w błąd i wyłudzające dane; według miesięcznych podsumowań CERT domeny są blokowane na 6 miesięcy, a jeśli nadal zawierają niebezpieczne treści, wpisuje się je ponownie. CSIRT KNF opisuje zgłaszanie do wpisu na tę listę domen z reklam fałszywych inwestycji publikowanych na Facebooku [@csirtknf2024]. Warunki: {{P18: warunki użycia Listy Ostrzeżeń | zależy od: inżynier danych | domyślnie: brak}}, {{P05: dostępność adresu docelowego | zależy od: pola źródła | domyślnie: nieznana}}, pokrycie: {{P19: odsetek domen z danych możliwych do zestawienia z listą | zależy od: P05, P18 | domyślnie: nieznane}}.
-3. *Ocena annotatora referencyjnego* (`scam_judgement`) jest zmienną pomocniczą, nie dowodem.
+**Scam.** Etykieta scamu pochodzi **wyłącznie z oceny annotatorów referencyjnych** według jawnej reguły codebooka (02): `scam_type` (typ oferty, łącznie z wartościami `not_scam` i `unclear`) oraz `scam_judgement` (czy reklama wygląda na oszukańczą). Zespół nie korzysta z zewnętrznej listy domen ani innego zewnętrznego dowodu scamu, więc nie ma niezależnego sprawdzianu etykiety; błąd etykiety jest jawnym ograniczeniem (R03) i jest szacowany pośrednio przez zgodność między annotatorami (α dla `scam_type` i `scam_judgement`).
 
-**Dlaczego nie wystarczy usunięcie reklamy przez platformę jako definicja scamu.** Jeśli „scam” = „usunięta”, to **czas życia jest z definicji czasem do usunięcia**, więc pytanie o czas życia staje się tautologią, a hipoteza o krótkim życiu byłaby spełniona z konstrukcji (R02, R03). Dlatego scam etykietujemy niezależnie od decyzji platformy, a decyzję platformy (`platform_removal`) traktujemy jako zmienną do analizy wrażliwości. Jeśli nie ma adresu docelowego, łańcuch dowodu odpada (D4) i trzeba to zapisać jako jawne zastrzeżenie.
+**Dlaczego nie wystarczy usunięcie reklamy przez platformę jako definicja scamu.** Jeśli „scam” = „usunięta”, to **czas życia jest z definicji czasem do usunięcia**, więc pytanie o czas życia staje się tautologią, a hipoteza o krótkim życiu byłaby spełniona z konstrukcji (R02, R03). Dlatego scam etykietujemy niezależnie od decyzji platformy, a decyzję platformy (`platform_removal`) traktujemy jako zmienną do analizy wrażliwości.
 
 ## 5. Zmienne kodowane przez annotatorów
 

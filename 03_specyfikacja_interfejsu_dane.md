@@ -8,7 +8,7 @@ Wszystkie dane pochodzą z legalnych źródeł, zgodnie z regulaminami stron i l
 
 ## 2. Wymagany schemat tabeli (jedna wiersz = jedna reklama w źródle)
 
-Kolumny **wymagane** to minimum do wykonania planu pomiaru (01). Kolumny **warunkowe** zależą od tego, co źródło legalnie udostępnia (punkty D1, D4, D6). Nazwy kolumn można zmienić, ale mapowanie musi być opisane.
+Kolumny **wymagane** to minimum do wykonania planu pomiaru (01). Kolumny **warunkowe** zależą od tego, co źródło legalnie udostępnia (punkty D1, D6). Nazwy kolumn można zmienić, ale mapowanie musi być opisane.
 
 | Kolumna | Opis | Wymagana? | Uwagi |
 |---|---|---|---|
@@ -22,7 +22,7 @@ Kolumny **wymagane** to minimum do wykonania planu pomiaru (01). Kolumny **warun
 | `ad_text`, `headline`, `link_caption` | tekst reklamy | tak | wejście dla poziomu L1 |
 | `language` | język tekstu (metoda detekcji opisana) | tak | D8 |
 | `cta_label` | etykieta przycisku wezwania do działania | jeśli dostępna | |
-| `dest_url` lub `dest_domain` | adres docelowy | warunkowa | łańcuch dowodu scamu (D4); P05 |
+| `dest_url` lub `dest_domain` | adres docelowy | opcjonalna | tylko pole opisowe (zewnętrznej listy scamów nie używamy); P05 |
 | `reach_total` | skumulowana liczba wyświetleń (lub osób, które zobaczyły reklamę) za cały okres emisji, jako liczba lub przedział | tak | dzienna intensywność I = reach_total / L (P27); ustalono, że źródło daje tylko sumę za okres, bez rozkładu godzinowego ani dziennego. Czy to wyświetlenia czy unikatowi odbiorcy, wartość czy przedział: P06. Przy przedziałach: kolumny `reach_min`, `reach_max` |
 | `reach_*` (inne) | rozbicia zasięgu (kraj, wiek, płeć), jeśli źródło je zwraca | jeśli dostępne | opis, nie wymagane do pytania |
 | `frame_source` | kryterium lub zapytanie, przez które reklama trafiła do ramki | warunkowa | niezależność ramki od annotatora ocenianego (D9, P29) |
@@ -43,14 +43,13 @@ Jeden wiersz = jedno źródło. Bez wypełnionej macierzy nie rozpoczynamy pracy
 |---|---|---|---|---|---|---|---|---|---|
 | TikTok Commercial Content Library i Commercial Content API [@tiktokcca; @tiktokcclnews2023] | TikTok | {{P07: podstawa (Developer Terms of Service, warunki biblioteki) \| zależy od: inżynier danych \| domyślnie: brak}} | konto TikTok for Developers z oficjalnym adresem e-mail i wniosek; odpowiedź deklarowana w ciągu 2 dni roboczych; API dla publiczności i badaczy | data publikacji, „last seen date”, liczba osób, targetowanie, metadane reklamy i reklamodawcy (dokładna lista: P06) | biblioteka: tak; API: {{P04: kreacje w API \| zależy od: dokumentacja \| domyślnie: niedostępne}} | do roku od ostatniego wyświetlenia | {{P07: co wolno zapisać i publikować \| zależy od: inżynier danych \| domyślnie: brak}} | nazwy reklamodawców; wizerunek osób | {{P07: ocena \| zależy od: inżynier danych \| domyślnie: brak}} |
 | {{P07: ewentualne źródło dodatkowe (np. biblioteka reklam Meta; tylko jeśli zespół je włącza) \| zależy od: inżynier danych \| domyślnie: brak}} | | | | | | | | | |
-| {{P18: źródło 3: Lista Ostrzeżeń CERT Polska i jej warunki użycia \| zależy od: inżynier danych \| domyślnie: brak}} | | | | | | | | | |
 
 Pytania, na które macierz musi odpowiedzieć (lista pytań jest moja, odpowiedzi należą do inżyniera danych):
 
 1. Czy TikTok Commercial Content API zwraca pełny zestaw pól potrzebnych do pytania: tekst, daty pierwszego i ostatniego wyświetlenia, skumulowane wyświetlenia, adres docelowy, kreację? Oficjalna strona wymienia datę publikacji, „last seen date” i liczbę osób; **znaczenie tych pól i adres docelowy wymagają potwierdzenia w oficjalnej dokumentacji** (P05, P06).
 2. Czy regulamin pozwala na zapis i dalsze przetwarzanie kreacji (obraz/wideo)? (D1)
 3. Kto i kiedy składa wniosek o dostęp do API (konto deweloperskie, opis celu badawczego) i czy wystarcza wniosek indywidualny, czy potrzebna jest zgoda uczelni? (P20)
-4. Czy wolno użyć Listy Ostrzeżeń CERT Polska do zestawienia z domenami z reklam i na jakich warunkach? (P18) Dotyczy tylko reklam, dla których źródło podaje adres docelowy (P05).
+4. Czy źródło podaje adres docelowy reklamy (pole opisowe)? (P05)
 5. Czy nazwiska osób publicznych w tekście reklam są danymi osobowymi wymagającymi dodatkowej podstawy w kontekście RODO i jak ograniczyć ich przetwarzanie? (R09)
 6. Jakie są ograniczenia retencji i do kiedy dane trzeba pobrać, aby nie zniknęły? (R01)
 7. Które pola określają początek i koniec emisji, co oznacza pusty koniec emisji, i czy źródło zwraca reklamy już zakończone lub usunięte oraz na jak długo? (czas życia: P28, R01, R17)

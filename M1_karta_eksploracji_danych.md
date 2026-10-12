@@ -33,7 +33,6 @@ Oznaczenia: `{{Pnn: ...}}` to miejsce do uzupełnienia po otrzymaniu danych lub 
 | Źródło | Co daje | Dostęp i warunki | Stan |
 |---|---|---|---|
 | **TikTok Commercial Content Library i Commercial Content API** (główne) | kreacje reklam, daty emisji (publikacja, „last seen date”), liczba osób, które zobaczyły reklamę, targetowanie, metadane reklamy i reklamodawcy; dane z UE [tiktokcca; tiktokcclnews2023] | biblioteka publiczna; API dla publiczności i badaczy po wniosku (konto TikTok for Developers, deklarowana odpowiedź w 2 dni robocze); dane dostępne do roku od ostatniego wyświetlenia reklamy | znaczenie pól, prawo zapisu kreacji i warunki publikacji: {{P07: macierz legalności \| zależy od: lektura Developer Terms of Service \| domyślnie: brak}} **[INŻ. DANYCH]** |
-| **Lista Ostrzeżeń CERT Polska** | domeny wprowadzające w błąd i wyłudzające dane; dowód zewnętrzny scamu [certlist] | publiczna lista; warunki użycia i pokrycie: {{P18: warunki użycia listy \| zależy od: inżynier danych \| domyślnie: brak}} | wymaga adresu docelowego reklamy: {{P05: dostępność adresu docelowego \| zależy od: pola źródła \| domyślnie: nieznana}} **[INŻ. DANYCH]** |
 | Źródło dodatkowe (opcjonalne) | zespół może włączyć inną bibliotekę reklam | do ustalenia | {{P07: źródło dodatkowe \| zależy od: zespół \| domyślnie: brak}} |
 
 **Zasady:** dane pochodzą wyłącznie z legalnych źródeł, zgodnie z regulaminami; nie stosujemy scrapowania. Dane o reklamach nie trafiają do repozytorium; opis zbioru zawiera data statement: {{P08: data statement | zależy od: P07 | domyślnie: brak}} **[INŻ. DANYCH]**.
@@ -70,10 +69,9 @@ Eksploracja zostanie wykonana po otrzymaniu danych; poniższa tabela wskazuje, c
 | Czas życia L, skumulowane wyświetlenia | metadane źródła | liczone z tabeli; annotatorzy ich nie widzą |
 | Dzienna intensywność I | metadane źródła | I = wyświetlenia / L |
 | Przynależność do populacji (scam, podejrzenie deepfake'a) | kodowanie annotatorów na kreacjach i tekście | codebook; walidacja na gold standardzie |
-| Dowód zewnętrzny scamu | domena docelowa i Lista Ostrzeżeń CERT | zestawienie po zakończeniu kodowania |
 | Warstwy: typ scamu, obecność osoby publicznej | kodowanie annotatorów | codebook |
 
-**Populacja „deepfake scam”.** Reklama należy do populacji, gdy (1) jest scamem oraz (2) kodowanie wskazuje podejrzenie deepfake'a (`media_synthetic_suspected` = `yes` lub `suspected`, z nazwaną przesłanką: wadliwy obraz, niezgodność ruchu warg i głosu, nienaturalny głos lub oznaczenie jako treść wygenerowana). Deepfake jest tu **podejrzewany, nie ustalany**; analiza wrażliwości obejmuje definicje „tylko `yes`” i „`yes` lub `suspected`”. Rozpoznawania twarzy nie stosujemy (dane biometryczne z art. 9 ust. 1 RODO). Scam jest etykietowany **niezależnie od decyzji platformy**: gdyby scam oznaczał „usunięta przez platformę”, czas życia byłby z definicji czasem do usunięcia i hipoteza byłaby spełniona z konstrukcji.
+**Populacja „deepfake scam”.** Reklama należy do populacji, gdy (1) jest scamem oraz (2) kodowanie wskazuje podejrzenie deepfake'a (`media_synthetic_suspected` = `yes` lub `suspected`, z nazwaną przesłanką: wadliwy obraz, niezgodność ruchu warg i głosu, nienaturalny głos lub oznaczenie jako treść wygenerowana). Deepfake jest tu **podejrzewany, nie ustalany**; analiza wrażliwości obejmuje definicje „tylko `yes`” i „`yes` lub `suspected`”. Rozpoznawania twarzy nie stosujemy (dane biometryczne z art. 9 ust. 1 RODO). Scam jest etykietowany **wyłącznie na podstawie oceny annotatorów** według jawnej reguły codebooka (`scam_judgement`, `scam_type`), **niezależnie od decyzji platformy**: gdyby scam oznaczał „usunięta przez platformę”, czas życia byłby z definicji czasem do usunięcia i hipoteza byłaby spełniona z konstrukcji. Nie używamy zewnętrznej listy scamów, więc etykieta nie ma niezależnego sprawdzianu.
 
 **Instrument i walidacja.**
 1. **Codebook** z pilotażem w dwóch rundach (30–50 reklam) i zamrożeniem. Zgodność annotatorów mierzymy współczynnikiem Krippendorffa α (≥ 0,80 wiarygodne, 0,667–0,80 tylko wnioski wstępne, poniżej odrzucić [krippendorff2004]), z prevalence i zgodnością pozytywną/negatywną. Wyniki pilotażu: {{P13: α per zmienna z przedziałem ufności | zależy od: pilotaż | domyślnie: brak}} **[PIPELINE]**.
@@ -96,10 +94,11 @@ Eksploracja zostanie wykonana po otrzymaniu danych; poniższa tabela wskazuje, c
 | **Cenzurowanie**: reklamy wciąż aktywne; dane tylko do roku od ostatniego wyświetlenia; reklamy usunięte mogą znikać z biblioteki | Zniekształcony czas życia (mediana może być zawyżona lub zaniżona) | Pasmo mediany; data pobrania jako zmienna; wnioski ograniczone do reklam widocznych w źródle |
 | **Egzekwowanie platformy**: czas życia zależy od tego, jak szybko platforma usuwa reklamy | Krótkie życie nie musi być decyzją reklamodawcy | Scam etykietowany niezależnie od usunięcia; `platform_removal` jako zmienna wrażliwości |
 | **Deepfake tylko podejrzewany** i jest kryterium populacji | Populacja może zawierać reklamy bez syntezy i pomijać reklamy z syntezą | Przesłanka nazwana w kodowaniu; α i odsetek „niepewne”; wrażliwość na definicję populacji |
+| **Brak niezależnego dowodu scamu**: etykieta pochodzi wyłącznie z oceny annotatorów | Część reklam uznanych za scam może być legalna lub odwrotnie; błąd etykiety nie jest mierzalny wprost | Jawna reguła w codebooku; dwie rundy pilotażu; α z prevalence; adjudykacja trzeciej osoby; wartość `unclear` zamiast zgadywania |
 | **Mała liczba reklam w populacji** (rzadka klasa) | Szerokie przedziały ufności; paradoks kappa maskuje jakość kodowania | Losowanie z nadpróbkowaniem; klasy z małą liczbą pozytywów jako eksploracyjne |
 | **Klastrowanie** reklamodawców (w raporcie branżowym 10 największych reklamodawców scamowych odpowiadało za 56,1% reklam scamowych [gendigital2026]) | Zawyżona pewność wniosków | Bootstrap po reklamodawcach; limit reklam na reklamodawcę w losowaniu |
 | **Ramka zależna od zapytań** | Wyniki dotyczą ramki, nie wszystkich reklam | Opis ramki w data statement; wyniki raportowane względem ramki |
-| **Dane osobowe i regulamin**: wizerunek i nazwiska osób publicznych; warunki API i listy CERT | Niemożność użycia lub publikacji danych | Bez rozpoznawania twarzy; identyfikatory osób tylko w plikach roboczych; macierz legalności przed pracą na danych |
+| **Dane osobowe i regulamin**: wizerunek i nazwiska osób publicznych; warunki API | Niemożność użycia lub publikacji danych | Bez rozpoznawania twarzy; identyfikatory osób tylko w plikach roboczych; macierz legalności przed pracą na danych |
 | **Wrażliwość instrumentu** na prompt i wersję | Niepowtarzalność | Zamrożenie codebooka i zbioru testowego; dziennik uruchomień; wyniki jako zakres |
 
 Pełny rejestr z prawdopodobieństwem, wpływem i wskaźnikami z danych znajduje się w dokumencie 06.
@@ -124,7 +123,7 @@ Temat jest wykonalny, jeśli spełnione są warunki sprawdzane przed pracą na d
 | Właściciel | Odpowiada za | Otwarte miejsca |
 |---|---|---|
 | **[LEAD]** | pytanie, hipoteza, progi, reguła decyzyjna, skład annotatorów, stan wiedzy | P28 (z inż. danych), P30, P32, P21, P31 |
-| **[INŻ. DANYCH]** | źródła, legalność, pola, ramka, statystyki opisowe | P01, P02, P04, P05, P06, P07, P08, P10, P11, P17, P18, P29 |
+| **[INŻ. DANYCH]** | źródła, legalność, pola, ramka, statystyki opisowe | P01, P02, P04, P06, P07, P08, P10, P11, P17, P29 |
 | **[PIPELINE]** | codebook, gold standard, walidacja annotatora ocenianego, analiza błędów | P09, P13, P15, P16, P23 |
 | **[ANALITYK]** | modele przeżycia, korekty końcowe, wnioskowanie | P12, P32 (z leadem) |
 
@@ -136,7 +135,6 @@ Temat jest wykonalny, jeśli spełnione są warunki sprawdzane przed pracą na d
 
 - TikTok for Developers. *Commercial Content API*. https://developers.tiktok.com/products/commercial-content-api [tiktokcca]
 - TikTok Newsroom (2023). *TikTok's Research API and Commercial Content Library*. https://newsroom.tiktok.com/tiktoks-research-api-and-commercial-content-library [tiktokcclnews2023]
-- CERT Polska. *Lista Ostrzeżeń przed niebezpiecznymi stronami*. https://cert.pl/lista-ostrzezen [certlist]
 - Krippendorff, K. (2004). *Content Analysis: An Introduction to Its Methodology* (2nd ed.). Sage. [krippendorff2004]
 - Cameron, A. C., Miller, D. L. (2015). A practitioner's guide to cluster-robust inference. *Journal of Human Resources* 50(2), 317–372. [cameron2015]
 - Egami, N., Hinck, M., Stewart, B. M., Wei, H. Using large language model annotations for the social sciences: A general framework of using predicted variables in downstream analyses. [egami2025dsl]

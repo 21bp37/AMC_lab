@@ -54,6 +54,7 @@
 - 10. Playbook: co robić po otrzymaniu danych
 
 
+
 ---
 
 # 00. Rejestr placeholderów i punktów decyzyjnych
@@ -81,9 +82,9 @@ Reguły: (1) placeholder zostaje w tekście, dopóki ktoś nie wpisze wartości 
 | P02 | Liczba rekordów: reklam, unikatowych kreacji, reklamodawców (po deduplikacji) | [INŻ. DANYCH] | pobranie danych | D2, D7 | otwarty |
 | P03 | Data pobrania (jest zmienną). **Wpisane:** retencja źródła = do roku od ostatniego wyświetlenia reklamy (oficjalna strona API) | [INŻ. DANYCH] | pobranie danych | D2, D6 | częściowo |
 | P04 | Czy kreacje (obraz/wideo) są legalnie dostępne i na jakiej podstawie | [INŻ. DANYCH] | regulamin źródła, ewentualna zgoda prowadzącego | D1 | otwarty |
-| P05 | Czy dostępny jest adres docelowy reklamy (domena) | [INŻ. DANYCH] | pola źródła | D4 | otwarty |
+| P05 | Czy dostępny jest adres docelowy reklamy (domena); opcjonalny, tylko jako pole opisowe | [INŻ. DANYCH] | pola źródła | — | otwarty |
 | P06 | Pola czasu emisji i wyświetleń w TikTok Commercial Content Library / API: czy daty to pierwszy i ostatni dzień wyświetlania, jak oznaczone są reklamy aktywne, czy „liczba osób, które zobaczyły reklamę” to wyświetlenia czy unikatowi odbiorcy, wartość czy przedział, suma za okres czy rozbicie. **Wpisane:** strona API wymienia datę publikacji, „last seen date” i liczbę osób; **ustalone przez zespół:** dane tylko zagregowane (suma za okres, nie rozkład godzinowy) | [INŻ. DANYCH] | oficjalna dokumentacja źródła | D6 | częściowo |
-| P07 | Macierz legalności: źródło, podstawa prawna/ToS/licencja, pola, retencja, wolno zapisać | [INŻ. DANYCH] | lektura regulaminów | D1, D4, D6 | otwarty |
+| P07 | Macierz legalności: źródło, podstawa prawna/ToS/licencja, pola, retencja, wolno zapisać | [INŻ. DANYCH] | lektura regulaminów | D1, D6 | otwarty |
 | P08 | Data statement: link i wersja | [INŻ. DANYCH] | P07 | wszystkie | otwarty |
 | P09 | Prevalence scamu i podejrzenia deepfake'a w próbie eksploracyjnej, z CI | [PIPELINE] | dane, pilotaż | D2 | otwarty |
 | P10 | Rozkład języków i udział reklam po polsku | [INŻ. DANYCH] | dane | D8 | otwarty |
@@ -94,8 +95,8 @@ Reguły: (1) placeholder zostaje w tekście, dopóki ktoś nie wpisze wartości 
 | P15 | Wybrany annotator oceniany: nazwa, wersja, parametry | [PIPELINE] | D1, D5, P20 | D5 | otwarty |
 | P16 | Koszt i limity przetwarzania całości danych | [PIPELINE] | P02, P15 | D5 | otwarty |
 | P17 | Wyniki eksploracji: rozkłady reklam w czasie, wstępne rozkłady czasu życia L i dziennej intensywności I | [INŻ. DANYCH] | dane | D2 | otwarty |
-| P18 | Warunki użycia Listy Ostrzeżeń CERT Polska (licencja samych danych listy) | [INŻ. DANYCH] | lektura warunków | D4 | otwarty |
-| P19 | Pokrycie: jaki odsetek domen z danych można zestawić z listą CERT i w jakim oknie | [PIPELINE] | P05, P18 | D4 | otwarty |
+| P18 | (wycofane: źródło Lista Ostrzeżeń CERT Polska usunięte decyzją zespołu) | — | — | — | wycofane |
+| P19 | (wycofane: pokrycie listy CERT; źródło usunięte) | — | — | — | wycofane |
 | P20 | Ścieżka dostępu: wniosek o TikTok Commercial Content API (konto deweloperskie, wniosek badawczy) i środowisko analizy. **Wpisane:** API otwarte dla publiczności i badaczy po wniosku (strona produktu) | [LEAD] / [INŻ. DANYCH] | uczelnia, wniosek | D1, D5 | częściowo |
 | P21 | Skład zespołu annotatorów referencyjnych (ilu, którzy) i ich dostępność | [LEAD] | zespół | D3 | otwarty |
 | P22 | Adres repozytorium, hash commita materiałów i lokalizacja logów sesji | [PIPELINE] | repozytorium | — | otwarty |
@@ -119,7 +120,7 @@ Każdy punkt ma postać: jeśli (wynik z danych), to (zmiana planu). Progi pocho
 | D1 | Czy kreacje (wideo/obraz) są legalnie dostępne i wolno je przetwarzać? (P04, P07) | włącz poziom L2 codebooka (podejrzenie deepfake'a oraz widoczna twarz oceniane przez annotatora referencyjnego; zob. 04); populację „deepfake scam” da się zidentyfikować | populacji „deepfake scam” nie da się zidentyfikować z tekstu i metadanych; lead zawęża pytanie (np. do reklam scamowych bez rozróżnienia deepfake'a) albo raportujemy wynik negatywny o pomiarze (P30) |
 | D2 | Czy w próbie jest dość reklam deepfake scam, aby oszacować medianę czasu życia i udział reklam z I ≥ T_I z użytecznym przedziałem ufności? (P02, P09) | plan próby z 05 | zawęż zakres lub raportuj jako eksploracyjne; wynik negatywny o wykonalności jest pełnoprawnym wynikiem |
 | D3 | Czy zmienne osiągają α ≥ 0,80 (wiarygodne) lub ≥ 0,667 (tylko wnioski wstępne)? (P13) | użyj zmiennej w analizie z odpowiednim zastrzeżeniem | popraw definicję i powtórz pilotaż; po drugiej nieudanej rundzie usuń zmienną z pomiaru |
-| D4 | Czy jest adres docelowy i legalny dostęp do listy CERT? (P05, P18, P19) | łańcuch dowodu reklama, domena, lista CERT | scam wyłącznie z oceny annotatora referencyjnego, z jawnym zastrzeżeniem o błędzie etykiety (06, R03) |
+| D4 | (wycofany: dowód zewnętrzny z listy CERT; źródło usunięte decyzją zespołu) | — | scam wyłącznie z oceny annotatorów referencyjnych według codebooka, z jawnym zastrzeżeniem o błędzie etykiety (06, R03) |
 | D5 | Czy annotator oceniany jest wystarczająco zgodny z gold standardem? (P14) | użyj do całości z korektą błędu (05) | kodowanie ręczne mniejszej próby (wariant E w 04) lub zmiana annotatora ocenianego |
 | D6 | Czy dostępne są daty początku i końca emisji (czas życia) oraz skumulowane wyświetlenia za okres (dzienna intensywność)? (P06, P28) | zmienne wynikowe L i I z metadanych (`tools/outcomes.py`) | pomiar czasu życia lub intensywności niemożliwy; wynik negatywny o pomiarze (01, sekcja 8) |
 | D7 | Czy liczba klastrów jest wystarczająca? (P11, P12) | bootstrap klastrowy lub efekty losowe | agreguj do poziomu reklamodawcy lub kampanii; przy bardzo małej liczbie klastrów wnioskowanie tylko opisowe [cameron2015] |
@@ -173,7 +174,6 @@ Karta M1 jest oceniana za: konkretność pytania, jakość eksploracji i spójno
 |---|---|---|
 | Przynależność reklamy do populacji badanej: (a) scam, (b) podejrzenie deepfake'a | annotator oceniany, zwalidowany na gold standardzie; kreacja (wideo) wymaga D1 | [PIPELINE] |
 | Typ scamu, obecność osoby publicznej (warstwy do podziałów) | j.w. | [PIPELINE] |
-| Dowód zewnętrzny scamu (domena docelowa, Lista Ostrzeżeń CERT) | dane i lista | [INŻ. DANYCH] dostarcza, [PIPELINE] zestawia |
 | Czas życia L (początek i koniec emisji) | metadane źródła (daty pierwszego i ostatniego wyświetlenia) | [INŻ. DANYCH] dostarcza; obróbka (cenzurowanie, przeżycie): [ANALITYK] |
 | Skumulowane wyświetlenia → dzienna intensywność I | metadane źródła (liczba osób lub wyświetleń za okres) | [INŻ. DANYCH] dostarcza; I = suma / L liczy `tools/outcomes.py` |
 | Mediana L, udział I ≥ T_I, przedziały ufności | liczone na populacji badanej z korektą błędu klasyfikacji | [PIPELINE] estymata prosta, [ANALITYK] modele |
@@ -196,12 +196,9 @@ Annotator oceniany nie mierzy ani czasu życia, ani intensywności. Mierzy **prz
 
 Deepfake nie jest tu ustalany, tylko **podejrzewany** na podstawie kreacji (R19). Pytanie „typu deepfake scam” w obecnym brzmieniu wymaga dostępu do kreacji (wideo): bez D1 populacji nie da się zidentyfikować (sekcja 8). Wizerunek osoby publicznej (`celeb_mention`, `celeb_face_visible`, `celeb_category`) jest warstwą opisową, chyba że lead zawęży populację (P30).
 
-**Scam.** Dwie warstwy, rozdzielone celowo:
-1. *Typ oferty* z treści reklamy (`scam_type`, kodowany przez annotatorów, łącznie z wartościami `not_scam` i `unclear`).
-2. *Dowód zewnętrzny*: łańcuch reklama, domena docelowa, Lista Ostrzeżeń CERT Polska [certlist]. Lista zawiera domeny wprowadzające w błąd i wyłudzające dane; według miesięcznych podsumowań CERT domeny są blokowane na 6 miesięcy, a jeśli nadal zawierają niebezpieczne treści, wpisuje się je ponownie. CSIRT KNF opisuje zgłaszanie do wpisu na tę listę domen z reklam fałszywych inwestycji publikowanych na Facebooku [csirtknf2024]. Warunki: {{P18: warunki użycia Listy Ostrzeżeń | zależy od: inżynier danych | domyślnie: brak}}, {{P05: dostępność adresu docelowego | zależy od: pola źródła | domyślnie: nieznana}}, pokrycie: {{P19: odsetek domen z danych możliwych do zestawienia z listą | zależy od: P05, P18 | domyślnie: nieznane}}.
-3. *Ocena annotatora referencyjnego* (`scam_judgement`) jest zmienną pomocniczą, nie dowodem.
+**Scam.** Etykieta scamu pochodzi **wyłącznie z oceny annotatorów referencyjnych** według jawnej reguły codebooka (02): `scam_type` (typ oferty, łącznie z wartościami `not_scam` i `unclear`) oraz `scam_judgement` (czy reklama wygląda na oszukańczą). Zespół nie korzysta z zewnętrznej listy domen ani innego zewnętrznego dowodu scamu, więc nie ma niezależnego sprawdzianu etykiety; błąd etykiety jest jawnym ograniczeniem (R03) i jest szacowany pośrednio przez zgodność między annotatorami (α dla `scam_type` i `scam_judgement`).
 
-**Dlaczego nie wystarczy usunięcie reklamy przez platformę jako definicja scamu.** Jeśli „scam” = „usunięta”, to **czas życia jest z definicji czasem do usunięcia**, więc pytanie o czas życia staje się tautologią, a hipoteza o krótkim życiu byłaby spełniona z konstrukcji (R02, R03). Dlatego scam etykietujemy niezależnie od decyzji platformy, a decyzję platformy (`platform_removal`) traktujemy jako zmienną do analizy wrażliwości. Jeśli nie ma adresu docelowego, łańcuch dowodu odpada (D4) i trzeba to zapisać jako jawne zastrzeżenie.
+**Dlaczego nie wystarczy usunięcie reklamy przez platformę jako definicja scamu.** Jeśli „scam” = „usunięta”, to **czas życia jest z definicji czasem do usunięcia**, więc pytanie o czas życia staje się tautologią, a hipoteza o krótkim życiu byłaby spełniona z konstrukcji (R02, R03). Dlatego scam etykietujemy niezależnie od decyzji platformy, a decyzję platformy (`platform_removal`) traktujemy jako zmienną do analizy wrażliwości.
 
 ## 5. Zmienne kodowane przez annotatorów
 
@@ -310,7 +307,7 @@ Jeśli kodowanie wykonuje jedna osoba, α między kodującymi nie da się policz
 ## Zasady ogólne
 
 1. **Jednostka kodowania:** pojedyncza unikatowa kreacja (`creative_id`); kopie tej samej kreacji u tego samego reklamodawcy są deduplikowane przed losowaniem (03, 05).
-2. **Kodowanie na ślepo:** annotator nie widzi zasięgu, czasu emisji, wyniku annotatora ocenianego ani dowodów zewnętrznych (lista CERT, usunięcie przez platformę). Powód: znajomość wyniku obciążałaby kodowanie kryteriów populacji.
+2. **Kodowanie na ślepo:** annotator nie widzi zasięgu, czasu emisji, wyniku annotatora ocenianego ani informacji zewnętrznych (usunięcie reklamy przez platformę). Powód: znajomość wyniku obciążałaby kodowanie kryteriów populacji.
 3. **Kodujemy to, co widać w reklamie**, nie to, co annotator wie z zewnątrz. Wyjątek: rozpoznanie osoby po opisie (`implied`) wymaga jednoznaczności opisu, a nie wiedzy specjalnej.
 4. **Kategoria `unsure` jest pełnoprawna.** Wybieraj ją zamiast zgadywać. Odsetek `unsure` jest raportowany; wysoki odsetek oznacza zbyt niejasną definicję.
 5. **Dwa poziomy:**
@@ -388,7 +385,7 @@ Zmienna oznacza *typ oferty*, a nie dowód oszustwa. `not_scam` i `unclear` pozw
 
 ### `scam_judgement`
 
-Ocena annotatora, czy reklama wygląda na oszukańczą (`scam`, `not_scam`, `unclear`) na podstawie wyłącznie reklamy. **Nie zastępuje dowodu zewnętrznego.** Służy jako zmienna pomocnicza i do analizy zgodności między oceną annotatora referencyjnego a dowodem zewnętrznym (sprawdzian, czy łatwo odróżnić scam od legalnej reklamy).
+Ocena annotatora, czy reklama wygląda na oszukańczą (`scam`, `not_scam`, `unclear`) na podstawie wyłącznie reklamy. Razem z `scam_type` (wartość inna niż `not_scam` i `unclear`) tworzy etykietę scamu, bo nie ma zewnętrznego dowodu. Reguła: reklama jest scamem, gdy annotator referencyjny zakoduje `scam_judgement` = `scam`; `scam_type` opisuje jego rodzaj. Niezgodność `scam_judgement` = `scam` i `scam_type` = `not_scam` jest błędem kodowania do wyjaśnienia na pilotażu. Brak niezależnego dowodu oznacza, że etykieta jest tak wiarygodna, jak zgodność annotatorów (α), i jest to jawne ograniczenie (06, R03).
 
 ### `urgency_cue` (dodatkowa)
 
@@ -470,9 +467,9 @@ Zmienna pomocnicza do `media_synthetic_suspected`: **główna przesłanka**, na 
 
 Reguły spójności (sprawdza `python tools/checks.py sheet`): przy `yes` i `suspected` wartość `none` i `na` jest niedozwolona; przy `no` i `na_no_media` przesłanka musi być `none` lub `na` (albo pusta).
 
-## Pola z dowodami zewnętrznymi (nie kodowane przez annotatorów)
+## Pola zewnętrzne (nie kodowane przez annotatorów)
 
-Wypełnia pipeline na podstawie danych i list publicznych, po zakończeniu kodowania kryteriów populacji: `dest_domain`, `domain_on_cert_list`, `cert_list_interval`, `platform_removal` (definicje w `tools/schema.yaml`). Dostępność zależy od P05, P18, P19.
+Wypełnia pipeline na podstawie danych źródła, po zakończeniu kodowania kryteriów populacji: `dest_domain` (opcjonalnie, jeśli źródło ją podaje), `platform_removal` (definicje w `tools/schema.yaml`). Dostępność zależy od P05 i P06. Zewnętrznej listy scamów nie używamy.
 
 ## Procedura
 
@@ -493,7 +490,7 @@ Wszystkie dane pochodzą z legalnych źródeł, zgodnie z regulaminami stron i l
 
 ## 2. Wymagany schemat tabeli (jedna wiersz = jedna reklama w źródle)
 
-Kolumny **wymagane** to minimum do wykonania planu pomiaru (01). Kolumny **warunkowe** zależą od tego, co źródło legalnie udostępnia (punkty D1, D4, D6). Nazwy kolumn można zmienić, ale mapowanie musi być opisane.
+Kolumny **wymagane** to minimum do wykonania planu pomiaru (01). Kolumny **warunkowe** zależą od tego, co źródło legalnie udostępnia (punkty D1, D6). Nazwy kolumn można zmienić, ale mapowanie musi być opisane.
 
 | Kolumna | Opis | Wymagana? | Uwagi |
 |---|---|---|---|
@@ -507,7 +504,7 @@ Kolumny **wymagane** to minimum do wykonania planu pomiaru (01). Kolumny **warun
 | `ad_text`, `headline`, `link_caption` | tekst reklamy | tak | wejście dla poziomu L1 |
 | `language` | język tekstu (metoda detekcji opisana) | tak | D8 |
 | `cta_label` | etykieta przycisku wezwania do działania | jeśli dostępna | |
-| `dest_url` lub `dest_domain` | adres docelowy | warunkowa | łańcuch dowodu scamu (D4); P05 |
+| `dest_url` lub `dest_domain` | adres docelowy | opcjonalna | tylko pole opisowe (zewnętrznej listy scamów nie używamy); P05 |
 | `reach_total` | skumulowana liczba wyświetleń (lub osób, które zobaczyły reklamę) za cały okres emisji, jako liczba lub przedział | tak | dzienna intensywność I = reach_total / L (P27); ustalono, że źródło daje tylko sumę za okres, bez rozkładu godzinowego ani dziennego. Czy to wyświetlenia czy unikatowi odbiorcy, wartość czy przedział: P06. Przy przedziałach: kolumny `reach_min`, `reach_max` |
 | `reach_*` (inne) | rozbicia zasięgu (kraj, wiek, płeć), jeśli źródło je zwraca | jeśli dostępne | opis, nie wymagane do pytania |
 | `frame_source` | kryterium lub zapytanie, przez które reklama trafiła do ramki | warunkowa | niezależność ramki od annotatora ocenianego (D9, P29) |
@@ -528,14 +525,13 @@ Jeden wiersz = jedno źródło. Bez wypełnionej macierzy nie rozpoczynamy pracy
 |---|---|---|---|---|---|---|---|---|---|
 | TikTok Commercial Content Library i Commercial Content API [tiktokcca; tiktokcclnews2023] | TikTok | {{P07: podstawa (Developer Terms of Service, warunki biblioteki) \| zależy od: inżynier danych \| domyślnie: brak}} | konto TikTok for Developers z oficjalnym adresem e-mail i wniosek; odpowiedź deklarowana w ciągu 2 dni roboczych; API dla publiczności i badaczy | data publikacji, „last seen date”, liczba osób, targetowanie, metadane reklamy i reklamodawcy (dokładna lista: P06) | biblioteka: tak; API: {{P04: kreacje w API \| zależy od: dokumentacja \| domyślnie: niedostępne}} | do roku od ostatniego wyświetlenia | {{P07: co wolno zapisać i publikować \| zależy od: inżynier danych \| domyślnie: brak}} | nazwy reklamodawców; wizerunek osób | {{P07: ocena \| zależy od: inżynier danych \| domyślnie: brak}} |
 | {{P07: ewentualne źródło dodatkowe (np. biblioteka reklam Meta; tylko jeśli zespół je włącza) \| zależy od: inżynier danych \| domyślnie: brak}} | | | | | | | | | |
-| {{P18: źródło 3: Lista Ostrzeżeń CERT Polska i jej warunki użycia \| zależy od: inżynier danych \| domyślnie: brak}} | | | | | | | | | |
 
 Pytania, na które macierz musi odpowiedzieć (lista pytań jest moja, odpowiedzi należą do inżyniera danych):
 
 1. Czy TikTok Commercial Content API zwraca pełny zestaw pól potrzebnych do pytania: tekst, daty pierwszego i ostatniego wyświetlenia, skumulowane wyświetlenia, adres docelowy, kreację? Oficjalna strona wymienia datę publikacji, „last seen date” i liczbę osób; **znaczenie tych pól i adres docelowy wymagają potwierdzenia w oficjalnej dokumentacji** (P05, P06).
 2. Czy regulamin pozwala na zapis i dalsze przetwarzanie kreacji (obraz/wideo)? (D1)
 3. Kto i kiedy składa wniosek o dostęp do API (konto deweloperskie, opis celu badawczego) i czy wystarcza wniosek indywidualny, czy potrzebna jest zgoda uczelni? (P20)
-4. Czy wolno użyć Listy Ostrzeżeń CERT Polska do zestawienia z domenami z reklam i na jakich warunkach? (P18) Dotyczy tylko reklam, dla których źródło podaje adres docelowy (P05).
+4. Czy źródło podaje adres docelowy reklamy (pole opisowe)? (P05)
 5. Czy nazwiska osób publicznych w tekście reklam są danymi osobowymi wymagającymi dodatkowej podstawy w kontekście RODO i jak ograniczyć ich przetwarzanie? (R09)
 6. Jakie są ograniczenia retencji i do kiedy dane trzeba pobrać, aby nie zniknęły? (R01)
 7. Które pola określają początek i koniec emisji, co oznacza pusty koniec emisji, i czy źródło zwraca reklamy już zakończone lub usunięte oraz na jak długo? (czas życia: P28, R01, R17)
@@ -759,14 +755,14 @@ Ryzyka są wpisem do karty M1 (jawne ograniczenia i źródła błędu to kryteri
 |---|---|---|---|---|---|---|
 | R01 | **[INŻ. DANYCH]** **Biblioteka reklam jako zbiór cenzurowany**: widzimy to, co platforma zachowała i udostępniła; TikTok udostępnia dane tylko do roku od ostatniego wyświetlenia reklamy [tiktokcca]; reklamy usunięte mogą znikać. Luki bibliotek opisano dla amerykańskich reklam politycznych na Facebooku [edelson2020; lepochat2022]; dla reklam komercyjnych TikToka w UE nie jest to ustalone | Obciążenie selekcją: jeśli reklamy usunięte szybko znikają z biblioteki, mediana czasu życia może być zawyżona | wysokie | wysoki | Jawnie ograniczyć wnioski do reklam widocznych w źródle w oknie dat; zapisywać datę pobrania; nie uogólniać na wszystkie reklamy | rozkład czasu między końcem emisji a pobraniem; udział reklam bez daty końca (P03) |
 | R02 | **[INŻ. DANYCH / LEAD]** **Czas życia zniekształcony przez egzekwowanie**: platforma może szybciej usuwać reklamy z osobą publiczną (ma do tego dedykowany mechanizm porównania twarzy [meta2024celebbait]), więc czas życia zależy od polityki egzekwowania, a nie tylko od „trwałości” zjawiska | Błędna interpretacja czasu emisji | wysokie | wysoki | Opisać czas życia jako czas widoczności w źródle; zestawić z `platform_removal`; zastrzeżenie w karcie | rozkład czasu emisji reklam usuniętych i nieusuniętych |
-| R03 | **[PIPELINE / INŻ. DANYCH]** **Etykieta scamu zależna od usunięcia przez platformę**: jeśli „scam" = usunięcie, to czas życia jest czasem do usunięcia (tautologia), a hipoteza o krótkim życiu byłaby spełniona z konstrukcji, bo populacja to reklamy wykryte i usunięte; dodatkowo reklamy z osobą publiczną są wykrywane osobnym mechanizmem | Czas życia nie do zinterpretowania | wysokie | wysoki | Scam etykietować niezależnie od decyzji platformy: dowód zewnętrzny (domena docelowa, lista CERT) i `scam_type` annotatora referencyjnego (D4); analiza wrażliwości na definicję | zgodność między `scam_judgement`, listą CERT i `platform_removal` |
-| R04 | **[INŻ. DANYCH]** **Brak adresu docelowego reklamy**: bez domeny nie ma łańcucha reklama, domena, lista CERT (P05) | Scam tylko z oceny annotatora i wskazania platformy | średnie | wysoki | D4; jawne zastrzeżenie; scam jako zmienna z poziomem pewności | odsetek rekordów z domeną |
+| R03 | **[PIPELINE / INŻ. DANYCH]** **Etykieta scamu zależna od usunięcia przez platformę**: jeśli „scam" = usunięcie, to czas życia jest czasem do usunięcia (tautologia), a hipoteza o krótkim życiu byłaby spełniona z konstrukcji, bo populacja to reklamy wykryte i usunięte; dodatkowo reklamy z osobą publiczną są wykrywane osobnym mechanizmem; ponieważ nie ma zewnętrznego dowodu scamu (lista CERT nie jest używana), etykieta zależy wyłącznie od oceny annotatorów | Czas życia nie do zinterpretowania | wysokie | wysoki | Scam etykietować niezależnie od decyzji platformy, wyłącznie według reguły codebooka (`scam_judgement`, `scam_type`); brak zewnętrznego dowodu jest jawnym ograniczeniem; analiza wrażliwości na definicję | α dla `scam_type` i `scam_judgement`; zgodność `scam_judgement` z `platform_removal` (informacyjnie) |
+| R04 | **[PIPELINE]** **Brak niezależnego dowodu scamu**: etykieta scamu pochodzi wyłącznie z oceny annotatorów referencyjnych (bez zewnętrznej listy domen) | Błąd etykiety nie jest mierzalny wprost; część reklam „scam” może być legalna lub odwrotnie; populacja zależy od subiektywnej oceny | średnie | wysoki | Jawna reguła w codebooku; dwie rundy pilotażu; α z prevalence i zgodnością pozytywną/negatywną; adjudykacja trzeciej osoby; scam jako zmienna z poziomem pewności (`unclear`) | α dla `scam_type` i `scam_judgement`; odsetek `unclear` |
 | R05 | **[PIPELINE]** **Błąd pomiaru warstwy „osoba publiczna” (L1 mierzy wzmiankę, nie wizerunek)**: reklamy z twarzą bez nazwiska są kodowane jako `none`. Dla pytania badawczego dotyczy to podziału na warstwy, nie populacji; staje się błędem populacji, jeśli lead zawęzi populację do wizerunku osoby publicznej (P30) | Zaniżona liczebność warstwy „osoba publiczna”; porównania warstw obciążone | średnie | średni | Walidacja `celeb_mention`; korekta błędu (05, sekcja 6); jawne ograniczenie konstruktu; decyzja leada o konstrukcie (P30) | recall `celeb_mention` w gold standardzie |
 | R06 | **[PIPELINE / INŻ. DANYCH]** **Koncentracja u kilku reklamodawców**: efektywna liczba obserwacji = liczba klastrów, nie reklam; przy niewielkiej liczbie klastrów standardowe błędy odporne na klastrowanie zaniżają niepewność [cameron2015] | Zawyżona pewność wniosków | wysokie | wysoki | Bootstrap po klastrach lub agregacja do reklamodawcy; limit w losowaniu; D7 | P11, P12 |
 | R07 | **[LEAD]** **Dzienna intensywność zależy od budżetu i algorytmu dostarczania, nie tylko od kreacji ani od „taktyki”**: wysoka intensywność może wynikać z dużego budżetu, targetowania lub konta o dużej wiarygodności | Interpretacja intensywności jako strategii reklamodawcy jest niepewna | wysokie | wysoki | Opisywać I jako wielkość obserwowaną; nie wnioskować o intencji (R20); budżet dla reklam komercyjnych prawdopodobnie niedostępny (P06) | dostępność pól budżetu i targetowania (P06) |
 | R08 | **[PIPELINE]** **Błąd instrumentu zależny od cech powiązanych z wynikiem** | Obciążenie, którego globalna korekta nie usunie | średnie | wysoki | Analiza błędów wg warstw; próba z etykietami w każdej warstwie (05) | zgodność model–gold wg `scam_type`, języka, kategorii celebryty |
 | R09 | **[INŻ. DANYCH / PIPELINE]** **Dane osobowe** (nazwiska osób publicznych; wizerunek). **Rozpoznawanie twarzy jest niezgodne z RODO w naszych warunkach, bo to dane biometryczne z art. 9 ust. 1 bez przesłanki z ust. 2 (04, zasada 4; [edpb2024clearview])**; Meta wstrzymała tę technologię w 2021 r. z powodu obaw społecznych i braku jasnych reguł, a obecnie stosuje ją z natychmiastowym usuwaniem danych twarzy [meta2024celebbait] | Naruszenie RODO/regulaminu, wyłączenie danych z użycia | średnie | wysoki | Bez automatycznego rozpoznawania twarzy; `celeb_id` tylko w pliku roboczym; raportowanie zagregowane po kategoriach; ocena prawna przez inżyniera danych (P07) | wynik oceny w macierzy legalności |
-| R10 | **[INŻ. DANYCH]** **Regulamin i licencje**: warunki API/Content Library (zakaz eksportu, publikacji danych osobowych), warunki użycia listy CERT | Niemożność użycia lub publikacji danych | średnie | wysoki | Macierz legalności przed jakąkolwiek pracą na danych (03, P07, P18); wynik negatywny o dostępie jest pełnoprawny | wypełniona macierz |
+| R10 | **[INŻ. DANYCH]** **Regulamin i licencje**: warunki API/Content Library (zakaz eksportu, publikacji danych osobowych) | Niemożność użycia lub publikacji danych | średnie | wysoki | Macierz legalności przed jakąkolwiek pracą na danych (03, P07); wynik negatywny o dostępie jest pełnoprawny | wypełniona macierz |
 | R11 | **[PIPELINE]** **Dryf definicji i konfiguracji**: zmiana promptu lub wersji modelu zmienia wynik [baumann2025] | Niepowtarzalność | średnie | średni | Zamrożenie codebooka i zbioru testowego; dziennik uruchomień; raport zakresu po konfiguracjach | flip rate między konfiguracjami (`prompt_robustness.py`) |
 | R12 | **[PIPELINE]** **Rzadkie klasy**: deepfake scamy mogą stanowić niewielki odsetek ramki, więc za mało pozytywów w gold standardzie; paradoks kappa maskuje jakość kodowania [feinstein1990] | Szerokie CI mediany i udziałów; fałszywe odrzucenie zmiennej | wysokie | wysoki | Losowanie warstwowe z nadpróbkowaniem; α z prevalence i zgodnością pozytywną/negatywną; klasy z małą liczbą pozytywów jako eksploracyjne (05); tabela liczebności dla hipotezy (05, sekcja 3) | P09 |
 | R13 | **[PIPELINE]** **Język**: instrument i literatura głównie dla angielskiego; część reklam może być w innych językach | Niższa jakość dla polskiego | średnie | średni | Analiza błędów wg języka; D8 | P10 |
@@ -784,7 +780,7 @@ Ryzyka są wpisem do karty M1 (jawne ograniczenia i źródła błędu to kryteri
 
 1. Najpoważniejsze zagrożenia dla pytania o medianę czasu życia i dzienną intensywność to R19 (deepfake tylko podejrzewany, a jest kryterium populacji), R20 (dane zagregowane), R21 (zależność L i I), R02 i R03 (egzekwowanie platformy a czas życia), R17 (cenzurowanie) i R18 (ramka). Są strukturalne (wynikają z konstrukcji badania i danych), nie techniczne.
 2. Część z nich nie jest usuwalna; jest jawnie opisywana jako ograniczenie, a sformułowanie wniosków (decyzja leada, P26) ma to odzwierciedlać, zwłaszcza w kwestii *burst-and-burn*.
-3. Ryzyka R04, R10, R16, R17 i R22 mogą zawęzić albo uniemożliwić badanie; plan zakłada rozstrzygnięcie ich przed zbieraniem danych (D1, D4, D6, macierz legalności).
+3. Ryzyka R10, R16, R17 i R22 mogą zawęzić albo uniemożliwić badanie; plan zakłada rozstrzygnięcie ich przed zbieraniem danych (D1, D6, macierz legalności).
 
 ---
 
@@ -828,8 +824,6 @@ Klucze (`@klucz`) są używane w pozostałych dokumentach i w komentarzach narz�
 | `ttp2025` | Tech Transparency Project (2025). Raport o reklamach scamowych z deepfake'ami polityków na platformach Meta. | 63 reklamodawców scamowych, 150 tys. reklam politycznych; scam operacjonalizowany przez usunięcie reklam przez platformę (przykład ryzyka R03: czas życia jako czas do usunięcia); **reklamy polityczne w USA** | Widziałem tylko omówienie (Biometric Update); **znajdź raport TTP**, sprawdź tytuł i datę |
 | `edelson2020` | Edelson, L., Lauinger, T., McCoy, D. (2020). A security analysis of the Facebook Ad Library. *IEEE Symposium on Security and Privacy*, 661–678. | Biblioteka reklam ma luki (np. częściowa awaria, reklamy bez ujawnienia); **dotyczy amerykańskich reklam politycznych** | Zweryfikowane (dane bibliograficzne z dblp i streszczenie) |
 | `lepochat2022` | Le Pochat, V., Edelson, L., Van Goethem, T., Joosen, W., McCoy, D., Lauinger, T. (2022). An audit of Facebook's political ad policy enforcement. *USENIX Security Symposium*, 607–624. | Egzekwowanie zasad platformy jest niedoskonałe i może być audytowane; **reklamy polityczne** | Zweryfikowane (j.w.) |
-| `csirtknf2024` | CSIRT KNF (2025). *Raport Roczny CSIRT KNF 2024*. Komisja Nadzoru Finansowego. | Instytucjonalny pomiar reklam fałszywych inwestycji na Facebooku, zgłaszanie domen do CSIRT NASK i wpis na Listę Ostrzeżeń | Zweryfikowane jako publiczny raport; rok publikacji do sprawdzenia |
-| `certlist` | CERT Polska. Lista Ostrzeżeń przed niebezpiecznymi stronami. cert.pl/lista-ostrzezen | Lista domen wprowadzających w błąd i wyłudzających dane; według miesięcznych podsumowań domeny są blokowane na 6 miesięcy | Opis potwierdzony w podsumowaniach CERT (licencja CC BY 4.0 dotyczy tych publikacji); **warunki użycia samej listy do sprawdzenia** |
 | `radboud2025` | Kablan, L. (2025). *Misleading ad detection: Cryptocurrency scam ad classification on Facebook's ad library*. Praca licencjacka, Radboud University. | Przykład pipeline'u z Meta Ad Library i LLM; precision niskie przy rzadkich pozytywach; deduplikacja zmniejszyła zbiór z ok. 100 tys. do 25 671 reklam, z czego 2454 unikatowe | Zweryfikowane jako praca nierecenzowana; użyj tylko jako przykład poglądowy |
 | `zeng2021` | Zeng, E., Wei, M., Gregersen, T., Kohno, T., Roesner, F. (2021). Polls, clickbait, and commemorative $2 bills: Problematic political advertising on news and media websites around the 2020 US elections. *ACM IMC*, 507–525. | Badanie reklam problematycznych metodą pomiarową | Dane bibliograficzne potwierdzone w spisach literatury innych prac; **treści (codebook) nie czytałem** |
 | `chasm2026` | Chasm: Unveiling covert advertisements on Chinese social media. arXiv:2604.20511 | Zbiór do oceny multimodalnych LLM w wykrywaniu ukrytych reklam; metryki P, R, F1, AUC; zero-shot, uczenie w kontekście, fine-tuning | Preprint zweryfikowany; autorów i rok do uzupełnienia; **czytaj w całości, zanim użyjesz jako wzorca** |
@@ -921,7 +915,7 @@ Reakcje:
 - nie ma dat początku i końca emisji albo skumulowanych wyświetleń (`reach_total`) → D6 = NIE (czas życia lub dzienna intensywność niemierzalne);
 - wyświetlenia podane jako przedziały → zapisz granice (`reach_min`, `reach_max`) i sprawdź, w ilu przypadkach próg T_I wypada w przedziale (R22);
 - duży udział reklam bez daty końca → zgłoś do leada i analityka (cenzurowanie, P28, R17);
-- adres docelowy niedostępny → D4 = NIE;
+- adres docelowy niedostępny → tylko adnotacja w opisie zbioru (pole opisowe, P05);
 - kreacje (wideo) niedostępne → D1 = NIE: populacji „deepfake scam” nie da się zidentyfikować, zgłoś do leada (P30).
 
 ## Krok 2. Eksploracja do karty M1

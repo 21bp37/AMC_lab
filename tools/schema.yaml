@@ -66,14 +66,16 @@ variables:
   media_synthetic_suspected:
     level: L2
     role: covariate
-    values: ["yes", "no", unsure, na_no_media]
+    values: ["yes", suspected, "no", unsure, na_no_media]
+  media_synthetic_cue:
+    level: L2
+    role: covariate
+    values: [visual_artifact, lip_audio_mismatch, voice_unnatural, platform_label, other, none, na]
 
-# Dowody zewnętrzne dla scamu: NIE są kodowane przez annotatorów; wypełnia pipeline z danych/list publicznych.
+# Pola zewnętrzne: NIE są kodowane przez annotatorów; wypełnia pipeline z danych źródła (zewnętrznej listy scamów nie używamy).
 # Annotatorzy kodujący zmienne ekspozycji NIE widzą tych pól ani wyników (zasięgu, czasu emisji): kodowanie na ślepo.
 external_evidence:
-  dest_domain: "domena docelowa reklamy (jeśli legalnie dostępna: punkt D4)"
-  domain_on_cert_list: ["yes", "no", unknown]
-  cert_list_interval: "daty wpisu/wygaśnięcia na Liście Ostrzeżeń (zależne od warunków źródła)"
+  dest_domain: "domena docelowa reklamy (opcjonalna, jeśli źródło ją podaje i wolno ją zapisać)"
   platform_removal: ["yes", "no", unknown]   # UWAGA: różnicowy błąd etykiety (patrz 06_rejestr_ryzyk.md, R03)
 
 annotation_sheet_columns: [ad_id, creative_id, annotator_id, pilot_round, codebook_version, timestamp, notes]

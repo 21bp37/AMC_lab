@@ -16,7 +16,7 @@ Reakcje:
 - nie ma dat początku i końca emisji albo skumulowanych wyświetleń (`reach_total`) → D6 = NIE (czas życia lub dzienna intensywność niemierzalne);
 - wyświetlenia podane jako przedziały → zapisz granice (`reach_min`, `reach_max`) i sprawdź, w ilu przypadkach próg T_I wypada w przedziale (R22);
 - duży udział reklam bez daty końca → zgłoś do leada i analityka (cenzurowanie, P28, R17);
-- adres docelowy niedostępny → D4 = NIE;
+- adres docelowy niedostępny → tylko adnotacja w opisie zbioru (pole opisowe, P05);
 - kreacje (wideo) niedostępne → D1 = NIE: populacji „deepfake scam” nie da się zidentyfikować, zgłoś do leada (P30).
 
 ## Krok 2. Eksploracja do karty M1
@@ -26,7 +26,7 @@ Reakcje:
 3. Szacunek prevalence scamu i podejrzenia deepfake'a na tej próbie (P09). Przedział ufności Wilsona: `python tools/sample_size.py wilson --k ... --n ...`. Przy małej próbie przedział jest szeroki; zapisz go.
 4. Koncentracja reklamodawców (P11), przybliżone ICC z danych (P12).
 5. Wstępne rozkłady L i I na całej ramce (opis, bez korekty): `python tools/outcomes.py dane.csv` (P17); sprawdź udział L = 1 i reklam aktywnych (R17, R21).
-6. Decyzja D2: czy jest dość przypadków do planu z 05 (tabela liczebności dla H1 i H2).
+6. Decyzja D2: czy jest dość przypadków do planu z 05 (tabela liczebności dla hipotezy).
 
 ## Krok 3. Pilotaż codebooka
 
@@ -67,7 +67,7 @@ Progi dotyczące „rzadkiej kategorii" są moją heurystyką, nie progiem z lit
 1. Populacja = gold standard sklasyfikowany jako deepfake scam (wagi 1/p): `python tools/outcomes.py gold.csv --class-col in_population --weight-col weight --cluster advertiser_id --thr-days 2 --thr-intensity 25000`. Progi to parametry od leada i mogą się zmienić.
 2. Ten sam skrypt na reklamach wskazanych przez annotatora ocenianego (estymata naiwna) i porównanie z wynikiem z gold standardu (05, sekcja 5).
 3. Wrażliwość: definicja populacji (tylko `yes`; `yes` ∪ `suspected`; `unsure` włączone lub wyłączone), konwencja liczenia dni, granice przedziałów wyświetleń.
-4. Pasmo mediany L przy reklamach aktywnych: dolne (obserwowane do dnia pobrania) i górne (nieskończone) ograniczenie. Jeśli pasmo obejmuje próg T_L, hipoteza H1 nie jest rozstrzygnięta.
+4. Pasmo mediany L przy reklamach aktywnych: dolne (obserwowane do dnia pobrania) i górne (nieskończone) ograniczenie. Jeśli pasmo obejmuje próg T_L, składowa hipotezy o czasie życia nie jest rozstrzygnięta.
 5. Wpis do rejestru (P32 czeka na regułę decyzyjną od leada i analityka).
 
 ## Krok 8. Przekazanie analitykowi
