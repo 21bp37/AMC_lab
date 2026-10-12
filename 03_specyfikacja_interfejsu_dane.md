@@ -1,6 +1,6 @@
 # 03. Specyfikacja interfejsu: pipeline i inżynier danych
 
-Ten dokument mówi, **czego pipeline potrzebuje od inżyniera danych** i **co pipeline sprawdzi po otrzymaniu danych**. Treść merytoryczną dotyczącą źródeł, podstaw prawnych, ramki i data statementu uzupełnia inżynier danych; w miejscach, które do niego należą (oznaczone **[INŻ. DANYCH – DO WYPEŁNIENIA]**), są placeholdery i nie są wypełnione propozycją. Temat: „Jaka jest skala i czas życia reklam scamowych z wizerunkiem znanych osób?”; definicje skali i czasu życia należą do leada (P27, P28).
+Ten dokument mówi, **czego pipeline potrzebuje od inżyniera danych** i **co pipeline sprawdzi po otrzymaniu danych**. Treść merytoryczną dotyczącą źródeł, podstaw prawnych, ramki i data statementu uzupełnia inżynier danych; w miejscach, które do niego należą (oznaczone **[INŻ. DANYCH – DO WYPEŁNIENIA]**), są placeholdery i nie są wypełnione propozycją. **Temat:** Oszustwa z deepfake'ami. **Pytanie projektowe:** „Jaka jest skala i czas życia reklam scamowych z wizerunkiem znanych osób?”; definicje wielkości mierzonych (czas życia, dzienna intensywność) są ustalone z leadem w 01 (P27, P28). **Źródło główne (ustalone przez zespół): TikTok Commercial Content Library i Commercial Content API** [@tiktokcca; @tiktokcclnews2023].
 
 ## 1. Zasada nadrzędna
 
@@ -16,21 +16,22 @@ Kolumny **wymagane** to minimum do wykonania planu pomiaru (01). Kolumny **warun
 | `creative_id` | identyfikator unikatowej kreacji po deduplikacji (ten sam tekst/obraz u tego samego reklamodawcy = jedna kreacja) | tak | metoda deduplikacji opisana w data statement |
 | `advertiser_id` | stabilny identyfikator reklamodawcy (strony) | tak | klaster w analizie; pseudonimizacja, jeśli wymagana |
 | `platform` | platforma emisji | tak | |
-| `delivery_start`, `delivery_stop` | początek i koniec emisji (koniec pusty = reklama aktywna lub brak danych; znaczenie opisuje data statement) | tak, jeśli źródło je udostępnia | czas życia (P28); brak = D6 |
+| `delivery_start`, `delivery_stop` | pierwszy i ostatni dzień emisji (koniec pusty = reklama aktywna lub brak danych; znaczenie opisuje data statement) | tak | czas życia L = stop − start + 1 (P28); brak = D6. Strona API wymienia datę publikacji i „last seen date”: czy to jest to samo, potwierdza P06 |
 | `retrieval_date` | data pobrania rekordu | tak | stan źródła w tym dniu; konieczna do oceny cenzurowania prawostronnego |
 | `countries_delivered` | kraje dostarczenia | tak | zakres próby (P01) |
 | `ad_text`, `headline`, `link_caption` | tekst reklamy | tak | wejście dla poziomu L1 |
 | `language` | język tekstu (metoda detekcji opisana) | tak | D8 |
 | `cta_label` | etykieta przycisku wezwania do działania | jeśli dostępna | |
 | `dest_url` lub `dest_domain` | adres docelowy | warunkowa | łańcuch dowodu scamu (D4); P05 |
-| `reach_*` | zasięg (liczba całkowita lub przedział) | warunkowa | tylko jeśli lead uzna zasięg za część „skali" (P27); P06 |
+| `reach_total` | skumulowana liczba wyświetleń (lub osób, które zobaczyły reklamę) za cały okres emisji, jako liczba lub przedział | tak | dzienna intensywność I = reach_total / L (P27); ustalono, że źródło daje tylko sumę za okres, bez rozkładu godzinowego ani dziennego. Czy to wyświetlenia czy unikatowi odbiorcy, wartość czy przedział: P06. Przy przedziałach: kolumny `reach_min`, `reach_max` |
+| `reach_*` (inne) | rozbicia zasięgu (kraj, wiek, płeć), jeśli źródło je zwraca | jeśli dostępne | opis, nie wymagane do pytania |
 | `frame_source` | kryterium lub zapytanie, przez które reklama trafiła do ramki | warunkowa | niezależność ramki od annotatora ocenianego (D9, P29) |
 | `creative_available` | czy kreacja (obraz/wideo) jest legalnie dostępna | tak | D1 |
 | `creative_path` | ścieżka do pliku kreacji | warunkowa | tylko jeśli legalnie wolno |
 | `source_removed_flag` | czy źródło oznacza reklamę jako usuniętą/naruszającą zasady | jeśli dostępne | dowód zewnętrzny, nie wynik; R03 |
 | `source_name`, `source_version` | skąd i w jakiej wersji | tak | odtwarzalność |
 
-Dostępność poszczególnych pól (według oficjalnej dokumentacji, nie scraperów): {{P06: pola zasięgu, czasu emisji i targetowania dostępne dla reklam komercyjnych | zależy od: oficjalna dokumentacja źródła | domyślnie: nieznane}}.
+Dostępność poszczególnych pól (według oficjalnej dokumentacji, nie scraperów): {{P06: znaczenie pól czasu emisji i wyświetleń w TikTok Commercial Content Library / API | zależy od: oficjalna dokumentacja źródła | domyślnie: nieznane}}. Wiadomo z oficjalnej strony API: pola daty publikacji i „last seen date”, „liczba osób, które zobaczyły reklamę”, targetowanie dla reklam płatnych, metadane reklamy i reklamodawcy; dane tylko z UE; dostęp do roku od ostatniego wyświetlenia [@tiktokcca].
 
 ## 3. Macierz legalności: szkielet
 
@@ -40,16 +41,16 @@ Jeden wiersz = jedno źródło. Bez wypełnionej macierzy nie rozpoczynamy pracy
 
 | Źródło | Kto udostępnia | Podstawa (regulamin, licencja, umowa) | Wymagania dostępu (tożsamość, wniosek, umowa uczelni) | Pola dostępne | Kreacje? | Retencja | Co wolno zapisać i publikować | Dane osobowe? | Ocena |
 |---|---|---|---|---|---|---|---|---|---|
-| {{P07: źródło 1 (np. oficjalne API biblioteki reklam) \| zależy od: inżynier danych \| domyślnie: brak}} | | | | | | | | | |
-| {{P07: źródło 2 (np. Meta Content Library) \| zależy od: inżynier danych \| domyślnie: brak}} | | | | | | | | | |
+| TikTok Commercial Content Library i Commercial Content API [@tiktokcca; @tiktokcclnews2023] | TikTok | {{P07: podstawa (Developer Terms of Service, warunki biblioteki) \| zależy od: inżynier danych \| domyślnie: brak}} | konto TikTok for Developers z oficjalnym adresem e-mail i wniosek; odpowiedź deklarowana w ciągu 2 dni roboczych; API dla publiczności i badaczy | data publikacji, „last seen date”, liczba osób, targetowanie, metadane reklamy i reklamodawcy (dokładna lista: P06) | biblioteka: tak; API: {{P04: kreacje w API \| zależy od: dokumentacja \| domyślnie: niedostępne}} | do roku od ostatniego wyświetlenia | {{P07: co wolno zapisać i publikować \| zależy od: inżynier danych \| domyślnie: brak}} | nazwy reklamodawców; wizerunek osób | {{P07: ocena \| zależy od: inżynier danych \| domyślnie: brak}} |
+| {{P07: ewentualne źródło dodatkowe (np. biblioteka reklam Meta; tylko jeśli zespół je włącza) \| zależy od: inżynier danych \| domyślnie: brak}} | | | | | | | | | |
 | {{P18: źródło 3: Lista Ostrzeżeń CERT Polska i jej warunki użycia \| zależy od: inżynier danych \| domyślnie: brak}} | | | | | | | | | |
 
 Pytania, na które macierz musi odpowiedzieć (lista pytań jest moja, odpowiedzi należą do inżyniera danych):
 
-1. Czy oficjalne API biblioteki reklam zwraca reklamy komercyjne dostarczone w UE i które pola (tekst, daty, adres docelowy, zasięg)? Dokumentacja firm trzecich sugeruje, że reklamy inne niż polityczne są dostępne tylko, jeśli były dostarczone do UE lub Wielkiej Brytanii, i tylko przez ograniczony czas; **to wymaga potwierdzenia w oficjalnej dokumentacji**.
+1. Czy TikTok Commercial Content API zwraca pełny zestaw pól potrzebnych do pytania: tekst, daty pierwszego i ostatniego wyświetlenia, skumulowane wyświetlenia, adres docelowy, kreację? Oficjalna strona wymienia datę publikacji, „last seen date” i liczbę osób; **znaczenie tych pól i adres docelowy wymagają potwierdzenia w oficjalnej dokumentacji** (P05, P06).
 2. Czy regulamin pozwala na zapis i dalsze przetwarzanie kreacji (obraz/wideo)? (D1)
-3. Czy uczelnia może złożyć wniosek o Meta Content Library i w jakim terminie? (P20) Według dokumentacji dostęp odbywa się przez ICPSR, wymaga umowy o korzystaniu z danych między ICPSR a instytucją, zabrania eksportu danych z platformy badawczej i uploadu danych do niej; dostępność reklamów w Content Library nie jest przeze mnie potwierdzona.
-4. Czy wolno użyć Listy Ostrzeżeń CERT Polska do zestawienia z domenami z reklam i na jakich warunkach? (P18)
+3. Kto i kiedy składa wniosek o dostęp do API (konto deweloperskie, opis celu badawczego) i czy wystarcza wniosek indywidualny, czy potrzebna jest zgoda uczelni? (P20)
+4. Czy wolno użyć Listy Ostrzeżeń CERT Polska do zestawienia z domenami z reklam i na jakich warunkach? (P18) Dotyczy tylko reklam, dla których źródło podaje adres docelowy (P05).
 5. Czy nazwiska osób publicznych w tekście reklam są danymi osobowymi wymagającymi dodatkowej podstawy w kontekście RODO i jak ograniczyć ich przetwarzanie? (R09)
 6. Jakie są ograniczenia retencji i do kiedy dane trzeba pobrać, aby nie zniknęły? (R01)
 7. Które pola określają początek i koniec emisji, co oznacza pusty koniec emisji, i czy źródło zwraca reklamy już zakończone lub usunięte oraz na jak długo? (czas życia: P28, R01, R17)
@@ -69,7 +70,7 @@ Narzędzie: `python tools/audit_dataset.py dane.csv` (opis w README). Sprawdzeni
 2. Zakres dat, odsetek brakujących dat końca i pól warunkowych.
 3. Liczba reklam, unikatowych kreacji, reklamodawców; koncentracja (udział 10 największych, indeks Herfindahla, efektywna liczba klastrów); wyniki trafiają do P02 i P11.
 4. Rozkład języków i krajów (P10, D8), rozkład miesięcy.
-5. Dostępność pól czasu emisji i adresu docelowego (P05, P06), dostępność kreacji (P04); udział reklam bez daty końca emisji i rozkład czasu emisji reklam zakończonych (jako opis, bez korekty cenzurowania; P28, D6).
+5. Dostępność pól czasu emisji, wyświetleń i adresu docelowego (P05, P06), dostępność kreacji (P04); udział reklam bez daty końca emisji i rozkład czasu emisji reklam zakończonych (jako opis, bez korekty cenzurowania; P28, D6); wartości `reach_total` równe zero lub brakujące; przedziały zamiast liczb.
 6. Czy jest data statement i wpis w macierzy legalności; **jeśli nie, pipeline zatrzymuje pracę i zgłasza to**.
 
 Wyniki audytu są wpisywane do rejestru placeholderów (00) z odwołaniem do uruchomienia (hash danych w dzienniku).

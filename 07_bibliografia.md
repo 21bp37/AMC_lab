@@ -45,6 +45,8 @@ Klucze (`@klucz`) są używane w pozostałych dokumentach i w komentarzach narz�
 | `chasm2026` | Chasm: Unveiling covert advertisements on Chinese social media. arXiv:2604.20511 | Zbiór do oceny multimodalnych LLM w wykrywaniu ukrytych reklam; metryki P, R, F1, AUC; zero-shot, uczenie w kontekście, fine-tuning | Preprint zweryfikowany; autorów i rok do uzupełnienia; **czytaj w całości, zanim użyjesz jako wzorca** |
 | `adsprofiles2025` | When ads become profiles: Large-scale audit of algorithmic biases and LLM profiling risks. arXiv:2509.18874 | Multimodalny LLM stosowany do reklam z Facebooka (zadanie inne niż nasze) | Preprint zweryfikowany; autorów do uzupełnienia |
 | `clark2026` | Clark, S., Lewandowsky, S. (2026). The continued influence of AI-generated deepfake videos despite transparency warnings. *Communications Psychology* 4. doi:10.1038/s44271-025-00381-9 | Perswazyjność deepfake'a nie znika po ostrzeżeniu (trzy eksperymenty, N = 175, 275, 223); autorzy zastrzegają, że wyjaśnienia związane z ramowaniem zadania nie są wykluczone; **dotyczy wideo i oceny winy, nie reklam**; nie jest używane w dokumentach pipelinu, do decyzji leada o przeglądzie literatury (P31) | Zweryfikowane |
+| `tiktokcca` | TikTok for Developers. *Commercial Content API* (strona produktu), developers.tiktok.com/products/commercial-content-api. | Pola: data publikacji i „last seen date”, liczba osób, które zobaczyły reklamę, targetowanie dla reklam płatnych, metadane reklamy i reklamodawcy; dane z UE; dostęp do roku od ostatniego wyświetlenia; API dla publiczności i badaczy po wniosku | Strona odczytana w tej sesji; **nie rozstrzyga znaczenia pól ani warunków zapisu danych (Developer Terms of Service do przeczytania, P06, P07)**; dodaj datę dostępu |
+| `tiktokcclnews2023` | TikTok Newsroom (2023-07-20). *TikTok's Research API and Commercial Content Library*, newsroom.tiktok.com. | Biblioteka zawiera kreację reklamy, daty emisji, targetowanie i liczbę osób, którym wyświetlono reklamę; dostępne dane z Europy | Strona odczytana w tej sesji (omówienie pól); sprawdź aktualność, bo komunikat jest z 2023 r. |
 
 ## D. Wnioskowanie i dokumentacja danych
 
@@ -56,9 +58,9 @@ Klucze (`@klucz`) są używane w pozostałych dokumentach i w komentarzach narz�
 
 ## E. Źródła do uzupełnienia przez inżyniera danych
 
-Oficjalna dokumentacja platform, na której opiera się feasibility (nie została przeze mnie zweryfikowana; opisy pól biblioteki reklam znam wyłącznie z dokumentacji firm trzecich): {{P07: adresy i wersje oficjalnej dokumentacji API biblioteki reklam i Meta Content Library, regulaminy | zależy od: inżynier danych | domyślnie: brak}}.
+Oficjalna dokumentacja TikToka (źródło główne): odczytałem strony produktu i komunikat z 2023 r. (pozycje `tiktokcca`, `tiktokcclnews2023`), ale **nie** Developer Terms of Service ani pełnej specyfikacji pól API; znaczenia pól i warunków zapisu nie rozstrzygam. Do uzupełnienia: {{P07: adresy i wersje oficjalnej dokumentacji TikTok Commercial Content API i Library, Developer Terms of Service, ewentualnych źródeł dodatkowych | zależy od: inżynier danych | domyślnie: brak}}.
 
-Dla Meta Content Library znana jest procedura wnioskowa (wniosek przez ICPSR, umowa o korzystaniu z danych między ICPSR a instytucją, zakaz eksportu i wgrywania danych do platformy badawczej, zakaz publikowania danych osobowych) według dokumentacji deweloperskiej Mety i komunikatu ICPSR; zakres pokrycia reklam nie został przeze mnie potwierdzony.
+Jeśli zespół włączy źródło dodatkowe, np. Meta Content Library: znana jest procedura wnioskowa (wniosek przez ICPSR, umowa o korzystaniu z danych między ICPSR a instytucją, zakaz eksportu i wgrywania danych do platformy badawczej, zakaz publikowania danych osobowych) według dokumentacji deweloperskiej Mety i komunikatu ICPSR; zakres pokrycia reklam nie został przeze mnie potwierdzony.
 
 ## Czego nie znalazłem
 

@@ -4,9 +4,9 @@
 
 **Dlaczego tak:** codebook jest jedną instrukcją dla wszystkich annotatorów (referencyjnych i ocenianego); ta sama wersja służy do annotacji referencyjnej i do promptu annotatora ocenianego, co jest wzorcem z prac porównujących LLM z annotatorami [@gilardi2023; @halterman2025].
 
-**Temat:** Oszustwa z deepfake'ami. **Pytanie projektowe:** „Jaka jest skala i czas życia reklam scamowych z wizerunkiem znanych osób?”. Codebook służy do zaklasyfikowania reklamy do populacji badanej (wzmianka lub wizerunek osoby publicznej, scam) i do podziału na warstwy. Skala i czas życia pochodzą z metadanych, nie z codebooka. Definicje skali, czasu życia i konstruktu „wizerunek” należą do leada (P27, P28, P30): {{P30: konstrukt wizerunku: wzmianka, twarz czy oba | zależy od: lead, D1 | domyślnie: brak}}.
+**Temat:** Oszustwa z deepfake'ami. **Pytanie projektowe:** „Jaka jest skala i czas życia reklam scamowych z wizerunkiem znanych osób?”. **Pytanie badawcze (wpisane z ustaleń leada):** jaka jest mediana czasu życia reklam typu deepfake scam i jaka jest ich dzienna intensywność wyświetleń (01). Codebook służy do zaklasyfikowania reklamy do **populacji badanej**: scam (`scam_type`, `scam_judgement`) oraz podejrzenie deepfake'a (`media_synthetic_suspected` ∈ {`yes`, `suspected`}, z nazwaną przesłanką w `media_synthetic_cue`), i do podziału na warstwy (typ scamu, obecność osoby publicznej). Czas życia i dzienna intensywność pochodzą z metadanych, nie z codebooka. Czy populacja jest dodatkowo zawężona do wizerunku osoby publicznej, rozstrzyga lead: {{P30: zawężenie populacji do wizerunku osoby publicznej | zależy od: lead, D1 | domyślnie: brak}}.
 
-**Rdzeń i zmienne dodatkowe.** Rdzeń: `celeb_mention`, `scam_type`, `scam_judgement`, `celeb_category` oraz (po D1) `celeb_face_visible`, `media_type`, `media_synthetic_suspected` (z pomocniczą `media_synthetic_cue`). Zmienne oznaczone „(dodatkowa)” są poza rdzeniem pytania: opcjonalne i eksploracyjne, kodowane tylko jeśli starczy czasu na pilotaż. Codebook przechodzi co najmniej dwie rundy pilotażu, zanim zostanie zamrożony (05).
+**Rdzeń i zmienne dodatkowe.** Rdzeń (kryteria populacji): `scam_type`, `scam_judgement` oraz (po D1) `media_synthetic_suspected` z pomocniczą `media_synthetic_cue`; rdzeń opisowy: `celeb_mention`, `celeb_category`, a po D1 `celeb_face_visible`, `media_type`. Zmienne oznaczone „(dodatkowa)” są poza rdzeniem pytania: opcjonalne i eksploracyjne, kodowane tylko jeśli starczy czasu na pilotaż. Codebook przechodzi co najmniej dwie rundy pilotażu, zanim zostanie zamrożony (05).
 
 **Przykłady poniżej są wymyślone** (fikcyjne osoby, fikcyjne marki) i służą wyłącznie do zilustrowania reguł. Zostaną zastąpione zanonimizowanymi przykładami z pilotażu: {{P23: przykłady z pilotażu do uzupełnienia | zależy od: pilotaż, P07 | domyślnie: przykłady fikcyjne}}.
 
@@ -32,7 +32,7 @@ Jeśli kodowanie wykonuje jedna osoba, α między kodującymi nie da się policz
 5. **Dwa poziomy:**
    - **L1** (z tekstu i metadanych): wykonalny bez dostępu do kreacji.
    - **L2** (wizualne): kodowany wyłącznie po potwierdzeniu punktu decyzyjnego D1 (legalny dostęp do kreacji): {{P04: dostępność kreacji i podstawa prawna | zależy od: regulamin źródła | domyślnie: brak dostępu, L2 wyłączony}}.
-6. **Ograniczenie konstruktu L1:** temat mówi o *wizerunku*, a poziom L1 mierzy tylko *wzmiankę* o osobie publicznej w tekście. Reklama z twarzą osoby publicznej i bez nazwiska w tekście zostanie na L1 zakodowana jako `none` i wypadnie z populacji, co zaniża skalę. To jest błąd pomiaru kryterium populacji (06, R05) i jest opisany jako ograniczenie, dopóki L2 nie jest dostępny.
+6. **Ograniczenie konstruktu L1:** wizerunek osoby publicznej poziom L1 mierzy tylko jako *wzmiankę* w tekście. Reklama z twarzą osoby publicznej i bez nazwiska w tekście zostanie na L1 zakodowana jako `none`. Dla pytania badawczego (populacja = deepfake scam) to błąd klasyfikacji *warstwy* „osoba publiczna”, a nie populacji; staje się błędem populacji dopiero, jeśli lead zawęzi populację do wizerunku osoby publicznej (P30; 06, R05).
 
 ## Zmienne poziomu L1
 
@@ -145,7 +145,7 @@ Kodowane wyłącznie wtedy, gdy kreacje są legalnie dostępne: {{P04: dostępno
 
 ### `media_synthetic_suspected`
 
-Ocena annotatora referencyjnego, czy kreacja (obraz lub wideo) wygląda na wygenerowaną lub zmanipulowaną (deepfake, obraz wygenerowany, podmiana twarzy lub głosu). Zmienna oznacza **podejrzenie, nie ustalenie**: z samego materiału nie da się wiarygodnie stwierdzić, że jest deepfake'iem (06, R19), a wartość `yes` nie znaczy „dowiedziono deepfake'a”. Zmienna jest opisowa; nie służy do określania populacji badanej, dopóki lead nie rozstrzygnie P30.
+Ocena annotatora referencyjnego, czy kreacja (obraz lub wideo) wygląda na wygenerowaną lub zmanipulowaną (deepfake, obraz wygenerowany, podmiana twarzy lub głosu). Zmienna oznacza **podejrzenie, nie ustalenie**: z samego materiału nie da się wiarygodnie stwierdzić, że jest deepfake'iem (06, R19), a wartość `yes` nie znaczy „dowiedziono deepfake'a”. Zmienna jest **kryterium populacji badanej** („deepfake scam”): wartości `yes` i `suspected` włączają reklamę do populacji (wrażliwość: tylko `yes`); `no`, `unsure` i `na_no_media` wyłączają lub oznaczają brak oceny. Ponieważ jest tylko podejrzeniem i ma niską oczekiwaną zgodność, jej błąd jest jednym z głównych źródeł niepewności wyników (06, R19). Reklamy z wartością `unsure` nie wchodzą do populacji, ale ich udział raportujemy, a w analizie wrażliwości traktujemy je kolejno jako włączone i wyłączone.
 
 | Wartość | Definicja |
 |---|---|

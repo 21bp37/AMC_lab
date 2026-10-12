@@ -1,6 +1,6 @@
 # 10. Playbook: co robić po otrzymaniu danych
 
-Kroki w kolejności. Każdy krok kończy się wpisem w rejestrze placeholderów (00) i, jeśli dotyczy, uruchomieniem zapisanym w dzienniku (`tools/run_log.py`). Punkty D1–D9 są zdefiniowane w 00. Temat: „Jaka jest skala i czas życia reklam scamowych z wizerunkiem znanych osób?”
+Kroki w kolejności. Każdy krok kończy się wpisem w rejestrze placeholderów (00) i, jeśli dotyczy, uruchomieniem zapisanym w dzienniku (`tools/run_log.py`). Punkty D1–D9 są zdefiniowane w 00. **Temat:** Oszustwa z deepfake'ami. **Pytanie projektowe:** „Jaka jest skala i czas życia reklam scamowych z wizerunkiem znanych osób?” **Pytanie badawcze (01):** mediana czasu życia reklam deepfake scam i ich dzienna intensywność wyświetleń (hipoteza: mediana ≤ 2 dni, ponad 50% reklam ≥ 25 tys. wyświetleń na dzień; progi są parametrami).
 
 ## Krok 0. Bramka legalności (przed otwarciem danych)
 
@@ -13,18 +13,20 @@ Kroki w kolejności. Każdy krok kończy się wpisem w rejestrze placeholderów 
 
 Reakcje:
 - brakuje kolumn wymaganych → zwróć do inżyniera danych z listą (03, sekcja 2);
-- nie ma dat początku i końca emisji → D6 = NIE (czas życia niemierzalny); zasięg jest potrzebny tylko, jeśli lead włączył go do definicji skali (P27);
+- nie ma dat początku i końca emisji albo skumulowanych wyświetleń (`reach_total`) → D6 = NIE (czas życia lub dzienna intensywność niemierzalne);
+- wyświetlenia podane jako przedziały → zapisz granice (`reach_min`, `reach_max`) i sprawdź, w ilu przypadkach próg T_I wypada w przedziale (R22);
 - duży udział reklam bez daty końca → zgłoś do leada i analityka (cenzurowanie, P28, R17);
 - adres docelowy niedostępny → D4 = NIE;
-- kreacje niedostępne → D1 = NIE.
+- kreacje (wideo) niedostępne → D1 = NIE: populacji „deepfake scam” nie da się zidentyfikować, zgłoś do leada (P30).
 
 ## Krok 2. Eksploracja do karty M1
 
 1. Rozkład w czasie, po platformach, krajach i językach (P17, P10; statystyki opisowe dostarcza inżynier danych, pipeline może użyć `audit_dataset.py`).
 2. Losowo wybrane 50–100 rekordów przejrzyj ręcznie; zapisz, co zaskoczyło (P17). To jest materiał do poprawy codebooka, nie do dowodzenia.
-3. Szacunek prevalence wzmianki o osobie publicznej i scamu na tej próbie (P09). Przedział ufności Wilsona: `python tools/sample_size.py wilson --k ... --n ...`. Przy małej próbie przedział jest szeroki; zapisz go.
+3. Szacunek prevalence scamu i podejrzenia deepfake'a na tej próbie (P09). Przedział ufności Wilsona: `python tools/sample_size.py wilson --k ... --n ...`. Przy małej próbie przedział jest szeroki; zapisz go.
 4. Koncentracja reklamodawców (P11), przybliżone ICC z danych (P12).
-5. Decyzja D2: czy jest dość przypadków do planu z 05.
+5. Wstępne rozkłady L i I na całej ramce (opis, bez korekty): `python tools/outcomes.py dane.csv` (P17); sprawdź udział L = 1 i reklam aktywnych (R17, R21).
+6. Decyzja D2: czy jest dość przypadków do planu z 05 (tabela liczebności dla H1 i H2).
 
 ## Krok 3. Pilotaż codebooka
 
@@ -60,9 +62,17 @@ Progi dotyczące „rzadkiej kategorii" są moją heurystyką, nie progiem z lit
 4. Wrażliwość: `python tools/prompt_robustness.py ...`.
 5. D5: zgodność annotatora ocenianego z gold standardem względem zgodności annotatorów referencyjnych między sobą.
 
-## Krok 7. Przekazanie analitykowi
+## Krok 7. Wyniki na populacji badanej
 
-Przekaż: tabelę z predykcjami i etykietami, wagami włączenia, klastrami; opis zmiennych; wyniki walidacji z CI; estymatę skali naiwną i skorygowaną; wyniki analizy błędów po warstwach i po czasie emisji (05, sekcja 5); zakres wrażliwości; ograniczenia. Analityk wdraża pełną korektę błędu pomiaru dla regresji lub modelu czasu życia [@egami2025dsl] (w repozytorium jest tylko wersja uproszczona dla częstości; 05, sekcja 6).
+1. Populacja = gold standard sklasyfikowany jako deepfake scam (wagi 1/p): `python tools/outcomes.py gold.csv --class-col in_population --weight-col weight --cluster advertiser_id --thr-days 2 --thr-intensity 25000`. Progi to parametry od leada i mogą się zmienić.
+2. Ten sam skrypt na reklamach wskazanych przez annotatora ocenianego (estymata naiwna) i porównanie z wynikiem z gold standardu (05, sekcja 5).
+3. Wrażliwość: definicja populacji (tylko `yes`; `yes` ∪ `suspected`; `unsure` włączone lub wyłączone), konwencja liczenia dni, granice przedziałów wyświetleń.
+4. Pasmo mediany L przy reklamach aktywnych: dolne (obserwowane do dnia pobrania) i górne (nieskończone) ograniczenie. Jeśli pasmo obejmuje próg T_L, hipoteza H1 nie jest rozstrzygnięta.
+5. Wpis do rejestru (P32 czeka na regułę decyzyjną od leada i analityka).
+
+## Krok 8. Przekazanie analitykowi
+
+Przekaż: tabelę z predykcjami i etykietami, wagami włączenia, klastrami; opis zmiennych; wyniki walidacji z CI; medianę L i udział I ≥ T_I naiwne i z gold standardu; wyniki analizy błędów po warstwach, po czasie emisji i po intensywności (05, sekcja 5); zakres wrażliwości; ograniczenia. Analityk wdraża model przeżycia dla reklam aktywnych (Kaplan–Meier) i pełną korektę błędu pomiaru dla regresji [@egami2025dsl] (w repozytorium są tylko: wersja uproszczona dla częstości i `tools/outcomes.py` z pasmem mediany; 05, sekcja 6).
 
 ## Lista kontrolna przed oddaniem raportu
 
