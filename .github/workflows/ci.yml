@@ -1,0 +1,36 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Testy narzędzi
+        run: python -m unittest discover -s tests -v
+      - name: Spójność schema, codebook i szablon CSV
+        run: python tools/checks.py consistency
+      - name: Placeholdery użyte w dokumentach są w rejestrze
+        run: python tools/checks.py placeholders
+
+  no-data-committed:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Brak danych o reklamach w repozytorium
+        run: |
+          bad=$(git ls-files | grep -E '\.(csv|parquet|xlsx|jsonl)$' | grep -v -E '^(templates/|data_synthetic/|logs/runs\.jsonl$)' || true)
+          if [ -n "$bad" ]; then
+            echo "Pliki danych nie mogą trafiać do repozytorium (03, 09):"; echo "$bad"; exit 1
+          fi

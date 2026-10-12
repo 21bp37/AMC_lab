@@ -1,6 +1,6 @@
 # 00. Rejestr placeholderów i punktów decyzyjnych
 
-**Temat:** „Jaka jest skala i czas życia reklam scamowych z wizerunkiem znanych osób?”
+**Temat:** „Oszustwa z Deepfake'ami. Jaka jest skala i czas życia reklam scamowych z wizerunkiem znanych osób?”
 
 Zakres tego repozytorium to wkład **inżyniera pipelinu**: codebook, gold standard, walidacja annotatora ocenianego, analiza błędów. Wszystko, co należy do innych ról, jest w dokumentach tylko jako placeholder i **nie jest wypełnione propozycją**. Oznaczenia właścicieli:
 

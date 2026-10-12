@@ -4,17 +4,19 @@ Karta M1 jest oceniana za: konkretność pytania, jakość eksploracji i spójno
 
 ## 1. Temat i pytanie badawcze
 
-**Temat (zadany):** „Jaka jest skala i czas życia reklam scamowych z wizerunkiem znanych osób?”
+**Temat:** Oszustwa z deepfake'ami.
 
-> **[LEAD – DO WYPEŁNIENIA]** Pytanie badawcze i hipoteza w wersji ostatecznej: {{P26: pytanie badawcze i hipoteza | zależy od: lead | domyślnie: brak}}
+**Pytanie projektowe:** „Jaka jest skala i czas życia reklam scamowych z wizerunkiem znanych osób?”
+
+> **[LEAD – DO WYPEŁNIENIA]** Hipoteza i ostateczne brzmienie pytania badawczego: {{P26: hipoteza i brzmienie pytania | zależy od: lead | domyślnie: brak}}
 >
 > **[LEAD – DO WYPEŁNIENIA]** Definicja skali: {{P27: skala (jednostka liczenia, okno czasu, ewentualnie zasięg) | zależy od: lead, P06 | domyślnie: brak}}
 >
 > **[LEAD / INŻ. DANYCH – DO WYPEŁNIENIA]** Definicja czasu życia: {{P28: czas życia reklamy (początek, koniec, reklamy aktywne, reklamy sprzed okna źródła) | zależy od: lead, P06, P03 | domyślnie: brak}}
 >
-> **[LEAD – DO WYPEŁNIENIA]** Konstrukt wizerunku: {{P30: wzmianka, widoczna twarz czy oba | zależy od: lead, D1 | domyślnie: brak}}
+> **[LEAD – DO WYPEŁNIENIA]** Konstrukt wizerunku i rola deepfake'a: {{P30: wzmianka, widoczna twarz czy oba; deepfake jako kryterium populacji czy zmienna opisowa | zależy od: lead, D1 | domyślnie: brak}}
 
-**Czego pipeline potrzebuje od leada (pytania, nie odpowiedzi):** (a) jednostka, w której liczymy skalę; (b) jak traktować reklamy bez daty końca i reklamy rozpoczęte przed oknem źródła; (c) czy „wizerunek” oznacza wzmiankę w tekście, widoczną twarz, czy oba (zależy od dostępu do kreacji, D1); (d) czy pytanie jest wyłącznie opisowe, czy zawiera porównanie z reklamami scamowymi bez osoby publicznej. Od odpowiedzi zależą klasy, które walidujemy w 05.
+**Czego pipeline potrzebuje od leada (pytania, nie odpowiedzi):** (a) jednostka, w której liczymy skalę; (b) jak traktować reklamy bez daty końca i reklamy rozpoczęte przed oknem źródła; (c) czy „wizerunek” oznacza wzmiankę w tekście, widoczną twarz, czy oba (zależy od dostępu do kreacji, D1); (d) czy pytanie jest wyłącznie opisowe, czy zawiera porównanie z reklamami scamowymi bez osoby publicznej; (e) czy temat „oszustwa z deepfake'ami” zawęża populację do reklam z podejrzeniem deepfake'a, czy deepfake jest tylko cechą opisową reklam z wizerunkiem. Od odpowiedzi zależą klasy, które walidujemy w 05.
 
 ## 2. Co mierzy pipeline, a co pochodzi skądinąd
 
@@ -39,7 +41,7 @@ Annotator oceniany nie mierzy ani skali, ani czasu życia. Mierzy **przynależno
 
 **Wizerunek znanej osoby (kryterium populacji).** Dwa poziomy (02):
 - **L1 (wykonalny):** *wzmianka* o osobie publicznej w tekście, nagłówku, podpisie linku lub domenie reklamy (`celeb_mention`).
-- **L2 (warunkowy, po D1):** *widoczna twarz* osoby, którą annotator referencyjny uznaje za osobę publiczną, bez ustalania tożsamości po twarzy (zob. 04, zasada 4), oraz podejrzenie syntetyczności kreacji. Bez legalnego dostępu do kreacji L2 jest wyłączony, a konstrukt zawęża się do wzmianki (ograniczenie opisane w R05; decyzja o temacie: P30). Dostępność: {{P04: dostępność kreacji | zależy od: regulamin źródła | domyślnie: niedostępne}}.
+- **L2 (warunkowy, po D1):** *widoczna twarz* osoby, którą annotator referencyjny uznaje za osobę publiczną, bez ustalania tożsamości po twarzy (zob. 04, zasada 4), oraz podejrzenie syntetyczności kreacji (`media_synthetic_suspected`: `yes`, `suspected`, `no`, `unsure`, `na_no_media`, z główną przesłanką w `media_synthetic_cue`). Temat dotyczy deepfake'ów, ale annotator referencyjny zgłasza tylko *podejrzenie* syntetyczności, a nie ustala deepfake'a; wiarygodność takiej oceny jest ograniczona (02, R19). Bez legalnego dostępu do kreacji L2 jest wyłączony, a konstrukt zawęża się do wzmianki (ograniczenie opisane w R05; decyzja o temacie: P30). Dostępność: {{P04: dostępność kreacji | zależy od: regulamin źródła | domyślnie: niedostępne}}.
 
 **Scam.** Dwie warstwy, rozdzielone celowo:
 1. *Typ oferty* z treści reklamy (`scam_type`, kodowany przez annotatorów, łącznie z wartościami `not_scam` i `unclear`).
@@ -55,7 +57,8 @@ Annotator oceniany nie mierzy ani skali, ani czasu życia. Mierzy **przynależno
 | `celeb_mention` | kryterium populacji (wzmianka o osobie publicznej) | L1 |
 | `scam_type`, `scam_judgement` | kryterium populacji (scam) i warstwy podziału skali | L1 |
 | `celeb_category` | warstwa podziału (opis populacji) | L1 |
-| `celeb_face_visible`, `media_type`, `media_synthetic_suspected` | kryterium populacji dla wizerunku (L2); dostępne tylko po D1 | L2 |
+| `celeb_face_visible` | kryterium populacji dla wizerunku (L2); dostępne tylko po D1 | L2 |
+| `media_type`, `media_synthetic_suspected`, `media_synthetic_cue` | zmienne opisowe (L2), niska oczekiwana wiarygodność dla deepfake'a; rola w populacji do rozstrzygnięcia przez leada (P30) | L2 |
 | `celeb_id` | pole robocze (dane osobowe, nie raportujemy) | L1 |
 | `celeb_claim`, `fake_news_format`, `urgency_cue`, `guaranteed_return_claim`, `authority_cue`, `cta_type` | zmienne dodatkowe; poza rdzeniem pytania (opcjonalne, eksploracyjne) | L1 |
 
@@ -106,7 +109,7 @@ Narzędzie pomocnicze do statystyk opisowych: `python tools/audit_dataset.py dan
 
 ## 10. Ograniczenia i źródła błędu (wersja do karty)
 
-Pełny rejestr w 06. Najważniejsze dla pytania o skalę i czas życia: (1) czas życia jako czas do usunięcia, jeśli scam definiuje usunięcie (R03); (2) cenzurowanie prawostronne (reklamy wciąż aktywne) i lewostronne (reklamy sprzed okna źródła) oraz retencja źródła (R01, R17); (3) skala jako liczba w ramce, a nie w populacji (R18); (4) błąd klasyfikacji wizerunku na poziomie L1 (R05); (5) klastrowanie (R06); (6) dane osobowe i regulaminy (R09, R10).
+Pełny rejestr w 06. Najważniejsze dla pytania o skalę i czas życia: (1) czas życia jako czas do usunięcia, jeśli scam definiuje usunięcie (R03); (2) cenzurowanie prawostronne (reklamy wciąż aktywne) i lewostronne (reklamy sprzed okna źródła) oraz retencja źródła (R01, R17); (3) skala jako liczba w ramce, a nie w populacji (R18); (4) błąd klasyfikacji wizerunku na poziomie L1 (R05); (5) klastrowanie (R06); (6) dane osobowe i regulaminy (R09, R10); (7) deepfake nie jest mierzony bezpośrednio, tylko podejrzewany (R19).
 
 ## 11. Stan wiedzy i uzasadnienie wartości badania
 

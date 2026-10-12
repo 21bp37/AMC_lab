@@ -1,6 +1,6 @@
 # 06. Rejestr ryzyk i ograniczeń
 
-Ryzyka są wpisem do karty M1 (jawne ograniczenia i źródła błędu to kryterium oceny). Temat: „Jaka jest skala i czas życia reklam scamowych z wizerunkiem znanych osób?” Znacznik na początku ryzyka wskazuje, kto je rozstrzyga lub potwierdza: **[PIPELINE]**, **[INŻ. DANYCH]**, **[LEAD]**; ryzyka danych i projektu zgłosił pipeline z własnej perspektywy, a ich opis i ocenę muszą potwierdzić wskazane role. Prawdopodobieństwo i wpływ to **ocena własna** (niski/średni/wysoki) do rewizji po danych; nie są oparte na pomiarze. „Wskaźnik z danych" mówi, co sprawdzić, gdy dane już są.
+Ryzyka są wpisem do karty M1 (jawne ograniczenia i źródła błędu to kryterium oceny). **Temat:** Oszustwa z deepfake'ami. **Pytanie projektowe:** „Jaka jest skala i czas życia reklam scamowych z wizerunkiem znanych osób?” Znacznik na początku ryzyka wskazuje, kto je rozstrzyga lub potwierdza: **[PIPELINE]**, **[INŻ. DANYCH]**, **[LEAD]**; ryzyka danych i projektu zgłosił pipeline z własnej perspektywy, a ich opis i ocenę muszą potwierdzić wskazane role. Prawdopodobieństwo i wpływ to **ocena własna** (niski/średni/wysoki) do rewizji po danych; nie są oparte na pomiarze. „Wskaźnik z danych" mówi, co sprawdzić, gdy dane już są.
 
 | ID | Ryzyko | Skutek dla wniosku | Praw. | Wpływ | Środek zaradczy | Wskaźnik z danych |
 |---|---|---|---|---|---|---|
@@ -22,9 +22,10 @@ Ryzyka są wpisem do karty M1 (jawne ograniczenia i źródła błędu to kryteri
 | R16 | **[INŻ. DANYCH / LEAD]** **Niewykonalność pomiaru czasu życia**: dla reklam komercyjnych daty emisji (a ewentualnie zasięg) mogą być niedostępne (P06) | Brak zmiennej wynikowej | do ustalenia | wysoki | D6; wynik negatywny o pomiarze jest pełnoprawnym wynikiem (zasady kursu) | P06 |
 | R17 | **[INŻ. DANYCH / LEAD]** **Cenzurowanie i obcięcie czasu życia**: reklamy wciąż aktywne (brak końca emisji) i reklamy rozpoczęte przed oknem źródła; retencja źródła obcina historię | Zaniżony lub zniekształcony czas życia | wysokie | wysoki | Jawna definicja czasu życia (P28); raportowanie udziału reklam bez końca; metody analizy przeżycia (analityk) | udział reklam bez daty końca (`audit_dataset.py`), rozkład `delivery_start` względem okna źródła |
 | R18 | **[INŻ. DANYCH / LEAD]** **Skala jako liczba w ramce, nie w populacji**: jeśli ramka powstała z kryteriów związanych z osobami publicznymi lub scamem, liczby dotyczą tylko ramki | Zawyżona lub zaniżona skala | wysokie | wysoki | Opis ramki (P29, D9); skala raportowana względem ramki | opis ramki w data statement |
+| R19 | **[PIPELINE / LEAD]** **Deepfake nie jest mierzony bezpośrednio**: temat dotyczy oszustw z deepfake'ami, ale annotator referencyjny i oceniany nie potrafią wiarygodnie stwierdzić, że materiał jest syntetyczny; `media_synthetic_suspected` to tylko podejrzenie | Skala i czas życia dotyczą reklam scamowych z wizerunkiem osób, nie dowiedzionych deepfake'ów; wniosek o deepfake'ach byłby nadinterpretacją | wysokie | wysoki | Zmienna opisowa o niskiej wiarygodności (02); rola deepfake'a rozstrzygnięta przez leada (P30); wnioski formułowane o „wizerunku”, nie o „deepfake'u” | α dla `media_synthetic_suspected` (P13); udział wartości „niepewne” |
 
 ## Wnioski do karty M1
 
-1. Najpoważniejsze zagrożenia dla pytania o skalę i czas życia to R02, R03, R17, R18 i R05. Wszystkie są strukturalne (wynikają z konstrukcji badania i danych), nie techniczne.
+1. Najpoważniejsze zagrożenia dla pytania o skalę i czas życia to R02, R03, R17, R18, R19 i R05. Wszystkie są strukturalne (wynikają z konstrukcji badania i danych), nie techniczne.
 2. Część z nich nie jest usuwalna; jest jawnie opisywana jako ograniczenie, a sformułowanie wniosków (decyzja leada, P26) ma to odzwierciedlać.
 3. Ryzyka R04, R10, R16 i R17 mogą zawęzić albo uniemożliwić badanie; plan zakłada rozstrzygnięcie ich przed zbieraniem danych (D4, D6, macierz legalności).

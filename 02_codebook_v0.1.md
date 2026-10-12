@@ -4,9 +4,9 @@
 
 **Dlaczego tak:** codebook jest jedną instrukcją dla wszystkich annotatorów (referencyjnych i ocenianego); ta sama wersja służy do annotacji referencyjnej i do promptu annotatora ocenianego, co jest wzorcem z prac porównujących LLM z annotatorami [@gilardi2023; @halterman2025].
 
-**Temat:** „Jaka jest skala i czas życia reklam scamowych z wizerunkiem znanych osób?” Codebook służy do zaklasyfikowania reklamy do populacji badanej (wzmianka lub wizerunek osoby publicznej, scam) i do podziału na warstwy. Skala i czas życia pochodzą z metadanych, nie z codebooka. Definicje skali, czasu życia i konstruktu „wizerunek” należą do leada (P27, P28, P30): {{P30: konstrukt wizerunku: wzmianka, twarz czy oba | zależy od: lead, D1 | domyślnie: brak}}.
+**Temat:** Oszustwa z deepfake'ami. **Pytanie projektowe:** „Jaka jest skala i czas życia reklam scamowych z wizerunkiem znanych osób?”. Codebook służy do zaklasyfikowania reklamy do populacji badanej (wzmianka lub wizerunek osoby publicznej, scam) i do podziału na warstwy. Skala i czas życia pochodzą z metadanych, nie z codebooka. Definicje skali, czasu życia i konstruktu „wizerunek” należą do leada (P27, P28, P30): {{P30: konstrukt wizerunku: wzmianka, twarz czy oba | zależy od: lead, D1 | domyślnie: brak}}.
 
-**Rdzeń i zmienne dodatkowe.** Rdzeń: `celeb_mention`, `scam_type`, `scam_judgement`, `celeb_category` oraz (po D1) `celeb_face_visible`, `media_type`, `media_synthetic_suspected`. Zmienne oznaczone „(dodatkowa)” są poza rdzeniem pytania: opcjonalne i eksploracyjne, kodowane tylko jeśli starczy czasu na pilotaż. Codebook przechodzi co najmniej dwie rundy pilotażu, zanim zostanie zamrożony (05).
+**Rdzeń i zmienne dodatkowe.** Rdzeń: `celeb_mention`, `scam_type`, `scam_judgement`, `celeb_category` oraz (po D1) `celeb_face_visible`, `media_type`, `media_synthetic_suspected` (z pomocniczą `media_synthetic_cue`). Zmienne oznaczone „(dodatkowa)” są poza rdzeniem pytania: opcjonalne i eksploracyjne, kodowane tylko jeśli starczy czasu na pilotaż. Codebook przechodzi co najmniej dwie rundy pilotażu, zanim zostanie zamrożony (05).
 
 **Przykłady poniżej są wymyślone** (fikcyjne osoby, fikcyjne marki) i służą wyłącznie do zilustrowania reguł. Zostaną zastąpione zanonimizowanymi przykładami z pilotażu: {{P23: przykłady z pilotażu do uzupełnienia | zależy od: pilotaż, P07 | domyślnie: przykłady fikcyjne}}.
 
@@ -145,7 +145,46 @@ Kodowane wyłącznie wtedy, gdy kreacje są legalnie dostępne: {{P04: dostępno
 
 ### `media_synthetic_suspected`
 
-`yes`, jeśli kreacja wygląda na wygenerowaną lub zmanipulowaną (artefakty obrazu, niezgodność ruchu ust i głosu), `no`, `unsure`, `na_no_media`. Zmienna oznacza *podejrzenie* annotatora, a nie ustalenie; wiarygodność oceny annotatora referencyjnego przy deepfake'ach jest ograniczona i jest raportowana jako zmienna o niskim oczekiwanym α.
+Ocena annotatora referencyjnego, czy kreacja (obraz lub wideo) wygląda na wygenerowaną lub zmanipulowaną (deepfake, obraz wygenerowany, podmiana twarzy lub głosu). Zmienna oznacza **podejrzenie, nie ustalenie**: z samego materiału nie da się wiarygodnie stwierdzić, że jest deepfake'iem (06, R19), a wartość `yes` nie znaczy „dowiedziono deepfake'a”. Zmienna jest opisowa; nie służy do określania populacji badanej, dopóki lead nie rozstrzygnie P30.
+
+| Wartość | Definicja |
+|---|---|
+| `yes` | co najmniej jedna wyraźna przesłanka, którą można wskazać w kreacji (zob. `media_synthetic_cue`), bez równie prawdopodobnego wyjaśnienia innego niż synteza |
+| `suspected` | słaba lub niejednoznaczna przesłanka (np. wygładzona skóra, dziwny ruch warg w jednym ujęciu), możliwe też inne wyjaśnienie (filtr, kompresja, retusz, animacja) |
+| `no` | kreacja wyświetlona dobrej jakości, bez przesłanek syntezy |
+| `unsure` | nie da się ocenić: niska rozdzielczość, bardzo krótki kadr, brak dźwięku przy ocenie ruchu ust, kreacja uszkodzona |
+| `na_no_media` | brak obrazu lub wideo (kreacja tylko tekstowa albo niedostępna) |
+
+Zasady rozstrzygania:
+1. Oceniamy to, co widać i słychać w kreacji. Nie szukamy źródła obrazu, nie używamy narzędzi do wykrywania deepfake'ów ani rozpoznawania twarzy, nie ustalamy, kim jest osoba na materiale (04, zasada 4).
+2. `yes` wymaga przesłanki, którą annotator potrafi nazwać w `media_synthetic_cue`; samo „wygląda dziwnie” to najwyżej `suspected`.
+3. Jeśli reklama zawiera tylko obraz statyczny, ocena dotyczy obrazu; brak możliwości oceny ruchu ust nie jest przesłanką za ani przeciw (wtedy `no` albo `unsure`, zależnie od jakości obrazu).
+4. W razie wahania między `yes` a `suspected` wybierz `suspected`; między `suspected` a `no`, gdy nie umiesz nazwać żadnej przesłanki, wybierz `no`; gdy jakość uniemożliwia ocenę, wybierz `unsure`, nie `no`.
+5. Karuzela: oceń wszystkie karty; wartość to najwyższy poziom podejrzenia spośród nich (kolejność `yes` > `suspected` > `no`), `unsure` tylko gdy żadna karta nie pozwala na ocenę.
+
+Przypadki brzegowe:
+- **Znana osoba z ewidentnie nierealnego kontekstu** (np. wypowiada się w sprawie inwestycji, której nigdy nie promowała): to treść fałszywego poparcia (`celeb_claim`), nie dowód syntezy obrazu; sama treść nie uzasadnia `yes`.
+- **Retusz, filtr beauty, sztuka cyfrowa, ilustracja, animacja, grafika AI wyraźnie niefotograficzna**: kodujemy `no` dla deepfake'a w sensie wizerunku osoby; jeśli kreacja jest jawnie oznaczona jako wygenerowana, patrz `platform_label` poniżej.
+- **Oznaczenie przez platformę lub reklamodawcę** („wygenerowano przez AI”): zapisz `platform_label` w `media_synthetic_cue`; wartość `media_synthetic_suspected` ustaw na `yes`, jeśli oznaczenie dotyczy osoby na materiale, w pozostałych przypadkach `no`. Brak oznaczenia nie jest przesłanką za `no`.
+- **Montaż z archiwalnych nagrań** (zmiana głosu, przycięty wywiad) bez oznak syntezy: `suspected` tylko wtedy, gdy ruch warg lub głos wyraźnie nie pasują; inaczej `no`.
+- **Podróbka, sobowtór, aktor**: z materiału nie da się odróżnić od syntezy; `no` albo `suspected`, zależnie od przesłanek. Nie ustalamy tożsamości.
+- **Wideo bez dźwięku lub z wyciętą ścieżką**: ruch ust nie może być jedyną przesłanką; ocena na podstawie obrazu, a przy złej jakości `unsure`.
+
+### `media_synthetic_cue`
+
+Zmienna pomocnicza do `media_synthetic_suspected`: **główna przesłanka**, na której oparto ocenę (jeśli kilka, wybierz najsilniejszą). Pozwala sprawdzić, na czym annotator opiera podejrzenie, i analizować niezgodności między annotatorami.
+
+| Wartość | Definicja |
+|---|---|
+| `visual_artifact` | artefakty obrazu: zniekształcone dłonie, zęby, uszy, okulary, krawędzie twarzy, niespójne światło lub cienie, mrugnięcie lub mimika nienaturalne |
+| `lip_audio_mismatch` | ruch warg nie pasuje do wypowiadanego tekstu |
+| `voice_unnatural` | głos metaliczny, monotonny lub niespójny z osobą i obrazem |
+| `platform_label` | oznaczenie treści jako wygenerowanej lub zmanipulowanej (platforma lub reklamodawca) |
+| `other` | inna przesłanka (opisz w `notes`) |
+| `none` | brak przesłanki (przy `no`, `unsure`) |
+| `na` | brak mediów (przy `na_no_media`) |
+
+Reguły spójności (sprawdza `python tools/checks.py sheet`): przy `yes` i `suspected` wartość `none` i `na` jest niedozwolona; przy `no` i `na_no_media` przesłanka musi być `none` lub `na` (albo pusta).
 
 ## Pola z dowodami zewnętrznymi (nie kodowane przez annotatorów)
 

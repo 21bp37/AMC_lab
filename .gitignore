@@ -1,0 +1,24 @@
+# Dane o reklamach NIE trafiają do repozytorium (legalność, dane osobowe, licencje; zob. 03, 09)
+data/
+data_raw/
+data_private/
+*.parquet
+*.xlsx
+# CSV dozwolone tylko w templates/ i data_synthetic/
+*.csv
+!templates/*.csv
+!data_synthetic/*.csv
+# Pole celeb_id i arkusze robocze annotatorów
+annotation_work/
+# Środowisko i pliki tymczasowe
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+.DS_Store
+# Wynik składania dokumentów (nie wersjonujemy; zawsze do odtworzenia)
+build/*.docx
+build/*.pdf
+build/*.jpg
+build/*.tar.gz
