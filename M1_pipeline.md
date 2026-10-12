@@ -53,6 +53,7 @@
 - 09. Ujawnienie użycia AI i dziennik wkładu
 - 10. Playbook: co robić po otrzymaniu danych
 
+
 ---
 
 # 00. Rejestr placeholderów i punktów decyzyjnych
@@ -107,7 +108,7 @@ Reguły: (1) placeholder zostaje w tekście, dopóki ktoś nie wpisze wartości 
 | P29 | Ramka: jak zbudowano zbiór reklam kandydujących (kryteria, zapytania, lista) | [INŻ. DANYCH] / [LEAD] | źródło, P01 | D9 | otwarty |
 | P30 | Czy populacja jest zawężona do deepfake'ów z wizerunkiem osoby publicznej (pytanie projektowe), czy obejmuje wszystkie deepfake scamy (pytanie badawcze); **wpisane:** deepfake (podejrzenie) jest kryterium populacji | [LEAD] | decyzja zespołu, D1 | D1 | częściowo |
 | P31 | Stan wiedzy i uzasadnienie wartości badania | [LEAD] | lektura | — | otwarty |
-| P32 | Reguła rozstrzygnięcia hipotez H1 i H2 (położenie przedziału ufności względem progów) | [LEAD] / [ANALITYK] | P13, P12 | D2 | otwarty |
+| P32 | Reguła rozstrzygnięcia hipotezy (jej składowych: czas życia i intensywność; położenie przedziału ufności względem progów) | [LEAD] / [ANALITYK] | P13, P12 | D2 | otwarty |
 
 ## Punkty decyzyjne
 
@@ -145,20 +146,20 @@ Karta M1 jest oceniana za: konkretność pytania, jakość eksploracji i spójno
 
 | Parametr | Wartość teraz | Użycie |
 |---|---|---|
-| T_L: próg mediany czasu życia | 2 dni kalendarzowe | H1: mediana L ≤ T_L |
-| T_I: próg dziennej intensywności | 25 000 wyświetleń na dzień | H2: udział reklam z I ≥ T_I |
-| p_min: wymagany udział | 50% | H2: udział reklam z I ≥ T_I jest większy niż p_min |
+| T_L: próg mediany czasu życia | 2 dni kalendarzowe | składowa o czasie życia: mediana L ≤ T_L |
+| T_I: próg dziennej intensywności | 25 000 wyświetleń na dzień | składowa o intensywności: udział reklam z I ≥ T_I |
+| p_min: wymagany udział | 50% | składowa o intensywności: udział reklam z I ≥ T_I jest większy niż p_min |
 
 **Operacjonalizacja przyjęta przez pipeline** (do potwierdzenia przez leada i analityka):
 
 - **L (czas życia)** = liczba dni kalendarzowych od pierwszego do ostatniego dnia emisji, **włącznie z oboma** (`delivery_stop − delivery_start + 1`); reklama wyświetlana jednego dnia ma L = 1. To ważne dla progu T_L = 2, bo zmiana konwencji o jeden dzień zmienia wniosek.
 - **I (dzienna intensywność)** = skumulowane wyświetlenia (`reach_total`) / L. Liczba „aktywnych dni” jest przybliżona rozpiętością od pierwszej do ostatniej emisji (źródło nie ujawnia dni przerwy, jeśli były).
-- **H1:** mediana L w populacji badanej ≤ T_L. **H2:** udział reklam populacji z I ≥ T_I jest większy niż p_min (równoważnie: mediana I ≥ T_I).
+- **Hipoteza jest jedna, o dwóch składowych:** (a) mediana L w populacji badanej ≤ T_L; (b) udział reklam populacji z I ≥ T_I jest większy niż p_min (równoważnie: mediana I ≥ T_I). Hipotezę uznajemy za wspartą w całości dopiero, gdy wspierane są obie składowe.
 - Obie wielkości są liczone **na populacji badanej**, czyli na reklamach sklasyfikowanych jako deepfake scam (sekcja 4), z korektą błędu klasyfikacji (05, sekcja 6).
 
 **Czego dane nie pozwolą ocenić (uczciwe zastrzeżenie dla karty M1).** Źródło daje **sumę wyświetleń za cały okres emisji**, a nie przebieg godzina po godzinie ani dzień po dniu. Dzienna intensywność jest więc wartością *średnią* (suma podzielona przez liczbę dni). Wysoka średnia intensywność przy krótkim życiu jest **zgodna z** taktyką *burst-and-burn*, ale jej nie dowodzi: ta taktyka dotyczy rozkładu w czasie (duży budżet na początku, potem wygaszenie), którego nie obserwujemy. Zdanie „co potwierdza stosowanie taktyki” w hipotezie jest interpretacją wykraczającą poza dane; w preprincie proponujemy sformułowanie „co jest zgodne z” (decyzja leada, R20). Dodatkowo krótkie życie może wynikać z szybkiego usuwania reklam przez platformę, a nie z decyzji reklamodawcy (R02).
 
-> **[LEAD – DO WYPEŁNIENIA]** Reguła rozstrzygnięcia hipotez (np. co uznajemy za wsparcie H1 i H2: położenie przedziału ufności względem T_L, T_I i p_min): {{P32: reguła decyzyjna dla H1 i H2 (np. położenie przedziału ufności względem T_L, T_I i p_min) | zależy od: lead, analityk, P13 | domyślnie: brak}}
+> **[LEAD – DO WYPEŁNIENIA]** Reguła rozstrzygnięcia hipotez (np. co uznajemy za wsparcie hipotezy i jej składowych: położenie przedziału ufności względem T_L, T_I i p_min): {{P32: reguła decyzyjna dla hipotezy (np. położenie przedziału ufności względem T_L, T_I i p_min) | zależy od: lead, analityk, P13 | domyślnie: brak}}
 >
 > **[LEAD / INŻ. DANYCH – DO WYPEŁNIENIA]** Traktowanie reklam wciąż aktywnych w dniu pobrania i reklam rozpoczętych przed oknem źródła (czas życia): {{P28: reklamy aktywne w dniu pobrania i obcięte przez okno źródła | zależy od: lead, P06, P03 | domyślnie: brak}}
 >
@@ -686,7 +687,7 @@ Przy recall ≈ 0,8: ±0,10 wymaga ok. 60 pozytywów, ±0,075 ok. 109, ±0,05 ok
 
 **Uzasadnienie wyboru:** przy recall ≈ 0,8 przedział Wilsona o połowie szerokości ±0,10 wymaga ok. 60 pozytywów; zawężenie do ±0,075 wymaga ok. 109, a do ±0,05 ok. 245, więc koszt ręcznej annotacji rośnie szybciej niż zysk w precyzji. Wartość ±0,10 jest decyzją zespołu (pozwala odróżnić annotatora wykrywającego większość pozytywów od pomijającego połowę), a nie wartością z literatury; metoda wyboru liczebności z docelowej szerokości przedziału pochodzi z planowania badań zgodności [donner1987; rotondi2012]. Rachunek zakłada niezależne obserwacje i recall 0,8; przy klastrowaniu (deff > 1) i innym recallu margines będzie szerszy, dlatego wartość weryfikujemy na danych (P09, P12).
 
-**Liczebność dla pytań H1 i H2 (populacja badana).** Obie hipotezy sprowadzają się do udziału w populacji: H1 (mediana L ≤ T_L) jest równoważna temu, że co najmniej 50% reklam ma L ≤ T_L, a H2 mówi, że więcej niż p_min = 50% reklam ma I ≥ T_I. Precyzja zależy więc od liczby reklam *w populacji badanej* (liczby pozytywów gold standardu), a nie od łącznej liczby reklam. Połowa szerokości 95% CI Wilsona dla udziału bliskiego 0,5 (wyliczenie: `tools/sample_size.py wilson`, obserwacje niezależne):
+**Liczebność dla hipotezy (populacja badana).** Obie składowe hipotezy sprowadzają się do udziału w populacji: składowa o czasie życia (mediana L ≤ T_L) jest równoważna temu, że co najmniej 50% reklam ma L ≤ T_L, a składowa o intensywności mówi, że więcej niż p_min = 50% reklam ma I ≥ T_I. Precyzja zależy więc od liczby reklam *w populacji badanej* (liczby pozytywów gold standardu), a nie od łącznej liczby reklam. Połowa szerokości 95% CI Wilsona dla udziału bliskiego 0,5 (wyliczenie: `tools/sample_size.py wilson`, obserwacje niezależne):
 
 | liczba reklam w populacji | udział 0,5 | udział 0,7 |
 |---|---|---|
@@ -767,7 +768,7 @@ Ryzyka są wpisem do karty M1 (jawne ograniczenia i źródła błędu to kryteri
 | R09 | **[INŻ. DANYCH / PIPELINE]** **Dane osobowe** (nazwiska osób publicznych; wizerunek). **Rozpoznawanie twarzy jest niezgodne z RODO w naszych warunkach, bo to dane biometryczne z art. 9 ust. 1 bez przesłanki z ust. 2 (04, zasada 4; [edpb2024clearview])**; Meta wstrzymała tę technologię w 2021 r. z powodu obaw społecznych i braku jasnych reguł, a obecnie stosuje ją z natychmiastowym usuwaniem danych twarzy [meta2024celebbait] | Naruszenie RODO/regulaminu, wyłączenie danych z użycia | średnie | wysoki | Bez automatycznego rozpoznawania twarzy; `celeb_id` tylko w pliku roboczym; raportowanie zagregowane po kategoriach; ocena prawna przez inżyniera danych (P07) | wynik oceny w macierzy legalności |
 | R10 | **[INŻ. DANYCH]** **Regulamin i licencje**: warunki API/Content Library (zakaz eksportu, publikacji danych osobowych), warunki użycia listy CERT | Niemożność użycia lub publikacji danych | średnie | wysoki | Macierz legalności przed jakąkolwiek pracą na danych (03, P07, P18); wynik negatywny o dostępie jest pełnoprawny | wypełniona macierz |
 | R11 | **[PIPELINE]** **Dryf definicji i konfiguracji**: zmiana promptu lub wersji modelu zmienia wynik [baumann2025] | Niepowtarzalność | średnie | średni | Zamrożenie codebooka i zbioru testowego; dziennik uruchomień; raport zakresu po konfiguracjach | flip rate między konfiguracjami (`prompt_robustness.py`) |
-| R12 | **[PIPELINE]** **Rzadkie klasy**: deepfake scamy mogą stanowić niewielki odsetek ramki, więc za mało pozytywów w gold standardzie; paradoks kappa maskuje jakość kodowania [feinstein1990] | Szerokie CI mediany i udziałów; fałszywe odrzucenie zmiennej | wysokie | wysoki | Losowanie warstwowe z nadpróbkowaniem; α z prevalence i zgodnością pozytywną/negatywną; klasy z małą liczbą pozytywów jako eksploracyjne (05); tabela liczebności dla H1 i H2 (05, sekcja 3) | P09 |
+| R12 | **[PIPELINE]** **Rzadkie klasy**: deepfake scamy mogą stanowić niewielki odsetek ramki, więc za mało pozytywów w gold standardzie; paradoks kappa maskuje jakość kodowania [feinstein1990] | Szerokie CI mediany i udziałów; fałszywe odrzucenie zmiennej | wysokie | wysoki | Losowanie warstwowe z nadpróbkowaniem; α z prevalence i zgodnością pozytywną/negatywną; klasy z małą liczbą pozytywów jako eksploracyjne (05); tabela liczebności dla hipotezy (05, sekcja 3) | P09 |
 | R13 | **[PIPELINE]** **Język**: instrument i literatura głównie dla angielskiego; część reklam może być w innych językach | Niższa jakość dla polskiego | średnie | średni | Analiza błędów wg języka; D8 | P10 |
 | R14 | **[LEAD]** **Nadinterpretacja**: opis czasu życia i intensywności może zostać odebrany jako wniosek o intencjach reklamodawców (*burst-and-burn*) lub skuteczności; ocena kursu wymaga rozróżnienia opisu od przyczynowości | Nadinterpretacja | wysokie | średni | Język tezy („zgodne z”, nie „potwierdza”; decyzja leada, P26); sekcja ograniczeń w preprincie | — |
 | R15 | **[PIPELINE]** **Koszt, limity i czas** przetwarzania | Niemożność przetworzenia całości | średnie | średni | Kodowanie próby zamiast całości (wariant E) i estymacja korygowana | P16 |
@@ -776,7 +777,7 @@ Ryzyka są wpisem do karty M1 (jawne ograniczenia i źródła błędu to kryteri
 | R18 | **[INŻ. DANYCH / LEAD]** **Wyniki dotyczą ramki, nie populacji reklam**: ramka powstała z zapytań (słowa kluczowe, reklamodawcy), więc mediana i udziały dotyczą tylko reklam, które te zapytania znalazły | Zawyżone lub zaniżone wartości względem populacji | wysokie | wysoki | Opis ramki (P29, D9); wyniki raportowane względem ramki | opis ramki w data statement |
 | R19 | **[PIPELINE / LEAD]** **Deepfake nie jest mierzony bezpośrednio, a jest kryterium populacji**: annotator referencyjny i oceniany nie potrafią wiarygodnie stwierdzić, że materiał jest syntetyczny; `media_synthetic_suspected` to tylko podejrzenie. Błąd tej klasyfikacji wchodzi bezpośrednio do populacji badanej | Populacja „deepfake scam” może zawierać reklamy bez syntezy i pomijać reklamy z syntezą; wnioski o deepfake'ach mogą być nadinterpretacją | wysokie | wysoki | Nazwana przesłanka (`media_synthetic_cue`); α i odsetek `unsure` (05); wrażliwość na definicję populacji (tylko `yes`; `yes` ∪ `suspected`); wnioski o „reklamach z podejrzeniem deepfake'a” | α dla `media_synthetic_suspected` (P13); udział `unsure`; różnica wyników między definicjami populacji |
 | R20 | **[LEAD / PIPELINE]** **Dane zagregowane: brak rozkładu w czasie.** Źródło daje sumę wyświetleń za okres, a nie wartości godzinowe czy dzienne; dzienna intensywność to średnia. Interpretacja *burst-and-burn* dotyczy przebiegu (budżet na początku), którego nie obserwujemy | Hipoteza o taktyce nie może być potwierdzona danymi, tylko uznana za zgodną lub niezgodną z nimi | wysokie | wysoki | Formułować wniosek jako „zgodne z” (decyzja leada, P26); nie używać słowa „potwierdza”; jeśli źródło daje rozbicie po dniach, wykorzystać je (P06) | dostępność wartości dziennych (P06) |
-| R21 | **[PIPELINE / ANALITYK]** **Zależność mechaniczna L i I**: I = suma / L, więc dla L = 1 intensywność równa jest całej sumie; krótkie reklamy mają większą i bardziej zmienną I; konwencja liczenia dni (włącznie lub nie) zmienia wniosek przy progu 2 dni | Przeszacowanie lub niedoszacowanie udziału I ≥ T_I; wrażliwość H1 na konwencję | wysokie | wysoki | Konwencja jawna (01); raportowanie także skumulowanych wyświetleń; analiza wrażliwości na konwencję (L bez dnia pierwszego) i na minimalną długość emisji | rozkład L; udział reklam z L = 1; mediana `reach_total` |
+| R21 | **[PIPELINE / ANALITYK]** **Zależność mechaniczna L i I**: I = suma / L, więc dla L = 1 intensywność równa jest całej sumie; krótkie reklamy mają większą i bardziej zmienną I; konwencja liczenia dni (włącznie lub nie) zmienia wniosek przy progu 2 dni | Przeszacowanie lub niedoszacowanie udziału I ≥ T_I; wrażliwość składowej o czasie życia na konwencję | wysokie | wysoki | Konwencja jawna (01); raportowanie także skumulowanych wyświetleń; analiza wrażliwości na konwencję (L bez dnia pierwszego) i na minimalną długość emisji | rozkład L; udział reklam z L = 1; mediana `reach_total` |
 | R22 | **[INŻ. DANYCH / PIPELINE]** **Definicja i dokładność pola wyświetleń**: „liczba osób, które zobaczyły reklamę” może być zasięgiem unikatowym, nie wyświetleniami; wartość może być przedziałem lub zaokrągleniem; próg 25 tys. może wypaść wewnątrz przedziału | Niepewna klasyfikacja reklam względem T_I; nazwa „impresje” może być nieścisła | średnie | wysoki | Ustalić znaczenie pola (P06); przy przedziałach policzyć udział dla dolnej i górnej granicy; nazwać wielkość tak, jak definiuje ją źródło | udział przedziałów obejmujących T_I; wartości zero lub brakujące |
 
 ## Wnioski do karty M1
@@ -930,7 +931,7 @@ Reakcje:
 3. Szacunek prevalence scamu i podejrzenia deepfake'a na tej próbie (P09). Przedział ufności Wilsona: `python tools/sample_size.py wilson --k ... --n ...`. Przy małej próbie przedział jest szeroki; zapisz go.
 4. Koncentracja reklamodawców (P11), przybliżone ICC z danych (P12).
 5. Wstępne rozkłady L i I na całej ramce (opis, bez korekty): `python tools/outcomes.py dane.csv` (P17); sprawdź udział L = 1 i reklam aktywnych (R17, R21).
-6. Decyzja D2: czy jest dość przypadków do planu z 05 (tabela liczebności dla H1 i H2).
+6. Decyzja D2: czy jest dość przypadków do planu z 05 (tabela liczebności dla hipotezy).
 
 ## Krok 3. Pilotaż codebooka
 
@@ -971,7 +972,7 @@ Progi dotyczące „rzadkiej kategorii" są moją heurystyką, nie progiem z lit
 1. Populacja = gold standard sklasyfikowany jako deepfake scam (wagi 1/p): `python tools/outcomes.py gold.csv --class-col in_population --weight-col weight --cluster advertiser_id --thr-days 2 --thr-intensity 25000`. Progi to parametry od leada i mogą się zmienić.
 2. Ten sam skrypt na reklamach wskazanych przez annotatora ocenianego (estymata naiwna) i porównanie z wynikiem z gold standardu (05, sekcja 5).
 3. Wrażliwość: definicja populacji (tylko `yes`; `yes` ∪ `suspected`; `unsure` włączone lub wyłączone), konwencja liczenia dni, granice przedziałów wyświetleń.
-4. Pasmo mediany L przy reklamach aktywnych: dolne (obserwowane do dnia pobrania) i górne (nieskończone) ograniczenie. Jeśli pasmo obejmuje próg T_L, hipoteza H1 nie jest rozstrzygnięta.
+4. Pasmo mediany L przy reklamach aktywnych: dolne (obserwowane do dnia pobrania) i górne (nieskończone) ograniczenie. Jeśli pasmo obejmuje próg T_L, składowa hipotezy o czasie życia nie jest rozstrzygnięta.
 5. Wpis do rejestru (P32 czeka na regułę decyzyjną od leada i analityka).
 
 ## Krok 8. Przekazanie analitykowi

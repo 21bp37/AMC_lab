@@ -16,20 +16,20 @@ Karta M1 jest oceniana za: konkretność pytania, jakość eksploracji i spójno
 
 | Parametr | Wartość teraz | Użycie |
 |---|---|---|
-| T_L: próg mediany czasu życia | 2 dni kalendarzowe | H1: mediana L ≤ T_L |
-| T_I: próg dziennej intensywności | 25 000 wyświetleń na dzień | H2: udział reklam z I ≥ T_I |
-| p_min: wymagany udział | 50% | H2: udział reklam z I ≥ T_I jest większy niż p_min |
+| T_L: próg mediany czasu życia | 2 dni kalendarzowe | składowa o czasie życia: mediana L ≤ T_L |
+| T_I: próg dziennej intensywności | 25 000 wyświetleń na dzień | składowa o intensywności: udział reklam z I ≥ T_I |
+| p_min: wymagany udział | 50% | składowa o intensywności: udział reklam z I ≥ T_I jest większy niż p_min |
 
 **Operacjonalizacja przyjęta przez pipeline** (do potwierdzenia przez leada i analityka):
 
 - **L (czas życia)** = liczba dni kalendarzowych od pierwszego do ostatniego dnia emisji, **włącznie z oboma** (`delivery_stop − delivery_start + 1`); reklama wyświetlana jednego dnia ma L = 1. To ważne dla progu T_L = 2, bo zmiana konwencji o jeden dzień zmienia wniosek.
 - **I (dzienna intensywność)** = skumulowane wyświetlenia (`reach_total`) / L. Liczba „aktywnych dni” jest przybliżona rozpiętością od pierwszej do ostatniej emisji (źródło nie ujawnia dni przerwy, jeśli były).
-- **H1:** mediana L w populacji badanej ≤ T_L. **H2:** udział reklam populacji z I ≥ T_I jest większy niż p_min (równoważnie: mediana I ≥ T_I).
+- **Hipoteza jest jedna, o dwóch składowych:** (a) mediana L w populacji badanej ≤ T_L; (b) udział reklam populacji z I ≥ T_I jest większy niż p_min (równoważnie: mediana I ≥ T_I). Hipotezę uznajemy za wspartą w całości dopiero, gdy wspierane są obie składowe.
 - Obie wielkości są liczone **na populacji badanej**, czyli na reklamach sklasyfikowanych jako deepfake scam (sekcja 4), z korektą błędu klasyfikacji (05, sekcja 6).
 
 **Czego dane nie pozwolą ocenić (uczciwe zastrzeżenie dla karty M1).** Źródło daje **sumę wyświetleń za cały okres emisji**, a nie przebieg godzina po godzinie ani dzień po dniu. Dzienna intensywność jest więc wartością *średnią* (suma podzielona przez liczbę dni). Wysoka średnia intensywność przy krótkim życiu jest **zgodna z** taktyką *burst-and-burn*, ale jej nie dowodzi: ta taktyka dotyczy rozkładu w czasie (duży budżet na początku, potem wygaszenie), którego nie obserwujemy. Zdanie „co potwierdza stosowanie taktyki” w hipotezie jest interpretacją wykraczającą poza dane; w preprincie proponujemy sformułowanie „co jest zgodne z” (decyzja leada, R20). Dodatkowo krótkie życie może wynikać z szybkiego usuwania reklam przez platformę, a nie z decyzji reklamodawcy (R02).
 
-> **[LEAD – DO WYPEŁNIENIA]** Reguła rozstrzygnięcia hipotez (np. co uznajemy za wsparcie H1 i H2: położenie przedziału ufności względem T_L, T_I i p_min): {{P32: reguła decyzyjna dla H1 i H2 (np. położenie przedziału ufności względem T_L, T_I i p_min) | zależy od: lead, analityk, P13 | domyślnie: brak}}
+> **[LEAD – DO WYPEŁNIENIA]** Reguła rozstrzygnięcia hipotez (np. co uznajemy za wsparcie hipotezy i jej składowych: położenie przedziału ufności względem T_L, T_I i p_min): {{P32: reguła decyzyjna dla hipotezy (np. położenie przedziału ufności względem T_L, T_I i p_min) | zależy od: lead, analityk, P13 | domyślnie: brak}}
 >
 > **[LEAD / INŻ. DANYCH – DO WYPEŁNIENIA]** Traktowanie reklam wciąż aktywnych w dniu pobrania i reklam rozpoczętych przed oknem źródła (czas życia): {{P28: reklamy aktywne w dniu pobrania i obcięte przez okno źródła | zależy od: lead, P06, P03 | domyślnie: brak}}
 >
