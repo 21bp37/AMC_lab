@@ -5,7 +5,6 @@ data_private/
 *.parquet
 *.xlsx
 # CSV dozwolone tylko w templates/ i data_synthetic/
-*.csv
 !templates/*.csv
 !data_synthetic/*.csv
 # Pole celeb_id i arkusze robocze annotatorów
