@@ -172,5 +172,33 @@ class TestTelegram(unittest.TestCase):
         self.assertEqual(int(telegram.side_series(daily, "Pro-Ukrainian", col="n_topic_anti").sum()), 0)
 
 
+class TestTelegramEda(unittest.TestCase):
+    def test_side_stats_without_writing_outputs(self):
+        from pipeline import eda_telegram as et
+
+        with tempfile.TemporaryDirectory() as d:
+            pd.DataFrame({
+                "id": [1, 2, 3, 4, 5], "peer_id": [10, 10, 20, 30, 10],
+                "date": ["2022-03-05T10:00:00Z", "2022-03-05T11:00:00Z", "2022-03-06T10:00:00Z",
+                         "2022-03-06T12:00:00Z", "2021-01-01T10:00:00Z"],
+                "message": ["Украинцы в Польше получают пособия", "Украинцы в Польше получают пособия", "Українці у Польщі",
+                            "украинцы в Польше", "Украинцы в Польше"],
+                "views": [100, 5, 50, 7, 1], "forwards": [3, 0, 1, 0, 0],
+            }).to_csv(Path(d) / "posts_2022_part_1.csv", index=False)
+            pd.DataFrame({"peer_id": [10, 20], "side": ["Pro-Russian", "Pro-Ukrainian"], "cluster": [1, 2]}).to_csv(
+                Path(d) / "cl.csv", index=False)
+            raw, parts = et.load_posts(str(Path(d) / "posts_2022_part_*.csv"))
+            df = et.prepare(raw, str(Path(d) / "cl.csv"))
+        self.assertEqual(parts, [1])
+        self.assertEqual(len(df), 4)                       # post z 2021 poza oknem
+        daily = et.daily_by_side(df)
+        ss = et.side_stats(df, daily)
+        self.assertEqual(ss["Pro-Russian"]["posts"], 2)
+        self.assertEqual(ss["Pro-Russian"]["anti_posts"], 2)
+        self.assertEqual(ss["Pro-Russian"]["copy_share"], 0.5)   # drugi post to powtórzony tekst
+        self.assertEqual(ss["unlabeled"]["posts"], 1)            # kanał bez etykiety nie znika
+        self.assertEqual(ss["Pro-Ukrainian"]["anti_posts"], 0)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -11,6 +11,7 @@ Projekt zespołowy (kurs AMC). Hipoteza: trendy w pojawianiu się negatywnych tr
 | `pipeline/series.py` | szeregi dzienne i wykrywanie peaków (odporny z-score) |
 | `pipeline/leadlag.py` | test hipotezy (korelacja przyrostów dziennych i tygodniowych z testem permutacyjnym), analizy kierunku (Granger, dopasowanie peaków), symulacje mocy |
 | `pipeline/telegram.py` | filtr 79 mln postów Telegrama (DuckDB) → szeregi dzienne wg strony kanału |
+| `pipeline/eda_telegram.py` | opisowa eksploracja Telegrama (na pobranych plikach): `reports/eda_telegram_section.tex`, `eda_telegram_results.md`, `figures/telegram.pdf` |
 | `pipeline/eda_twitter.py` | eksploracja X: `reports/eda_summary.json`, `eda_numbers.tex`, `peaks_table.tex`, `figures/` |
 | `tools/` | narzędzia walidacji instrumentu: zgodność koderów, P/R/F1, liczebność próby, korekta estymacji, dziennik uruchomień |
 | `tests/` | testy na danych syntetycznych |
@@ -23,6 +24,7 @@ Projekt zespołowy (kurs AMC). Hipoteza: trendy w pojawianiu się negatywnych tr
 pip install -r requirements.txt
 python -m unittest discover -s tests
 python -m pipeline.eda_twitter
+python -m pipeline.eda_telegram   # po pobraniu i przefiltrowaniu plików Telegrama (filtr_telegram.py)
 cd reports && latexmk -pdf M1_karta_eksploracji.tex
 ```
 
