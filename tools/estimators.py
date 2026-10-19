@@ -9,8 +9,8 @@ CO TU JEST, A CZEGO NIE MA (uczciwie):
   theta = mean(pred na całej ramce) + (1/N) * suma_w_próbie( w_i * (gold_i - pred_i) ),  w_i = 1/inclusion_prob.
   Przy poprawnych wagach jest nieobciążony niezależnie od jakości modelu; jakość modelu wpływa tylko na wariancję.
 - NIE ma pełnego DSL dla regresji (to, czego potrzebuje analiza końcowa z kowariatami). Do tego użyj implementacji
-  autorów po przeczytaniu pracy (status: DO WDROŻENIA, patrz 05_gold_standard_i_walidacja.md).
-- Przedział ufności: bootstrap klastrowy po reklamodawcach z zachowaniem wag; to przybliżenie dla próby dwufazowej.
+  autorów po przeczytaniu pracy (status: DO WDROŻENIA).
+- Przedział ufności: bootstrap klastrowy po kontach źródłowych (dawniej: reklamodawcach) z zachowaniem wag; to przybliżenie dla próby dwufazowej.
 
 Wejście: ramka `pop` o wszystkich rekordach ramki, kolumny: pred (0/1), gold (0/1 lub NaN poza próbą),
 weight (1/inclusion_prob dla rekordów w próbie, NaN poza), cluster (opcjonalnie).

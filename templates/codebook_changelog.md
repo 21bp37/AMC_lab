@@ -1,8 +1,7 @@
-# Dziennik zmian codebooka
+# Dziennik zmian pomiaru (leksykon, klasyfikator, definicje szeregów)
 
-Każda zmiana definicji, wartości lub reguły = wpis. Wersja rośnie przy każdej zmianie zmieniającej sposób kodowania (nie przy literówkach).
+Każda zmiana definicji zmiennej wynikowej (leksykon narracji, próg piku, model sentymentu/klasyfikator, filtr tematu) = wpis i nowa wersja.
 
-| Wersja | Data | Kto | Co zmieniono | Dlaczego (dowód: przykłady, α z pilotażu) | Wpływ na już zakodowane dane |
+| Wersja | Data | Kto | Co zmieniono | Dlaczego (dowód: przykłady, wynik walidacji) | Wpływ na wyniki |
 |---|---|---|---|---|---|
-| 0.1 | {{P22: data i autor wersji początkowej | zależy od: repozytorium | domyślnie: data utworzenia repozytorium}} | pipeline | wersja początkowa przed pilotażem | — | brak danych |
-| 0.2 | | | | | |
+| leksykon 0.1 | 2026-10-19 | pipeline | wersja eksploracyjna 6 narracji (`pipeline/config.py`); usunięto „wdzięczn*” (fałszywe trafienia w podziękowaniach) | eksploracja M1 | brak walidacji, tylko opis |

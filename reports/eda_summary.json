@@ -1,0 +1,209 @@
+{
+  "quality": {
+    "n_rows": 55035,
+    "n_by_type": {
+      "retweet": 35219,
+      "reply": 13773,
+      "original": 6043
+    },
+    "duplicate_tweet_id": 0,
+    "n_authors": 18833,
+    "n_unique_texts": 22299,
+    "n_cascades": 20205,
+    "ts_min": "2022-02-24 09:23:58+00:00",
+    "ts_max": "2022-12-31 23:47:06+00:00",
+    "n_days": 312,
+    "rows_before_effective_start": 39,
+    "median_daily_rows_effective": 131.0,
+    "share_truncated_rt": 0.9334450154746018,
+    "share_topic_both_original": 0.533675326824425,
+    "share_topic_ua": 0.8090669573907513,
+    "sentiment_dist": {
+      "neutral": 0.5164,
+      "negative": 0.4148,
+      "positive": 0.0688
+    },
+    "share_sentiment_score_gt_0_95": 0.931588988825293,
+    "share_anti_ua_lexicon": 0.1317343508676297,
+    "missing_share": {
+      "sentiment": 0.0,
+      "text": 0.0,
+      "author": 0.0
+    }
+  },
+  "concentration": {
+    "authors": {
+      "n": 18833,
+      "top1pct_share": 0.16838375579176887,
+      "top10_share": 0.027473426001635323
+    },
+    "rt_sources": {
+      "n": 1567,
+      "top1pct_share": 0.29117805729861723,
+      "top10_share": 0.22612794230387007
+    }
+  },
+  "neg_by_type": {
+    "original": 0.5087,
+    "reply": 0.5881,
+    "retweet": 0.3309
+  },
+  "lexicon_by_narrative": {
+    "swiadczenia": 0.058144816934677934,
+    "praca_mieszkania": 0.0019623875715453804,
+    "przestepczosc": 0.03247024620695921,
+    "banderyzm": 0.029871899700190788,
+    "roszczeniowosc": 0.006650313436903789,
+    "zagrozenie_zdrowie": 0.005287544289997274
+  },
+  "neg_share_given_lexicon": {
+    "lex": 0.4590344827586207,
+    "no_lex": 0.4080987757664539
+  },
+  "corr_daily_negshare_lexshare": -0.07566281005675218,
+  "n_peaks_rows": 6,
+  "peak_sensitivity": {
+    "2.0": {
+      "rows": 10,
+      "cascades": 12,
+      "negative_authored": 10,
+      "anti_lex": 15
+    },
+    "2.5": {
+      "rows": 6,
+      "cascades": 8,
+      "negative_authored": 8,
+      "anti_lex": 11
+    },
+    "3.0": {
+      "rows": 4,
+      "cascades": 7,
+      "negative_authored": 6,
+      "anti_lex": 7
+    }
+  },
+  "n_peaks_cascades": 8,
+  "n_peaks_neg_authored": 8,
+  "peaks_overlap_rows_cascades": 1,
+  "peaks_median_top_source_share": 0.20818031038976426,
+  "peaks_single_source_majority": 0,
+  "peaks": [
+    {
+      "day": "2022-04-09",
+      "n": 552,
+      "top_source_share": 0.1956521739130435,
+      "top_cascade_share": 0.1956521739130435,
+      "negative_share": 0.4257246376811594,
+      "event": ""
+    },
+    {
+      "day": "2022-04-17",
+      "n": 289,
+      "top_source_share": 0.27335640138408307,
+      "top_cascade_share": 0.2491349480968858,
+      "negative_share": 0.11072664359861592,
+      "event": ""
+    },
+    {
+      "day": "2022-05-09",
+      "n": 877,
+      "top_source_share": 0.17217787913340935,
+      "top_cascade_share": 0.10490307867730901,
+      "negative_share": 0.5815279361459521,
+      "event": "ambasador Rosji (farba) (+0 d)"
+    },
+    {
+      "day": "2022-05-15",
+      "n": 1048,
+      "top_source_share": 0.3473282442748092,
+      "top_cascade_share": 0.3463740458015267,
+      "negative_share": 0.5372137404580153,
+      "event": "Eurowizja (+1 d)"
+    },
+    {
+      "day": "2022-05-22",
+      "n": 367,
+      "top_source_share": 0.22070844686648503,
+      "top_cascade_share": 0.22070844686648503,
+      "negative_share": 0.14986376021798364,
+      "event": ""
+    },
+    {
+      "day": "2022-07-12",
+      "n": 155,
+      "top_source_share": 0.09032258064516129,
+      "top_cascade_share": 0.03225806451612903,
+      "negative_share": 0.4774193548387097,
+      "event": ""
+    },
+    {
+      "day": "2022-10-31",
+      "n": 350,
+      "top_source_share": 0.49142857142857144,
+      "top_cascade_share": 0.49142857142857144,
+      "negative_share": 0.62,
+      "event": ""
+    },
+    {
+      "day": "2022-11-16",
+      "n": 291,
+      "top_source_share": 0.13745704467353953,
+      "top_cascade_share": 0.13745704467353953,
+      "negative_share": 0.5120274914089347,
+      "event": "Przewodów (+1 d)"
+    }
+  ],
+  "peaks_cascades": [
+    "2022-04-09",
+    "2022-04-17",
+    "2022-05-09",
+    "2022-05-15",
+    "2022-05-22",
+    "2022-07-12",
+    "2022-10-31",
+    "2022-11-16"
+  ],
+  "peaks_neg_authored": [
+    "2022-03-05",
+    "2022-03-16",
+    "2022-04-09",
+    "2022-05-09",
+    "2022-05-15",
+    "2022-06-01",
+    "2022-11-16",
+    "2022-11-25"
+  ],
+  "ru_domain_links": 3,
+  "telegram_links": 9,
+  "monthly_rows": {
+    "2022-02-01 00:00:00": 9,
+    "2022-03-01 00:00:00": 11606,
+    "2022-04-01 00:00:00": 6887,
+    "2022-05-01 00:00:00": 6722,
+    "2022-06-01 00:00:00": 2394,
+    "2022-07-01 00:00:00": 4535,
+    "2022-08-01 00:00:00": 5894,
+    "2022-09-01 00:00:00": 4298,
+    "2022-10-01 00:00:00": 4651,
+    "2022-11-01 00:00:00": 4441,
+    "2022-12-01 00:00:00": 3596
+  },
+  "nodexl_groups_top5": {
+    "2": 24296,
+    "1": 12023,
+    "3": 6234,
+    "4": 6085,
+    "5": 808
+  },
+  "params": {
+    "z": 2.5,
+    "window": 15,
+    "sep": 3,
+    "lexicon_version": "0.1",
+    "effective_start": "2022-03-04"
+  },
+  "power_peak_lag": {
+    "0.5": 0.46,
+    "0.8": 0.8
+  }
+}
