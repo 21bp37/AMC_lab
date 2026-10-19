@@ -1,4 +1,4 @@
-"""Dzienne szeregi czasowe i wykrywanie pików.
+"""Dzienne szeregi czasowe i wykrywanie peaków.
 
 Szeregi (definicje pomiarowe; „dzień” = doba kalendarzowa Europe/Warsaw):
 - rows          : wszystkie wiersze (oryginały + retweety + odpowiedzi),
@@ -6,9 +6,12 @@ Szeregi (definicje pomiarowe; „dzień” = doba kalendarzowa Europe/Warsaw):
 - cascades      : liczba różnych kaskad aktywnych danego dnia (odporne na jeden wiralowy wpis),
 - negative      : wiersze z etykietą sentymentu „negative”,
 - anti_lex      : wiersze z trafieniem w leksykon narracji antyukraińskich (eksploracyjnie),
+- pro_lex       : wiersze z trafieniem w leksykon treści proukraińskich,
+- neg_anti      : negatywny sentyment ORAZ leksykon anty-UA (przybliżenie „negatywnych wobec Ukraińców”),
+- pos_pro       : pozytywny sentyment ORAZ leksykon pro-UA,
 - *_share       : udziały w `rows`.
 
-Pik: dzień, w którym log(1+x) przekracza kroczącą medianę (okno `window`, wycentrowane)
+Peak: dzień, w którym log(1+x) przekracza kroczącą medianę (okno `window`, wycentrowane)
 o więcej niż `z` odporne odchylenia (1.4826·MAD) i jest lokalnym maksimum w ±`sep` dni.
 """
 from __future__ import annotations
@@ -27,6 +30,9 @@ def daily_series(df: pd.DataFrame, start: str, end: str) -> pd.DataFrame:
         "negative": df[df["negative"]].groupby("day").size(),
         "anti_lex": df[df["anti_ua_lexicon"]].groupby("day").size(),
         "negative_authored": df[df["negative"] & (df["type"] != "retweet")].groupby("day").size(),
+        "pro_lex": df[df["pro_ua_lexicon"]].groupby("day").size(),
+        "neg_anti": df[df["negative"] & df["anti_ua_lexicon"]].groupby("day").size(),
+        "pos_pro": df[df["positive"] & df["pro_ua_lexicon"]].groupby("day").size(),
     }).reindex(idx).fillna(0).astype(int)
     out.index.name = "day"
     out["negative_share"] = out["negative"] / out["rows"].replace(0, np.nan)
@@ -50,7 +56,7 @@ def detect_peaks(x: pd.Series, z: float = 3.0, window: int = 15, sep: int = 3) -
 
 
 def peak_table(df: pd.DataFrame, series: pd.Series, peaks: pd.DatetimeIndex, events: dict | None = None) -> pd.DataFrame:
-    """Opis pików: wielkość, koncentracja na jednej kaskadzie/koncie, udział negatywnych, najbliższe wydarzenie."""
+    """Opis peaków: wielkość, koncentracja na jednej kaskadzie/koncie, udział negatywnych, najbliższe wydarzenie."""
     events = {pd.Timestamp(k): v for k, v in (events or {}).items()}
     rows = []
     for d in peaks:

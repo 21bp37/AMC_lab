@@ -8,8 +8,8 @@ Projekt zespołowy (kurs AMC). Pytanie: czy wzrosty treści o Ukraińcach w Pols
 |---|---|
 | `pipeline/config.py` | ścieżki, filtry tematu, leksykon narracji (wersjonowany), lista wydarzeń |
 | `pipeline/load_twitter.py` | eksport NodeXL → tabela robocza (typ wiersza, kaskady RT, dzień PL, flagi) + raport jakości |
-| `pipeline/series.py` | szeregi dzienne i wykrywanie pików (odporny z-score) |
-| `pipeline/leadlag.py` | korelacja krzyżowa, dopasowanie pików z testem permutacyjnym, Granger, symulacja mocy |
+| `pipeline/series.py` | szeregi dzienne i wykrywanie peaków (odporny z-score) |
+| `pipeline/leadlag.py` | korelacja krzyżowa, dopasowanie peaków z testem permutacyjnym, Granger, symulacja mocy |
 | `pipeline/telegram.py` | filtr 79 mln postów Telegrama (DuckDB) → szeregi dzienne wg strony kanału |
 | `pipeline/eda_twitter.py` | eksploracja X: `reports/eda_summary.json`, `eda_numbers.tex`, `peaks_table.tex`, `figures/` |
 | `tools/` | narzędzia walidacji instrumentu: zgodność koderów, P/R/F1, liczebność próby, korekta estymacji, dziennik uruchomień |

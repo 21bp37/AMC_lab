@@ -48,21 +48,30 @@ TOPIC_PL = r"w polsce|polsk|polak|polacy|polek"
 
 # Leksykon narracji antyukraińskich (wersja eksploracyjna, do walidacji na gold standardzie).
 # Narracje odpowiadają kategoriom znanym z raportów o dezinformacji wobec uchodźców w PL.
-LEXICON_VERSION = "0.1"
+LEXICON_VERSION = "0.2"
 ANTI_UA_NARRATIVES = {
-    "swiadczenia": r"800\s?\+|500\s?\+|świadcze|zasiłk|socjal|za darmo|na nasz koszt|utrzym",
+    "swiadczenia": r"800\s?\+|500\s?\+|świadcze|zasiłk|socjal|za darmo|na nasz koszt|utrzym|podatnik",
     "praca_mieszkania": r"zabier\w* (?:nam )?(?:prac|mieszka)|podwyż\w* czynsz|kolejk\w* do lekarz",
     "przestepczosc": r"gwałt|morderst|bandy[tc]|napad|przestęp|kradzie",
     "banderyzm": r"bandero|banderow|upa\b|wołyń|ukrainizac|ukropol",
-    "roszczeniowosc": r"roszczeni|niewdzięcz|bezczeln|panosz",
+    "roszczeniowosc": r"roszczeni|niewdzięcz|(?:nie widać|brak\w*|bez) wdzięczn|bezczeln|panosz",
     "zagrozenie_zdrowie": r"gruźlic|choroby|epidemi|szczepi",
 }
+
+# Leksykon treści proukraińskich (solidarność, pomoc, wdzięczność). Wersja eksploracyjna.
+PRO_UA_NARRATIVES = {
+    "pomoc": r"pomag|pomoc\w* (?:ukrai|uchodź)|zbiórk|wolontari|gościn|przyjmuj\w* uchodź",
+    "solidarnosc": r"solidarn|wspier|wsparci|bracia|braterst|przyjaci|razem|sława ukrain|slava ukrain|standwithukraine|witamy",
+    "wdziecznosc": r"wdzięczn|dziękuj",
+}
+# Negacja wdzięczności („nie widać wdzięczności”) to narracja anty-UA, nie pro-UA: zeruje flagę pro dla wpisu.
+NEGATED_GRATITUDE = r"(?:nie widać|nie ma|brak\w*|bez|zero) wdzięczn|niewdzięcz"
 
 # Telegram: słowa kluczowe RU/UK dla „Ukraińcy w Polsce” (do filtrowania 79 mln postów)
 TELEGRAM_UA = r"(?i)(?:украин|україн)"
 TELEGRAM_PL = r"(?i)(?:польш|польщ|поляк|поляц|польськ|варшав)"
 
-# Wydarzenia do opisu pików (daty UTC; lista robocza, do weryfikacji przez analityka)
+# Wydarzenia do opisu peaków (daty UTC; lista robocza, do weryfikacji przez analityka)
 EVENTS = {
     "2022-03-12": "ustawa o pomocy UA",
     "2022-05-09": "ambasador Rosji (farba)",

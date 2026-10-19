@@ -47,6 +47,16 @@ class TestLoad(unittest.TestCase):
         self.assertTrue(self.df.loc[0, "anti_ua_lexicon"])      # 500+
         self.assertFalse(self.df.loc[4, "anti_ua_lexicon"])     # „wdzięczni” nie jest narracją
         self.assertTrue(self.df.loc[5, "nar_banderyzm"])
+        self.assertTrue(self.df.loc[4, "pro_ua_lexicon"])      # wdzięczność = treść pro-UA
+        self.assertEqual(self.df.loc[4, "stance_lex"], "pro")
+
+    def test_negated_gratitude_is_anti_not_pro(self):
+        raw = fake_nodexl()
+        raw.loc[0, "text"] = "Ukraińcy w Polsce liczą pieniądze od podatnika. Nie widać wdzięczności."
+        df = normalize(raw)
+        self.assertFalse(df.loc[0, "pro_ua_lexicon"])
+        self.assertTrue(df.loc[0, "anti_ua_lexicon"])
+        self.assertEqual(df.loc[0, "stance_lex"], "anti")
 
     def test_daily_series_fills_gaps(self):
         d = series.daily_series(self.df, "2022-05-08", "2022-05-12")

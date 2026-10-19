@@ -6,7 +6,7 @@
 \usepackage[polish]{babel}
 \usepackage{lmodern}
 \usepackage{microtype}
-\usepackage[margin=1.7cm,top=1.5cm,bottom=1.6cm]{geometry}
+\usepackage[margin=1.6cm,top=1.3cm,bottom=1.5cm]{geometry}
 \usepackage{booktabs,tabularx,array,graphicx,xcolor,enumitem}
 \usepackage[hidelinks]{hyperref}
 \setlist{nosep,leftmargin=*}
@@ -30,69 +30,86 @@
 \textbf{Pytanie.} Czy w okresie 4.03--31.12.2022 wzrosty liczby treści o Ukraińcach w Polsce pojawiały się najpierw
 w prorosyjskich kanałach Telegrama, a dopiero później w polskojęzycznym X/Twitterze, i z jakim opóźnieniem?
 
-\textbf{H1 (kolejność).} Piki dziennej liczby postów o Ukraińcach w Polsce w kanałach prorosyjskich poprzedzają piki
-w polskojęzycznym X: odsetek pików X, przed którymi w oknie 0--7 dni wystąpił pik prorosyjskiego Telegrama, jest wyższy
-niż przy losowym położeniu pików, a dla kanałów proukraińskich (grupa kontrolna) efekt nie występuje albo jest słabszy.
+\textbf{H1 (kolejność).} Peaki dziennej liczby postów o Ukraińcach w Polsce w kanałach prorosyjskich poprzedzają peaki
+w polskojęzycznym X: odsetek peaków X, przed którymi w oknie 0--7 dni wystąpił peak prorosyjskiego Telegrama, jest wyższy
+niż przy losowym położeniu peaków, a dla kanałów proukraińskich (grupa kontrolna) efekt nie występuje albo jest słabszy.
 
-\textbf{H2 (stałe opóźnienie).} Dla pików z narracjami antyukraińskimi opóźnienie X względem prorosyjskiego Telegrama
+\textbf{H2 (stałe opóźnienie).} Dla peaków z narracjami antyukraińskimi opóźnienie X względem prorosyjskiego Telegrama
 jest dodatnie i w przybliżeniu stałe: mediana 1--7 dni, rozstęp międzykwartylowy $\le 2$ dni.
 
 \textbf{Zawężenia wobec sformułowań roboczych.} (a) „Polskie media” mierzymy jako polskojęzyczny X, bo tylko takie dane
 mamy. (b) Mierzymy \emph{narracje antyukraińskie} (świadczenia, przestępczość, banderyzm itd.), a nie dezinformację:
-ta wymaga weryfikacji prawdziwości twierdzenia, którą możemy wykonać najwyżej dla kilku największych pików.
+ta wymaga weryfikacji prawdziwości twierdzenia, którą możemy wykonać najwyżej dla kilku największych peaków.
 (c) Zbieżność w czasie nie dowodzi przepływu treści (zob. sekcja~5).
 
 \section{Źródła danych i zakres próby}
-\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{2.3cm}X>{\raggedright\arraybackslash}p{3.4cm}@{}}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{2.3cm}X>{\raggedright\arraybackslash}p{3.3cm}@{}}
 \toprule
 Źródło & Zakres i pola & Stan \\
 \midrule
 X/Twitter, PL (zmienna zależna) & API v2 for Academic Research (dostęp sprzed zmian z II 2023), import do NodeXL;
-posty po polsku z frazami „Ukraińcy” i „w Polsce”, 24.02--31.12.2022. \EdaNRows{} wierszy: \EdaNOrig{} oryginałów,
-\EdaNReply{} odpowiedzi, \EdaNRt{} retweetów; \EdaNAuthors{} kont. Pola: czas, tekst, typ relacji, liczniki interakcji,
-domeny, grupa NodeXL, etykieta i pewność sentymentu. & w repozytorium; przeanalizowane \\
-Telegram (zmienna niezależna) & „Russian and Ukrainian War-related Telegram Channels Dataset”: 79,6\,mln postów z 4\,687
-kanałów (2015--2024), sieć 18,2\,mln przekazań, etykieta strony (\emph{Pro-Russian / Pro-Ukrainian / Neutral}) dla
-3\,074 kanałów z klastrowania Leidena. Pola posta: kanał, czas, tekst, wyświetlenia, przekazania. &
-\textbf{jeszcze niewczytany}; filtr gotowy i przetestowany \\
+posty po polsku z frazami „Ukraińcy” i „w Polsce”, 24.02--31.12.2022. \EdaNRows{} wpisów: \EdaNOrig{} oryginałów,
+\EdaNReply{} odpowiedzi, \EdaNRt{} retweetów; \EdaNAuthors{} kont; \EdaNContents{} unikalnych treści. Pola: czas, tekst,
+typ relacji, liczniki interakcji, domeny, grupa NodeXL, etykieta i pewność sentymentu. & w repozytorium; przeanalizowane \\
+Telegram (zmienna niezależna) & Kyrychenko R., \emph{Russian and Ukrainian War-related Telegram Channels}, Zenodo 2025,
+doi:10.5281/zenodo.16949193, CC BY 4.0. 79,6\,mln postów z 4\,687 kanałów (2015--2024), 18,2\,mln przekazań, strona
+kanału (\emph{Pro-Russian / Pro-Ukrainian / Neutral}) dla 3\,074 kanałów. Pola posta: kanał, czas, tekst, wyświetlenia,
+przekazania. & otwarty, 49\,GB (8 plików postów); \textbf{jeszcze niepobrany}; filtr gotowy \\
 \bottomrule
 \end{tabularx}
 
-\textbf{Jednostka analizy:} doba kalendarzowa (czas Europe/Warsaw) × platforma × strona kanału.
-\textbf{Okno:} 4.03--31.12.2022 (303 dni); dni 24.02--3.03 wyłączone, bo zbiór X ma w nich tylko \EdaNBeforeEff{} wierszy.
-\textbf{Próba Telegrama:} posty z okna, wspominające Ukrainę/Ukraińców \emph{i} Polskę/Polaków (wyrażenia RU/UK w
-\texttt{pipeline/config.py}); kanały bez etykiety strony raportujemy osobno.
+\textbf{Jednostka analizy:} doba (czas Europe/Warsaw) × platforma × strona kanału. \textbf{Okno:} 4.03--31.12.2022
+(303 dni); 24.02--3.03 wyłączone, bo X ma w nich tylko \EdaNBeforeEff{} wpisów. \textbf{Próba Telegrama:} posty z okna
+wspominające Ukrainę/Ukraińców \emph{i} Polskę/Polaków (wyrażenia RU/UK w \texttt{pipeline/config.py}). Zapas: zbiór
+404 kanałów prokremlowskich i 114 antykremlowskich (XII 2020--IV 2023, Figshare, doi:10.6084/m9.figshare.28785449).
 
 \section{Wyniki wstępnej eksploracji (X/Twitter)}
-{\centering\includegraphics[width=0.92\linewidth]{figures/daily.pdf}\par}
-{\footnotesize\textbf{Rys. 1.} Góra: liczba wierszy i liczba różnych treści (kaskad) na dzień, kropki: piki kaskad
-($z>2{,}5$). Dół: kroczący 7-dniowy udział wierszy z sentymentem negatywnym i z trafieniem w leksykon narracji
-antyukraińskich. Szare pole: okres niekompletny.\par}\vspace{2pt}
-\begin{minipage}[t]{0.47\linewidth}\vspace{0pt}\footnotesize\setlength{\tabcolsep}{3.5pt}
-\input{peaks_table.tex}\\[2pt]
-\footnotesize Piki kaskad; „Top konto” = udział najczęściej retweetowanego konta w wierszach dnia.
+\textbf{Dwie miary.} \emph{Sentyment} (etykieta z pliku) mówi, czy wpis jest negatywny, ale nie wobec kogo.
+\emph{Leksykony} (v0.2, niezwalidowane) mówią, czy wpis zawiera narrację anty-UA (świadczenia, przestępczość, banderyzm,
+roszczeniowość, praca, zdrowie) lub treść pro-UA (pomoc, solidarność, wdzięczność). „Negatywne wobec Ukraińców”
+przybliżamy przecięciem obu. Udziały liczymy na unikalnych treściach, bo jeden wiralowy wpis z setkami retweetów
+przesuwa udział miesiąca nawet o kilkanaście punktów.
+
+\begin{minipage}[t]{0.47\linewidth}\vspace{0pt}\footnotesize\setlength{\tabcolsep}{3pt}
+\input{composition_table.tex}\\[1pt]
+\textbf{Tab. 1.} Ton według modelu w grupach leksykonu.
 \end{minipage}\hfill
-\begin{minipage}[t]{0.5\linewidth}\vspace{0pt}
+\begin{minipage}[t]{0.5\linewidth}\vspace{0pt}\footnotesize\setlength{\tabcolsep}{3pt}
+\input{peaks_table.tex}\\[1pt]
+\textbf{Tab. 2.} Peaki; „Top konto” = udział jednego retweetowanego konta.
+\end{minipage}\\[4pt]
+{\centering\includegraphics[width=0.86\linewidth]{figures/daily.pdf}\par}
+{\footnotesize\textbf{Rys. 1.} A: ile wpisów pojawiało się dziennie; kropki to peaki (dni z liczbą różnych treści wyraźnie
+ponad 15-dniową medianą). B: odsetek treści o tonie negatywnym i pozytywnym, bez względu na to, czego dotyczą.
+C: odsetek treści z narracją anty-UA (pomarańczowa) i pro-UA (zielona); linie przerywane to te z nich, którym model nadał
+pasujący ton.\par}\vspace{3pt}
+
+{\centering\footnotesize\setlength{\tabcolsep}{4pt}\input{monthly_table.tex}\par}
+{\footnotesize\textbf{Tab. 3.} Udziały (\%) wśród unikalnych treści w miesiącu.\par}
+
 \begin{enumerate}[label=\textbf{E\arabic*.}]
-\item \textbf{Zbiór jest niekompletny na starcie wojny:} mediana \EdaMedDaily{} wierszy/dzień, ale w 24.02--3.03 łącznie
-\EdaNBeforeEff. Pierwsza fala narracji jest poza zasięgiem.
-\item \textbf{Wolumen tworzą kaskady RT kilku kont:} 10 kont to \EdaTopTenSources{} retweetów, 1\,\% najaktywniejszych
-kont daje \EdaTopOnePctAuthors{} wierszy. Piki wierszy i piki treści pokrywają się tylko w \EdaNPeaksOverlap{}
-z \EdaNPeaksRows{} dni, dlatego miarą główną są kaskady.
-\item \textbf{Mało pików:} \EdaNPeaks{} pików kaskad w 303 dniach; 3 z nich mają oczywisty polski bodziec (Eurowizja,
-farba na ambasadorze Rosji, Przewodów).
-\end{enumerate}
-\end{minipage}
-\begin{enumerate}[label=\textbf{E\arabic*.},start=4]
-\item \textbf{Brak śladu źródła w samym X:} w linkach jest \EdaNRuDomain{} odwołań do rosyjskich domen państwowych
-i \EdaNTme{} do Telegrama. Kierunku przepływu nie da się więc odczytać z X; potrzebny jest Telegram i porównanie w czasie.
-\item \textbf{Sentyment nie mierzy narracji antyukraińskich:} etykieta \emph{negative} obejmuje \EdaShareNeg{} wierszy
-(neutral \EdaShareNeu, positive \EdaSharePos), także krytykę Rosji i polskich polityków. Wśród trafień leksykonu negatywnych
-jest \EdaLexNeg, poza nimi \EdaNoLexNeg; dzienna korelacja obu udziałów wynosi \EdaCorrNegLex. Model sentymentu jest
-nieopisany, a \EdaShareScoreHigh{} etykiet ma pewność $>0{,}95$. Sentymentu nie używamy jako miary.
-\item \textbf{Kryterium doboru nie zgadza się z opisem:} obie frazy dosłownie zawiera \EdaShareBothOrig{} oryginałów
-i odpowiedzi (odmiana, synonimy); \EdaShareTrunc{} retweetów ma ucięty tekst. Leksykon narracji (v0.1, niezwalidowany)
-trafia w \EdaShareLex{} wierszy. Negatywność jest wyższa w odpowiedziach (\EdaNegShareReply) niż w retweetach (\EdaNegShareRetweet).
+\item \textbf{Ton ogółem a ton wobec Ukraińców.} Negatywnych jest \EdaCNeg{} treści, ale tylko \EdaCAntiGivenNeg{}
+z nich zawiera narrację anty-UA; reszta to m.in. krytyka Rosji i polityków. Treści negatywne i z narracją anty-UA:
+\EdaCNegAnti; pro-UA: \EdaCPro, pozytywne pro-UA tylko \EdaCPosPro.
+\item \textbf{Model sentymentu nie mierzy stosunku do Ukraińców.} \EdaCNeuGivenAnti{} treści z narracją anty-UA dostało
+etykietę neutralną (także jawnie wrogie), a \EdaCNegGivenPro{} treści pro-UA negatywną (obrona Ukraińców przed atakami).
+Model jest nieopisany, \EdaShareScoreHigh{} etykiet ma pewność $>0{,}95$. Potrzebna klasyfikacja stanowiska, nie tonu.
+\item \textbf{Dyskurs w 2022 r. powoli się zaostrzał.} Trend tygodniowy (Spearman, \EdaNWeeks{} tyg.): negatywne
+$\rho=\EdaTrNegRho$ (\EdaTrNegP), anty-UA $\rho=\EdaTrAntiRho$ (\EdaTrAntiP), anty-UA i negatywne $\rho=\EdaTrNegAntiRho$
+(\EdaTrNegAntiP), pro-UA $\rho=\EdaTrProRho$ (\EdaTrProP). III--IV vs XI--XII: anty-UA \EdaElAntiA{}$\to$\EdaElAntiB,
+pro-UA \EdaElProA{}$\to$\EdaElProB, negatywne \EdaElNegA{}$\to$\EdaElNegB{} (wszystkie \EdaElAntiP). Zmiana jest
+istotna, ale umiarkowana (kilka punktów procentowych).
+\item \textbf{Dni o dużym wolumenie są mniej negatywne} ($\rho=\EdaCorVolNegRho$, \EdaCorVolNegP): peaki wynikają z newsów
+i solidarności, a tło jest bardziej wrogie. Udziały anty-UA i pro-UA w dniu nie są skorelowane ($\rho=\EdaCorAntiProRho$,
+\EdaCorAntiProP).
+\item \textbf{Zaangażowanie:} oryginały pozytywne mają medianę \EdaLikesPos{} polubień, negatywne \EdaLikesNeg, neutralne
+\EdaLikesNeu{} (\EdaLikesPosNegP); narracje anty-UA nie są istotnie częściej retweetowane (mediana \EdaRtAnti{} vs
+\EdaRtNone, \EdaRtAntiP).
+\item \textbf{Peaki i źródła:} \EdaNPeaks{} peaków w 303 dniach, 3 z polskim bodźcem (Eurowizja, farba na ambasadorze
+Rosji, Przewodów); 10 kont daje \EdaTopTenSources{} retweetów. W linkach jest \EdaNRuDomain{} odwołań do rosyjskich
+mediów państwowych i \EdaNTme{} do Telegrama, więc źródła prorosyjskiego nie widać w samym X.
+\item \textbf{Jakość danych:} luka 24.02--3.03; obie frazy dosłownie zawiera tylko \EdaShareBothOrig{} oryginałów
+i odpowiedzi; \EdaShareTrunc{} retweetów ma ucięty tekst.
 \end{enumerate}
 
 \section{Plan pomiaru zjawiska}
@@ -100,19 +117,19 @@ trafia w \EdaShareLex{} wierszy. Negatywność jest wyższa w odpowiedziach (\Ed
 \item \textbf{Szeregi dzienne.} $Y_t$: liczba różnych kaskad w X o Ukraińcach w Polsce (H1) oraz z narracją antyukraińską
 (H2). $X^{RU}_t$, $X^{UA}_t$: liczba postów z tematem w kanałach prorosyjskich i proukraińskich (kontrola); dla H2
 również z narracją antyukraińską. Wariant ważony: suma wyświetleń.
-\item \textbf{Narracje.} Leksykon PL v0.1 i odpowiednik RU/UK $\rightarrow$ klasyfikator (leksykon lub LLM z zapisanym
+\item \textbf{Narracje.} Leksykony PL v0.2 i odpowiednik RU/UK $\rightarrow$ klasyfikator (leksykon lub LLM z zapisanym
 promptem). Walidacja: próba 2×300 postów (X, Telegram), warstwowana po trafieniu leksykonu i limitowana per konto/kanał,
 kodowana przez 2 osoby; wymagane $\alpha$ Krippendorffa $\ge 0{,}667$; raportujemy P/R/F1 klasyfikatora
 i korygujemy udziały estymatorem z próbą ekspercką (\texttt{tools/}).
-\item \textbf{Piki.} Dzień, w którym $\log(1+x)$ przekracza 15-dniową kroczącą medianę o $z>2{,}5$ odpornych odchyleń
+\item \textbf{Peaki.} Dzień, w którym $\log(1+x)$ przekracza 15-dniową kroczącą medianę o $z>2{,}5$ odpornych odchyleń
 (1,4826·MAD) i jest maksimum w $\pm3$ dniach; czułość dla $z\in\{2;\,2{,}5;\,3\}$.
-\item \textbf{Testy.} (i) Dopasowanie pików: odsetek pików $Y$ poprzedzonych pikiem $X$ w oknie 0--7 dni, rozkład zerowy
-z 1000 kołowych przesunięć pików $X$. (ii) Korelacja krzyżowa przyrostów $\log(1+x)$ dla opóźnień $-14\ldots14$, test
+\item \textbf{Testy.} (i) Dopasowanie peaków: odsetek peaków $Y$ poprzedzonych peakiem $X$ w oknie 0--7 dni, rozkład zerowy
+z 1000 kołowych przesunięć peaków $X$. (ii) Korelacja krzyżowa przyrostów $\log(1+x)$ dla opóźnień $-14\ldots14$, test
 permutacyjny. (iii) Granger w obu kierunkach. \textbf{H1 wspieramy}, gdy (i) daje $p<0{,}05$, (ii) ma maksimum przy
 $k\in[1,7]$ z $r>0$, Granger $X^{RU}\!\to\!Y$ jest istotny, a $Y\!\to\!X^{RU}$ nie, oraz efekt dla $X^{RU}$ jest wyraźnie
 silniejszy niż dla $X^{UA}$. \textbf{H2 wspieramy}, gdy dodatkowo mediana dopasowanych opóźnień leży w 1--7 dniach,
 a IQR $\le 2$ dni (bootstrapowy przedział mediany).
-\item \textbf{Ślad treści.} Dla 5 największych pików $Y$ ręcznie szukamy tego samego twierdzenia w Telegramie (tłumaczenie
+\item \textbf{Ślad treści.} Dla 5 największych peaków $Y$ ręcznie szukamy tego samego twierdzenia w Telegramie (tłumaczenie
 RU$\to$PL) z datą wcześniejszą niż w X; to jedyny bezpośredni dowód przepływu.
 \end{enumerate}
 
@@ -121,35 +138,35 @@ RU$\to$PL) z datą wcześniejszą niż w X; to jedyny bezpośredni dowód przep�
 \item \textbf{Wspólny bodziec (najpoważniejsze):} obie platformy reagują na te same wydarzenia, a Telegram jest szybszy;
 dodatnie opóźnienie może oznaczać szybkość platformy, nie przepływ. Ograniczamy to kontrolą proukraińską,
 usunięciem dni z wydarzeniami z listy i śledzeniem treści (punkt~5).
-\item \textbf{Moc testu:} w symulacji z 8 pikami i opóźnieniem 3 dni test (i) wykrywa efekt w \EdaPowerHalf{} prób, gdy
-połowa pików X ma poprzednika na Telegramie, i w \EdaPowerHigh, gdy ma go 80\,\% (silne, 4-krotne piki; w danych
-słabsze). \textbf{H2 przy ok. 8 pikach jest słabo oznaczalna}: IQR z kilku opóźnień jest niestabilny, więc H2
-raportujemy opisowo, jeśli liczba dopasowanych pików będzie mniejsza niż 8.
+\item \textbf{Moc testu:} w symulacji z 8 peakami i opóźnieniem 3 dni test (i) wykrywa efekt w \EdaPowerHalf{} prób, gdy
+połowa peaków X ma poprzednika na Telegramie, i w \EdaPowerHigh, gdy ma go 80\,\% (silne, 4-krotne peaki; w danych
+słabsze). \textbf{H2 przy ok. 8 peakach jest słabo oznaczalna}: IQR z kilku opóźnień jest niestabilny, więc H2
+raportujemy opisowo, jeśli liczba dopasowanych peaków będzie mniejsza niż 8.
 \item \textbf{Dobór X:} nieznane dokładne zapytanie, luka 24.02--3.03, ucięte retweety, koncentracja na kilku kontach,
 konta usunięte przed pobraniem są nieobecne. Grupy NodeXL to klastry sieci, nie etykiety ideologiczne.
 \item \textbf{Telegram:} etykieta strony tylko dla 3\,074 z 4\,687 kanałów i na poziomie kanału (miary \texttt{antiukr},
 \texttt{toxic} są zagregowane per kanał, nie per post); wyświetlenia z dnia pobrania, nie publikacji; temat w RU/UK
 może być rzadki, co da zaszumione szeregi; wyrażenia filtra mogą łapać wzmianki niezwiązane z uchodźcami (np. o handlu z Polską).
-\item \textbf{Pomiar narracji:} leksykon v0.1 bez walidacji; wspólny zestaw narracji dla PL i RU wymaga tłumaczenia
+\item \textbf{Pomiar narracji:} leksykony v0.2 bez walidacji (fałszywe trafienia, np. kontrargumenty pro-UA z hasłem „socjal”; negacja „nie widać wdzięczności” jest już obsłużona); wspólny zestaw narracji dla PL i RU wymaga tłumaczenia
 kategorii, nie słów. Strefy czasowe: oba źródła agregujemy do doby w czasie warszawskim.
 \item \textbf{Etyka i licencje:} plik X z treściami i loginami jest w publicznym repozytorium; rekomendujemy zostawić
 publicznie tylko ID postów (decyzja D1 w \texttt{CLEANUP.md}).
 \end{itemize}
 
 \section{Wykonalność do 5. zajęć}
-\textbf{Gotowe:} pipeline X (wczytanie, kaskady, szeregi, piki, wykres, liczby do karty), filtr Telegrama w DuckDB
+\textbf{Gotowe:} pipeline X (wczytanie, kaskady, szeregi, peaki, wykres, liczby do karty), filtr Telegrama w DuckDB
 (strumieniowo, bez ładowania 79\,mln postów do pamięci), testy opóźnień i symulacja mocy; 23 testy na danych
 syntetycznych, w tym odtworzenie znanego opóźnienia 3 dni i kalibracja testu przy braku efektu.\\[2pt]
 \begin{tabularx}{\linewidth}{@{}lX@{}}
 \toprule
-Zajęcia 2 & Kopia zbioru Telegrama, uruchomienie filtra, liczności tematu per strona (\textbf{punkt krytyczny}). \\
+Zajęcia 2 & Pobranie zbioru Telegrama z Zenodo (49\,GB), uruchomienie filtra, liczności tematu per strona (\textbf{punkt krytyczny}). \\
 Zajęcia 3 & Leksykon RU/UK, próba walidacyjna 2×300, kodowanie, $\alpha$; poprawki leksykonu. \\
-Zajęcia 4 & Testy H1 z kontrolą, czułość progu i okna, śledzenie treści 5 pików. \\
-Zajęcia 5 & H2 (lub opis, jeśli za mało pików), wyniki i ograniczenia do preprintu. \\
+Zajęcia 4 & Testy H1 z kontrolą, czułość progu i okna, śledzenie treści 5 peaków. \\
+Zajęcia 5 & H2 (lub opis, jeśli za mało peaków), wyniki i ograniczenia do preprintu. \\
 \bottomrule
 \end{tabularx}\\[3pt]
-\textbf{Wprost:} na samych danych z X hipotez nie da się zmierzyć (E4). Jeśli do 2. zajęć nie będziemy mieć Telegrama
-albo dzienna liczba postów z tematem w kanałach prorosyjskich będzie bliska zera, H1 i H2 są nietestowalne i zawężamy
+\textbf{Wprost:} na samych danych z X hipotez nie da się zmierzyć (E6). Zbiór Telegrama jest otwarty, więc ryzykiem nie jest dostęp, lecz treść: jeśli
+dzienna liczba postów z tematem w kanałach prorosyjskich okaże się bliska zera, H1 i H2 są nietestowalne i zawężamy
 projekt do dynamiki narracji w X wokół wydarzeń. H1 na poziomie wolumenu tematu jest realna; H2 prawdopodobnie tylko
 opisowo.
 
@@ -159,7 +176,7 @@ opisowo.
 Osoba & Rola & Zakres \\
 \midrule
 \UZUP{imię i nazwisko} & Lead & pytanie, hipotezy, reguły decyzyjne, preprint \\
-\UZUP{imię i nazwisko} & Inżynier danych & pozyskanie X i Telegrama, licencje, decyzje D1--D4 \\
+\UZUP{imię i nazwisko} & Inżynier danych & pozyskanie X i Telegrama, licencje, decyzje D1--D3 \\
 \UZUP{imię i nazwisko} & Inżynier pipeline'u & \texttt{pipeline/}, testy, eksploracja, walidacja klasyfikatora \\
 \UZUP{imię i nazwisko} & Analityk & leksykon narracji, kodowanie, testy H1/H2, interpretacja \\
 \bottomrule

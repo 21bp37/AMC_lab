@@ -5,7 +5,7 @@ Co robi:
 - parsuje czas (UTC) i dzień kalendarzowy w strefie Europe/Warsaw (zjawisko dotyczy polskiej publiczności),
 - rozróżnia typ wiersza: original / retweet / reply,
 - dla retweetów odzyskuje autora źródłowego (`source_author`) i klucz kaskady (`cascade_key`),
-- dodaje flagi tematu i leksykonu narracji (wersja eksploracyjna),
+- dodaje flagi tematu i leksykonów narracji anty-UA i pro-UA (wersja eksploracyjna) oraz `stance_lex`,
 - sprawdza jakość: duplikaty ID, braki, zakres dat.
 
 Użycie:
@@ -58,7 +58,15 @@ def normalize(df: pd.DataFrame) -> pd.DataFrame:
         out[f"nar_{name}"] = low.str.contains(pattern, regex=True)
     nar_cols = [c for c in out.columns if c.startswith("nar_")]
     out["anti_ua_lexicon"] = out[nar_cols].any(axis=1)
+    negated = low.str.contains(config.NEGATED_GRATITUDE, regex=True)
+    for name, pattern in config.PRO_UA_NARRATIVES.items():
+        out[f"pro_{name}"] = low.str.contains(pattern, regex=True) & ~negated
+    out["pro_ua_lexicon"] = out[[f"pro_{n}" for n in config.PRO_UA_NARRATIVES]].any(axis=1)
+    out["stance_lex"] = np.select(
+        [out["anti_ua_lexicon"] & ~out["pro_ua_lexicon"], out["pro_ua_lexicon"] & ~out["anti_ua_lexicon"],
+         out["anti_ua_lexicon"] & out["pro_ua_lexicon"]], ["anti", "pro", "mieszane"], "brak")
     out["negative"] = out["sentiment"].eq("negative")
+    out["positive"] = out["sentiment"].eq("positive")
     return out
 
 

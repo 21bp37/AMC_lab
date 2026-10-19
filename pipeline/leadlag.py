@@ -4,11 +4,11 @@ Trzy uzupełniające się miary (H1: X wyprzedza Y; H2: opóźnienie jest w przy
 1. `xcorr`         : korelacja krzyżowa przyrostów log(1+x); k > 0 oznacza, że X wyprzedza Y o k dni.
                      Różnicowanie usuwa wspólny trend (oba szeregi rosną/opadają z ogólnym zainteresowaniem wojną),
                      który inaczej daje pozorną korelację przy każdym opóźnieniu.
-2. `peak_lags`     : dla każdego piku Y najbliższy wcześniejszy (lub równoczesny) pik X w oknie `max_lag`;
+2. `peak_lags`     : dla każdego peaku Y najbliższy wcześniejszy (lub równoczesny) peak X w oknie `max_lag`;
                      rozkład tych opóźnień testuje „stałość” (mały rozrzut = stałe opóźnienie).
 3. `granger_min_p` : test przyczynowości Grangera X -> Y i Y -> X (kierunek, nie mechanizm).
 
-Istotność 1 i 2: test permutacyjny przez kołowe przesunięcia X (zachowuje autokorelację i liczbę pików).
+Istotność 1 i 2: test permutacyjny przez kołowe przesunięcia X (zachowuje autokorelację i liczbę peaków).
 """
 from __future__ import annotations
 
@@ -52,7 +52,7 @@ def xcorr_test(x: pd.Series, y: pd.Series, max_lag: int = 14, n_perm: int = 500,
 
 
 def peak_lags(x_peaks, y_peaks, max_lag: int = 7) -> list[int | None]:
-    """Opóźnienie (dni) od najbliższego piku X w [t-max_lag, t] do każdego piku Y; None = brak dopasowania."""
+    """Opóźnienie (dni) od najbliższego peaku X w [t-max_lag, t] do każdego peaku Y; None = brak dopasowania."""
     xp = pd.DatetimeIndex(x_peaks)
     out = []
     for t in pd.DatetimeIndex(y_peaks):
@@ -100,7 +100,7 @@ def simulate_series(n_days: int = 300, n_events: int = 10, lag: int = 3, jitter:
                     base_y: float = 130, amp: float = 3.0, follow: float = 1.0, seed: int = 0):
     """Para syntetycznych szeregów: zdarzenia w X i (z prawd. `follow`) w Y po `lag`±`jitter` dniach.
 
-    Służy do testów i do szacowania mocy: czy przy tylu pikach, ile mamy w danych, wykryjemy opóźnienie.
+    Służy do testów i do szacowania mocy: czy przy tylu peakach, ile mamy w danych, wykryjemy opóźnienie.
     """
     rng = np.random.default_rng(seed)
     idx = pd.date_range("2022-03-04", periods=n_days, freq="D")
@@ -120,7 +120,7 @@ def simulate_series(n_days: int = 300, n_events: int = 10, lag: int = 3, jitter:
 
 def power_peak_lag(n_events: int, lag: int = 3, follow: float = 0.7, reps: int = 100, alpha: float = 0.05,
                    max_lag: int = 7, z: float = 2.5, seed: int = 0) -> dict:
-    """Moc testu dopasowania pików (peak_lag_test) i trafność estymaty mediany opóźnienia."""
+    """Moc testu dopasowania peaków (peak_lag_test) i trafność estymaty mediany opóźnienia."""
     from pipeline.series import detect_peaks
 
     hits, med = 0, []

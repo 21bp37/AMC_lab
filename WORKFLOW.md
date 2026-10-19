@@ -19,4 +19,4 @@ cd reports && latexmk -pdf M1_karta_eksploracji.tex
 ```
 
 ## Pomiar
-Zmiana leksykonu, progu piku lub klasyfikatora = nowa wersja w `pipeline/config.py` + wpis w `templates/codebook_changelog.md`. Prompty: `prompts/`, uruchomienia: `logs/runs.jsonl`.
+Zmiana leksykonu, progu peaku lub klasyfikatora = nowa wersja w `pipeline/config.py` + wpis w `templates/codebook_changelog.md`. Prompty: `prompts/`, uruchomienia: `logs/runs.jsonl`.
