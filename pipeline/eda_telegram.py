@@ -56,6 +56,39 @@ def load_posts(pattern: str) -> tuple[pd.DataFrame, list[int]]:
     return df, sorted(set(int(p) for p in parts))
 
 
+def _norm_side(v) -> str:
+    t = str(v).strip().lower()
+    if "russ" in t or "ros" in t or t in ("ru", "pro-ru"):
+        return "Pro-Russian"
+    if "ukr" in t or t in ("ua", "pro-ua"):
+        return "Pro-Ukrainian"
+    if "neutral" in t or "neutr" in t:
+        return "Neutral"
+    return "unlabeled"
+
+
+def _norm_id(x: pd.Series) -> pd.Series:
+    """Ujednolica identyfikatory kanałów (Telegram bywa zapisywany jako -100XXXXXXXXXX)."""
+    n = pd.to_numeric(x, errors="coerce")
+    return n.where(n > -1_000_000_000_000, -n - 1_000_000_000_000).abs()
+
+
+def attach_sides(df: pd.DataFrame, clusters_csv: str) -> tuple[pd.DataFrame, dict]:
+    cl = pd.read_csv(clusters_csv)
+    id_col = next((c for c in ("peer_id", "channel_id", "id", "channel") if c in cl.columns), cl.columns[0])
+    side_col = next((c for c in ("side", "label", "stance", "camp") if c in cl.columns), None)
+    if side_col is None:
+        raise SystemExit(f"W {clusters_csv} nie znalazłem kolumny strony (side/label/stance). Kolumny: {list(cl.columns)}")
+    cl = cl.assign(_id=_norm_id(cl[id_col]), _side=cl[side_col].map(_norm_side)).dropna(subset=["_id"]).drop_duplicates("_id")
+    out = df.assign(_id=_norm_id(df["peer_id"])).merge(cl[["_id", "_side"]], on="_id", how="left")
+    out["side"] = out["_side"].fillna("unlabeled")
+    out = out.drop(columns=["_id", "_side"])
+    diag = {"clusters_columns": list(cl.columns[:-2]), "clusters_side_values": cl[side_col].value_counts().head(8).to_dict(),
+            "clusters_rows": int(len(cl)), "post_channels_in_clusters": float(out.loc[out["side"] != "unlabeled", "peer_id"].nunique() / max(out["peer_id"].nunique(), 1)),
+            "id_column": id_col, "side_column": side_col}
+    return out, diag
+
+
 def prepare(df: pd.DataFrame, clusters_csv: str) -> pd.DataFrame:
     ts = pd.to_datetime(df["date"], utc=True, errors="coerce")
     df = df.assign(ts=ts).dropna(subset=["ts"])
@@ -67,10 +100,8 @@ def prepare(df: pd.DataFrame, clusters_csv: str) -> pd.DataFrame:
     msg = df["message"].fillna("")
     df["is_anti"] = msg.str.contains(config.TELEGRAM_ANTI_UA, regex=True)
     df["copy_key"] = msg.str.lower().str.replace(r"\s+", " ", regex=True).str.strip().str[:80]
-    cl = pd.read_csv(clusters_csv)[["peer_id", "side"]].drop_duplicates("peer_id")
-    df = df.merge(cl, on="peer_id", how="left")
-    df["side"] = df["side"].fillna("unlabeled")
-    df.loc[~df["side"].isin(SIDES), "side"] = "unlabeled"
+    df, diag = attach_sides(df, clusters_csv)
+    df.attrs["diag"] = diag
     for c in ("views", "forwards"):
         df[c] = pd.to_numeric(df[c], errors="coerce")
     return df
@@ -263,7 +294,9 @@ def run(posts: str, clusters: str, twitter_daily: str, z: float) -> dict:
         x_daily = pd.read_csv(twitter_daily, index_col=0, parse_dates=True)
     except FileNotFoundError:
         pass
+    diag = df.attrs.get("diag", {})
     summary = {
+        "diagnostics": diag,
         "coverage": {"parts": parts, "n_posts": int(len(df)), "n_channels": int(df["peer_id"].nunique()),
                      "first_day": str(df["day"].min().date()) if len(df) else None, "last_day": str(df["day"].max().date()) if len(df) else None,
                      "unlabeled_share": float((df["side"] == "unlabeled").mean()) if len(df) else 0.0,
@@ -287,6 +320,11 @@ def main() -> None:
     ap.add_argument("--z", type=float, default=2.5)
     a = ap.parse_args()
     s = run(a.posts, a.clusters, a.twitter_daily, a.z)
+    d = s["diagnostics"]
+    print("Etykiety stron: kolumna", d.get("side_column"), "wartości", d.get("clusters_side_values"), "| kanały z postów znalezione w pliku etykiet:",
+          f"{d.get('post_channels_in_clusters', 0):.0%}")
+    if d.get("post_channels_in_clusters", 0) < 0.05:
+        print("UWAGA: prawie żaden kanał z postów nie ma etykiety strony; sprawdź format peer_id w pliku etykiet (wklej mi head).")
     print(json.dumps({"coverage": s["coverage"], "posts_by_side": {k: v["posts"] for k, v in s["sides"].items()},
                       "n_peaks_ru": s["n_peaks_ru"]}, ensure_ascii=False, indent=2))
     print("Zapisano reports/eda_telegram_section.tex, eda_telegram_results.md, figures/telegram.pdf")
