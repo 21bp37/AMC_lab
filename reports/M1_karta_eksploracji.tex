@@ -16,15 +16,26 @@
 \titlespacing*{\section}{0pt}{6pt}{2pt}
 
 \input{eda_numbers.tex}
-\newcommand{\UZUP}[1]{\textcolor{red}{[#1]}}   % miejsca do uzupełnienia przez zespół
-\newcommand{\repo}{\url{https://github.com/21bp37/AMC_lab/tree/ukraine-source}}
+\newcommand{\repo}{\url{https://github.com/21bp37/AMC_lab}}
 
 \begin{document}
 \begin{center}
 {\large\bfseries Karta eksploracji danych (M1)}\\[2pt]
 {\bfseries Negatywne treści o ukraińskich uchodźcach: czy trendy w polskojęzycznym X i prorosyjskim Telegramie są skorelowane?}\\[1pt]
-\small AMC\quad·\quad repozytorium: \repo\quad·\quad 19.10.2026
+\small Analiza mediów cyfrowych\quad·\quad 19.10.2026
 \end{center}
+
+\section{Skład zespołu i role}
+\begin{tabularx}{\linewidth}{@{}llX@{}}
+\toprule
+Osoba & Rola & Zakres \\
+\midrule
+Adam Broszkiewicz & Lead badawczy & pytanie badawcze, hipoteza, preprint, poster \\
+Bartosz Procki & Inżynier danych & pozyskanie X i Telegrama, licencje, decyzje D1--D3 \\
+Mateusz Wechman & Inżynier pipeline'u & \texttt{pipeline/}, testy, eksploracja, walidacja klasyfikatora \\
+\bottomrule
+\end{tabularx}\\[2pt]
+Repozytorium: \repo{}.
 
 \section{Pytanie badawcze i hipoteza}
 \textbf{Pytanie.} Czy w okresie 4.03--31.12.2022 zmiany natężenia negatywnych treści o ukraińskich uchodźcach
@@ -33,15 +44,17 @@ w polskojęzycznym X szły w parze ze zmianami takich treści w prorosyjskich ka
 \textbf{Hipoteza (H).} Trendy w pojawianiu się negatywnych treści na temat ukraińskich uchodźców w polskich mediach
 społecznościowych są skorelowane z podobnymi trendami w źródłach prorosyjskich. \emph{Operacyjnie:} dzienne zmiany
 liczby treści o Ukraińcach w Polsce z narracją antyukraińską w polskojęzycznym X są dodatnio skorelowane ze zmianami
-liczby takich postów w prorosyjskich kanałach Telegrama, jednocześnie lub z Telegramem wcześniej o 1--7 dni,
-i korelacja ta jest wyraźnie silniejsza niż z kanałami proukraińskimi (grupa kontrolna).
-\textbf{H$_0$:} po usunięciu wspólnego trendu całorocznego zmiany w obu źródłach nie są dodatnio skorelowane.
+liczby takich postów w prorosyjskich kanałach Telegrama (jednocześnie lub z Telegramem wcześniej o 1--7 dni),
+i silniej niż z kanałami proukraińskimi (grupa kontrolna). \textbf{H$_0$:} po usunięciu wspólnego trendu całorocznego
+zmiany w obu źródłach nie są dodatnio skorelowane.
+
+\textbf{Zakres M1: tylko eksploracja.} Hipotezy \emph{nie testujemy} i nie pracujemy na pełnych danych: analizujemy
+cały zbiór z X, a Telegram jest w M1 niepełny (nie wyciągamy z niego wniosków). Sekcja~4 to plan testu na kolejne etapy.
 
 \textbf{Zawężenia.} (a) „Polskie media społecznościowe” mierzymy jako polskojęzyczny X, bo tylko takie dane mamy.
 (b) „Negatywne treści” to treści z narracją antyukraińską (świadczenia, przestępczość, banderyzm itd.), a nie ton
-wypowiedzi (E2) ani dezinformacja, która wymaga weryfikacji prawdziwości. (c) „Trend” to zmiany natężenia z dnia na dzień
-i z tygodnia na tydzień, a nie wspólny spadek w całym roku, który dałby korelację dowolnym dwóm tematom.
-(d) Korelacja nie dowodzi przepływu ani wpływu; kierunek badamy tylko uzupełniająco (sekcja~4).
+wypowiedzi (E2) ani dezinformacja. (c) „Trend” to zmiany natężenia z dnia na dzień i z tygodnia na tydzień, a nie wspólny
+spadek w całym roku. (d) Korelacja nie dowodzi przepływu ani wpływu.
 
 \section{Źródła danych i zakres próby}
 \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{2.3cm}X>{\raggedright\arraybackslash}p{3.3cm}@{}}
@@ -51,11 +64,11 @@ i z tygodnia na tydzień, a nie wspólny spadek w całym roku, który dałby kor
 X/Twitter, PL (zmienna zależna) & API v2 for Academic Research (dostęp sprzed zmian z II 2023), import do NodeXL;
 posty po polsku z frazami „Ukraińcy” i „w Polsce”, 24.02--31.12.2022. \EdaNRows{} wpisów: \EdaNOrig{} oryginałów,
 \EdaNReply{} odpowiedzi, \EdaNRt{} retweetów; \EdaNAuthors{} kont; \EdaNContents{} unikalnych treści. Pola: czas, tekst,
-typ relacji, liczniki interakcji, domeny, grupa NodeXL, etykieta i pewność sentymentu. & w repozytorium; przeanalizowane \\
+typ relacji, liczniki interakcji, domeny, grupa NodeXL, etykieta i pewność sentymentu. & w repozytorium; przeanalizowane (M1) \\
 Telegram (zmienna niezależna) & Kyrychenko R., \emph{Russian and Ukrainian War-related Telegram Channels}, Zenodo 2025,
 doi:10.5281/zenodo.16949193, CC BY 4.0. 79,6\,mln postów z 4\,687 kanałów (2015--2024), 18,2\,mln przekazań, strona
 kanału (\emph{Pro-Russian / Pro-Ukrainian / Neutral}) dla 3\,074 kanałów. Pola posta: kanał, czas, tekst, wyświetlenia,
-przekazania. & otwarty, 49\,GB (8 plików postów); \textbf{jeszcze niepobrany}; filtr gotowy \\
+przekazania. & otwarty, 49\,GB (8 plików postów); \textbf{dane niepełne}, w M1 nieużyte; filtr gotowy \\
 \bottomrule
 \end{tabularx}
 
@@ -112,7 +125,7 @@ Rosji, Przewodów); 10 kont daje \EdaTopTenSources{} retweetów. W linkach jest 
 mediów państwowych i \EdaNTme{} do Telegrama, więc źródła prorosyjskiego nie widać w samym X.
 \end{enumerate}
 
-\section{Plan pomiaru zjawiska}
+\section{Plan pomiaru zjawiska (na etapy po M1; w M1 niewykonywany)}
 \begin{enumerate}[label=\arabic*.]
 \item \textbf{Szeregi dzienne} ($t$ = dzień). $Y_t$: liczba różnych treści w X o Ukraińcach w Polsce z narracją
 antyukraińską. $X^{RU}_t$, $X^{UA}_t$ (indeks górny = strona kanału): liczba postów o Ukraińcach w Polsce z narracją
@@ -164,7 +177,7 @@ publicznie tylko ID postów (decyzja D1 w \texttt{CLEANUP.md}).
 \end{itemize}
 
 \section{Wykonalność do 5. zajęć}
-\textbf{Gotowe:} pipeline X (wczytanie, kaskady, szeregi, peaki, wykres, liczby do karty), filtr Telegrama w DuckDB
+\textbf{Gotowe w M1:} pipeline X (wczytanie, kaskady, szeregi, peaki, wykres, liczby do karty), filtr Telegrama w DuckDB
 (strumieniowo), test główny, test tygodniowy, analizy kierunku i symulacja mocy; 27 testów na danych
 syntetycznych, w tym odtworzenie znanej korelacji i opóźnienia, kalibracja przy braku efektu, odporność na wspólny trend i porównanie z kontrolą (\texttt{leadlag.test\_hypothesis}).\\[2pt]
 \begin{tabularx}{\linewidth}{@{}lX@{}}
@@ -175,20 +188,8 @@ Zajęcia 4 & Test główny i tygodniowy dla $X^{RU}$ i $X^{UA}$, warianty (udzia
 Zajęcia 5 & Analizy kierunku (Granger, peaki, ślad treści), wyniki i ograniczenia do preprintu. \\
 \bottomrule
 \end{tabularx}\\[3pt]
-\textbf{Wprost:} na samych danych z X hipotezy nie da się zmierzyć (E6). Ryzykiem nie jest dostęp do Telegrama (zbiór jest otwarty), lecz treść: jeśli
+\textbf{Wprost:} na samych danych z X hipotezy nie da się zmierzyć (E5), a w M1 jej nie testujemy. Ryzykiem nie jest dostęp do Telegrama (zbiór jest otwarty), lecz treść: jeśli
 dzienna liczba postów z narracją antyukraińską o Ukraińcach w Polsce w kanałach prorosyjskich okaże się bliska zera,
 szeregu $X^{RU}_t$ nie da się zbudować, hipoteza jest nietestowalna i zawężamy projekt do dynamiki narracji w X wokół
-wydarzeń. Wtedy w pierwszej kolejności przechodzimy na szereg tygodniowy, który jest mniej zaszumiony.
-
-\section{Skład zespołu i role}
-\begin{tabularx}{\linewidth}{@{}llX@{}}
-\toprule
-Osoba & Rola & Zakres \\
-\midrule
-Adam Broszkiewicz & Lead & pytanie, hipoteza, reguła decyzyjna, preprint \\
-Bartosz Procki & Inżynier danych & pozyskanie X i Telegrama, licencje, decyzje D1--D3 \\
-Mateusz Wechman & Inżynier pipeline'u & \texttt{pipeline/}, testy, eksploracja, walidacja klasyfikatora \\
-\bottomrule
-\end{tabularx}\\[2pt]
-Repo: \repo{} · odtworzenie: \texttt{python -m pipeline.eda\_twitter}
+wydarzeń (wtedy przechodzimy na szereg tygodniowy).
 \end{document}
