@@ -145,15 +145,20 @@ def plot_overview(daily: pd.DataFrame, w: pd.DataFrame, peaks: pd.DatetimeIndex,
     for ax in axes:
         ax.grid(axis="y", color=GRID, lw=0.6)
     eff = daily.loc[config.EFFECTIVE_START:]
-    a1.plot(eff.index, eff["rows"], color=BLUE, lw=0.9)
-    a1.scatter(peaks, eff.loc[peaks, "rows"], s=18, color=ORANGE, edgecolor="white", lw=0.8, zorder=3)
+    # Peaki wykrywamy na liczbie RÓŻNYCH treści dziennie, względem lokalnej mediany - i to samo rysujemy.
+    base = np.expm1(np.log1p(eff["cascades"].astype(float)).rolling(15, center=True, min_periods=7).median())
+    a1.plot(eff.index, base, color=MUTED, lw=1.0, ls="--", label="tło: 15-dniowa mediana")
+    a1.plot(eff.index, eff["cascades"], color=BLUE, lw=0.9, label="różne treści / dzień")
+    a1.scatter(peaks, eff.loc[peaks, "cascades"], s=20, color=ORANGE, edgecolor="white", lw=0.8, zorder=3, label="peak")
     for _, r in ptab.iterrows():
         if r["event"]:
             d0 = pd.Timestamp(r["day"])
-            a1.annotate(r["event"].split(" (")[0], (d0, eff.loc[d0, "rows"]), xytext=(5, -2),
+            a1.annotate(r["event"].split(" (")[0], (d0, eff.loc[d0, "cascades"]), xytext=(5, -2),
                         textcoords="offset points", fontsize=6.5, color=INK)
-    a1.set_title("A. Ile wpisów dziennie (z retweetami); pomarańczowe kropki = peaki")
-    a1.set_ylabel("wpisy / dzień")
+    a1.set_title("A. Ile różnych treści dziennie (retweety jednego wpisu liczone raz)")
+    a1.set_ylabel("treści / dzień")
+    a1.set_ylim(0, 520)
+    a1.legend(frameon=False, loc="upper right", ncols=1, fontsize=7)
 
     a2.plot(w.index, w["negative"], color=BLUE, lw=1.4, marker="o", ms=2.5, label="negatywne (wobec kogokolwiek)")
     a2.plot(w.index, w["positive"], color=AQUA, lw=1.4, marker="o", ms=2.5, label="pozytywne")

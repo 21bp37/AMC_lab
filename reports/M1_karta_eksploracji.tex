@@ -66,8 +66,9 @@ wspominające Ukrainę/Ukraińców \emph{i} Polskę/Polaków (wyrażenia RU/UK w
 \section{Wyniki wstępnej eksploracji (X/Twitter)}
 \textbf{Dwie miary.} \emph{Sentyment} (etykieta z pliku) mówi, czy wpis jest negatywny, ale nie wobec kogo.
 \emph{Leksykony} (v0.2, niezwalidowane) mówią, czy wpis zawiera narrację anty-UA (świadczenia, przestępczość, banderyzm,
-roszczeniowość, praca, zdrowie) lub treść pro-UA (pomoc, solidarność, wdzięczność). „Negatywne wobec Ukraińców”
-przybliżamy przecięciem obu. Udziały liczymy na unikalnych treściach, bo jeden wiralowy wpis z setkami retweetów
+roszczeniowość, praca, zdrowie) lub treść pro-UA (pomoc, solidarność, wdzięczność). Każda treść trafia do jednej grupy: tylko anty-UA, tylko pro-UA, oba leksykony
+(np. „wystarczająco otrzymali pomocy (…) ukrainizacja Polski”) albo żaden (brak słów kluczowych; to nie znaczy
+„neutralna”). „Negatywne wobec Ukraińców” przybliżamy przecięciem tonu i leksykonu. Udziały liczymy na unikalnych treściach, bo jeden wiralowy wpis z setkami retweetów
 przesuwa udział miesiąca nawet o kilkanaście punktów.
 
 \begin{minipage}[t]{0.47\linewidth}\vspace{0pt}\footnotesize\setlength{\tabcolsep}{3pt}
@@ -79,10 +80,11 @@ przesuwa udział miesiąca nawet o kilkanaście punktów.
 \textbf{Tab. 2.} Peaki; „Top konto” = udział jednego retweetowanego konta.
 \end{minipage}\\[4pt]
 {\centering\includegraphics[width=0.86\linewidth]{figures/daily.pdf}\par}
-{\footnotesize\textbf{Rys. 1.} A: ile wpisów pojawiało się dziennie; kropki to peaki (dni z liczbą różnych treści wyraźnie
-ponad 15-dniową medianą). B: odsetek treści o tonie negatywnym i pozytywnym, bez względu na to, czego dotyczą.
-C: odsetek treści z narracją anty-UA (pomarańczowa) i pro-UA (zielona); linie przerywane to te z nich, którym model nadał
-pasujący ton.\par}\vspace{3pt}
+{\footnotesize\textbf{Rys. 1.} A: liczba różnych treści dziennie (retweety jednego wpisu liczone raz) i jej 15-dniowa
+mediana; peak to dzień wyraźnie ponad tym lokalnym tłem (więc w spokojnym okresie peakiem może być umiarkowany dzień,
+a w ruchliwym marcu nawet duży dzień nim nie jest). B: odsetek treści o tonie negatywnym i pozytywnym, bez względu na
+to, czego dotyczą. C: odsetek treści z narracją anty-UA (pomarańczowa) i pro-UA (zielona); linie przerywane to te
+z nich, którym model nadał pasujący ton.\par}\vspace{3pt}
 
 {\centering\footnotesize\setlength{\tabcolsep}{4pt}\input{monthly_table.tex}\par}
 {\footnotesize\textbf{Tab. 3.} Udziały (\%) wśród unikalnych treści w miesiącu.\par}
