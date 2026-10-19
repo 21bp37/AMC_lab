@@ -14,7 +14,7 @@ Projekt zespołowy (kurs AMC). Pytanie: czy wzrosty treści o Ukraińcach w Pols
 | `pipeline/eda_twitter.py` | eksploracja X: `reports/eda_summary.json`, `eda_numbers.tex`, `peaks_table.tex`, `figures/` |
 | `tools/` | narzędzia walidacji instrumentu: zgodność koderów, P/R/F1, liczebność próby, korekta estymacji, dziennik uruchomień |
 | `tests/` | testy na danych syntetycznych |
-| `reports/` | wyniki eksploracji i karta M1 (LaTeX) |
+| `reports/` | karta M1 (LaTeX), wyniki eksploracji (`eda_results.md`, generowany), definicje miar i testów (`METODY.md`) |
 | `ukraine-source/with_sentiment.csv` | eksport X (NodeXL + etykiety sentymentu); **do przeniesienia poza repozytorium**, zob. `CLEANUP.md` |
 
 ## Uruchomienie

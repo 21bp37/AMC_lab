@@ -6,7 +6,7 @@
 \usepackage[polish]{babel}
 \usepackage{lmodern}
 \usepackage{microtype}
-\usepackage[margin=1.6cm,top=1.3cm,bottom=1.5cm]{geometry}
+\usepackage[margin=1.5cm,top=1.2cm,bottom=1.4cm]{geometry}
 \usepackage{booktabs,tabularx,array,graphicx,xcolor,enumitem}
 \usepackage[hidelinks]{hyperref}
 \setlist{nosep,leftmargin=*}
@@ -35,7 +35,7 @@ w polskojęzycznym X: odsetek peaków X, przed którymi w oknie 0--7 dni wystąp
 niż przy losowym położeniu peaków, a dla kanałów proukraińskich (grupa kontrolna) efekt nie występuje albo jest słabszy.
 
 \textbf{H2 (stałe opóźnienie).} Dla peaków z narracjami antyukraińskimi opóźnienie X względem prorosyjskiego Telegrama
-jest dodatnie i w przybliżeniu stałe: mediana 1--7 dni, rozstęp międzykwartylowy $\le 2$ dni.
+jest dodatnie i w przybliżeniu stałe: mediana 1--7 dni, rozstęp międzykwartylowy (IQR: różnica między 75. a 25.~percentylem opóźnień) $\le 2$ dni.
 
 \textbf{Zawężenia wobec sformułowań roboczych.} (a) „Polskie media” mierzymy jako polskojęzyczny X, bo tylko takie dane
 mamy. (b) Mierzymy \emph{narracje antyukraińskie} (świadczenia, przestępczość, banderyzm itd.), a nie dezinformację:
@@ -79,15 +79,14 @@ przesuwa udział miesiąca nawet o kilkanaście punktów.
 \input{peaks_table.tex}\\[1pt]
 \textbf{Tab. 2.} Peaki; „Top konto” = udział jednego retweetowanego konta.
 \end{minipage}\\[4pt]
-{\centering\includegraphics[width=0.86\linewidth]{figures/daily.pdf}\par}
+{\centering\includegraphics[width=0.8\linewidth]{figures/daily.pdf}\par}
 {\footnotesize\textbf{Rys. 1.} A: liczba różnych treści dziennie (retweety jednego wpisu liczone raz) i jej 15-dniowa
 mediana; peak to dzień wyraźnie ponad tym lokalnym tłem (więc w spokojnym okresie peakiem może być umiarkowany dzień,
 a w ruchliwym marcu nawet duży dzień nim nie jest). B: odsetek treści o tonie negatywnym i pozytywnym, bez względu na
 to, czego dotyczą. C: odsetek treści z narracją anty-UA (pomarańczowa) i pro-UA (zielona); linie przerywane to te
 z nich, którym model nadał pasujący ton.\par}\vspace{3pt}
 
-{\centering\footnotesize\setlength{\tabcolsep}{4pt}\input{monthly_table.tex}\par}
-{\footnotesize\textbf{Tab. 3.} Udziały (\%) wśród unikalnych treści w miesiącu.\par}
+{\footnotesize Udziały miesięczne: \texttt{reports/monthly\_table.tex}; wszystkie liczby z nazwą testu: \texttt{reports/eda\_results.md}; definicje: \texttt{reports/METODY.md}.\par}
 
 \begin{enumerate}[label=\textbf{E\arabic*.}]
 \item \textbf{Ton ogółem a ton wobec Ukraińców.} Negatywnych jest \EdaCNeg{} treści, ale tylko \EdaCAntiGivenNeg{}
@@ -95,12 +94,12 @@ z nich zawiera narrację anty-UA; reszta to m.in. krytyka Rosji i polityków. Tr
 \EdaCNegAnti; pro-UA: \EdaCPro, pozytywne pro-UA tylko \EdaCPosPro.
 \item \textbf{Model sentymentu nie mierzy stosunku do Ukraińców.} \EdaCNeuGivenAnti{} treści z narracją anty-UA dostało
 etykietę neutralną (także jawnie wrogie), a \EdaCNegGivenPro{} treści pro-UA negatywną (obrona Ukraińców przed atakami).
-Nie wiemy, jakim modelem nadano etykiety w pliku (nazwa, wersja, dane treningowe; D2), a \EdaShareScoreHigh{} etykiet ma deklarowaną pewność $>0{,}95$ mimo tak częstych pomyłek. Potrzebna klasyfikacja stanowiska, nie tonu.
-\item \textbf{Dyskurs w 2022 r. powoli się zaostrzał.} Trend: korelacja rang Spearmana $\rho$ między numerem tygodnia a udziałem treści danego typu (\EdaNWeeks{} tyg.): negatywne
+Nie wiemy, jakim modelem nadano etykiety w pliku (nazwa, wersja, dane treningowe; D2), a \EdaShareScoreHigh{} etykiet ma deklarowaną pewność (\texttt{Sentiment\_Score}, prawdopodobieństwo przypisane etykiecie przez model) $>0{,}95$ mimo tak częstych pomyłek. Potrzebna klasyfikacja stanowiska, nie tonu.
+\item \textbf{Dyskurs w 2022 r. powoli się zaostrzał.} Trend: korelacja rang Spearmana $\rho$ między numerem tygodnia a udziałem treści danego typu (\EdaNWeeks{} tyg.; $\rho$ od $-1$ do $1$: $>0$ udział rośnie w czasie, $<0$ maleje; $p$ to prawdopodobieństwo takiego lub silniejszego wyniku, gdyby zależności nie było, za istotne uznajemy $p<0{,}05$): negatywne
 $\rho=\EdaTrNegRho$ (\EdaTrNegP), anty-UA $\rho=\EdaTrAntiRho$ (\EdaTrAntiP), anty-UA i negatywne $\rho=\EdaTrNegAntiRho$
 (\EdaTrNegAntiP), pro-UA $\rho=\EdaTrProRho$ (\EdaTrProP). III--IV vs XI--XII: anty-UA \EdaElAntiA{}$\to$\EdaElAntiB,
-pro-UA \EdaElProA{}$\to$\EdaElProB, negatywne \EdaElNegA{}$\to$\EdaElNegB{} (test $z$ dla dwóch proporcji: \EdaElAntiP, \EdaElProP, \EdaElNegP). Zmiana jest
-istotna, ale umiarkowana (kilka punktów procentowych).
+pro-UA \EdaElProA{}$\to$\EdaElProB, negatywne \EdaElNegA{}$\to$\EdaElNegB{} (test $z$ dla dwóch proporcji, $z$ = różnica odsetków podzielona przez jej błąd standardowy: \EdaElAntiP, \EdaElProP, \EdaElNegP). Zmiana jest
+istotna, ale umiarkowana (kilka punktów procentowych, pp).
 \item \textbf{Dni o dużym wolumenie są mniej negatywne} (Spearman po 303 dniach, liczba wpisów vs udział negatywnych: $\rho=\EdaCorVolNegRho$, \EdaCorVolNegP): peaki wynikają z newsów
 i solidarności, a tło jest bardziej wrogie. Udziały anty-UA i pro-UA w dniu nie są skorelowane ($\rho=\EdaCorAntiProRho$,
 \EdaCorAntiProP).
@@ -116,18 +115,18 @@ i odpowiedzi; \EdaShareTrunc{} retweetów ma ucięty tekst.
 
 \section{Plan pomiaru zjawiska}
 \begin{enumerate}[label=\arabic*.]
-\item \textbf{Szeregi dzienne.} $Y_t$: liczba różnych kaskad w X o Ukraińcach w Polsce (H1) oraz z narracją antyukraińską
-(H2). $X^{RU}_t$, $X^{UA}_t$: liczba postów z tematem w kanałach prorosyjskich i proukraińskich (kontrola); dla H2
+\item \textbf{Szeregi dzienne} ($t$ = dzień). $Y_t$: liczba różnych kaskad w X o Ukraińcach w Polsce (H1) oraz z narracją antyukraińską
+(H2). $X^{RU}_t$, $X^{UA}_t$ (indeks górny = strona kanału): liczba postów z tematem w kanałach prorosyjskich i proukraińskich (kontrola); dla H2
 również z narracją antyukraińską. Wariant ważony: suma wyświetleń.
 \item \textbf{Narracje.} Leksykony PL v0.2 i odpowiednik RU/UK $\rightarrow$ klasyfikator (leksykon lub LLM z zapisanym
 promptem). Walidacja: próba 2×300 postów (X, Telegram), warstwowana po trafieniu leksykonu i limitowana per konto/kanał,
-kodowana przez 2 osoby; wymagane $\alpha$ Krippendorffa $\ge 0{,}667$; raportujemy P/R/F1 klasyfikatora
+kodowana przez 2 osoby; wymagane $\alpha$ Krippendorffa (zgodność koderów: 0 = losowa, 1 = pełna) $\ge 0{,}667$; raportujemy precyzję P (odsetek trafnych wśród oznaczonych przez klasyfikator), czułość R (odsetek wyłapanych wśród prawdziwych) i ich średnią harmoniczną F1
 i korygujemy udziały estymatorem z próbą ekspercką (\texttt{tools/}).
-\item \textbf{Peaki.} Dzień, w którym $\log(1+x)$ przekracza 15-dniową kroczącą medianę o $z>2{,}5$ odpornych odchyleń
-(1,4826·MAD) i jest maksimum w $\pm3$ dniach; czułość dla $z\in\{2;\,2{,}5;\,3\}$.
+\item \textbf{Peaki.} Dla dziennej liczby $x_t$ (np. $Y_t$) liczymy $z_t=\bigl(\log(1+x_t)-m_t\bigr)/(1{,}4826\cdot\mathrm{MAD}_t)$, gdzie $m_t$ to 15-dniowa krocząca mediana $\log(1+x)$, a MAD to mediana bezwzględnych odchyleń od niej (odporny odpowiednik odchylenia standardowego; 1,4826 zrównuje skale). Logarytm z $1+x$ spłaszcza wielkie wartości i działa dla $x=0$. Peak to dzień z $z_t>2{,}5$
+będący maksimum w $\pm3$ dniach; czułość dla $z\in\{2;\,2{,}5;\,3\}$.
 \item \textbf{Testy.} (i) Dopasowanie peaków: odsetek peaków $Y$ poprzedzonych peakiem $X$ w oknie 0--7 dni, rozkład zerowy
-z 1000 kołowych przesunięć peaków $X$. (ii) Korelacja krzyżowa przyrostów $\log(1+x)$ dla opóźnień $-14\ldots14$, test
-permutacyjny. (iii) Granger w obu kierunkach. \textbf{H1 wspieramy}, gdy (i) daje $p<0{,}05$, (ii) ma maksimum przy
+z 1000 kołowych przesunięć peaków $X$ (losowo przesuwamy daty peaków o tę samą liczbę dni z „zawijaniem” na początek okna, co zachowuje ich liczbę i odstępy). (ii) Korelacja krzyżowa: współczynnik Pearsona $r$ między przyrostem $\log(1+x)$ dzień do dnia w $X$ przesuniętym o $k$ dni a przyrostem w $Y$, dla opóźnień $k=-14\ldots14$ ($k>0$: Telegram wyprzedza X), test
+permutacyjny. (iii) Test Grangera (test $F$) w obu kierunkach: czy przeszłe wartości $X$ poprawiają prognozę $Y$ ponad przeszłe wartości samego $Y$, dla opóźnień 1--7 dni. \textbf{H1 wspieramy}, gdy (i) daje $p<0{,}05$, (ii) ma maksimum przy
 $k\in[1,7]$ z $r>0$, Granger $X^{RU}\!\to\!Y$ jest istotny, a $Y\!\to\!X^{RU}$ nie, oraz efekt dla $X^{RU}$ jest wyraźnie
 silniejszy niż dla $X^{UA}$. \textbf{H2 wspieramy}, gdy dodatkowo mediana dopasowanych opóźnień leży w 1--7 dniach,
 a IQR $\le 2$ dni (bootstrapowy przedział mediany).
@@ -140,7 +139,7 @@ RU$\to$PL) z datą wcześniejszą niż w X; to jedyny bezpośredni dowód przep�
 \item \textbf{Wspólny bodziec (najpoważniejsze):} obie platformy reagują na te same wydarzenia, a Telegram jest szybszy;
 dodatnie opóźnienie może oznaczać szybkość platformy, nie przepływ. Ograniczamy to kontrolą proukraińską,
 usunięciem dni z wydarzeniami z listy i śledzeniem treści (punkt~5).
-\item \textbf{Moc testu:} w symulacji z 8 peakami i opóźnieniem 3 dni test (i) wykrywa efekt w \EdaPowerHalf{} prób, gdy
+\item \textbf{Moc testu} (szansa wykrycia efektu, jeśli istnieje): w symulacji z 8 peakami i opóźnieniem 3 dni test (i) wykrywa efekt w \EdaPowerHalf{} prób, gdy
 połowa peaków X ma poprzednika na Telegramie, i w \EdaPowerHigh, gdy ma go 80\,\% (silne, 4-krotne peaki; w danych
 słabsze). \textbf{H2 przy ok. 8 peakach jest słabo oznaczalna}: IQR z kilku opóźnień jest niestabilny, więc H2
 raportujemy opisowo, jeśli liczba dopasowanych peaków będzie mniejsza niż 8.

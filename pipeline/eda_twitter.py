@@ -9,7 +9,7 @@ Użycie:
     python -m pipeline.eda_twitter [--input ścieżka.csv] [--z 2.5]
 Wyniki (bez treści postów i loginów):
     reports/eda_summary.json, reports/eda_numbers.tex (makra \\EdaXxx), reports/peaks_table.tex,
-    reports/composition_table.tex, reports/monthly_table.tex, reports/figures/daily.pdf
+    reports/composition_table.tex, reports/monthly_table.tex, reports/eda_results.md, reports/figures/daily.pdf
 """
 from __future__ import annotations
 
@@ -268,6 +268,108 @@ def write_tex(s: dict, peaks: pd.DataFrame, monthly: pd.DataFrame) -> None:
     (config.REPORTS / "monthly_table.tex").write_text("\n".join(t) + "\n", encoding="utf-8")
 
 
+def _pct(v, nd=1) -> str:
+    return f"{100 * v:.{nd}f}%".replace(".", ",")
+
+
+def _p(p) -> str:
+    return "< 0,001" if p < 0.001 else f"{p:.3f}".replace(".", ",")
+
+
+def _r(v) -> str:
+    return f"{v:.2f}".replace(".", ",")
+
+
+def write_results_md(s: dict) -> None:
+    """reports/eda_results.md: wszystkie liczby z eksploracji z nazwą miary, podstawą liczenia i testem.
+
+    Definicje miar i testów: reports/METODY.md (statyczny opis), ten plik jest generowany.
+    """
+    q, cc, cr = s["quality"], s["composition_contents"], s["composition_rows"]
+    tr, el, dc, en = s["weekly_trend"], s["early_vs_late"], s["daily_corr"], s["engagement_originals"]
+    L = ["# Wyniki eksploracji X/Twitter (generowane)", "",
+         "Plik generuje `python -m pipeline.eda_twitter`; nie edytować ręcznie. Definicje miar, podstaw liczenia "
+         "i testów: `reports/METODY.md` (numery sekcji w nawiasach §).", "",
+         f"Parametry: okno {s['params']['effective_start']}–2022-12-31, próg peaku z = {s['params']['z']}, "
+         f"okno mediany {s['params']['window']} dni, separacja ±{s['params']['sep']} dni, leksykony v{s['params']['lexicon_version']}.", "",
+         "## 1. Zbiór (§1)", "",
+         "| Miara | Wartość |", "|---|---|",
+         f"| wpisy (wiersze) | {q['n_rows']:,} |".replace(",", " "),
+         f"| w tym oryginały / odpowiedzi / retweety | {q['n_by_type'].get('original', 0)} / {q['n_by_type'].get('reply', 0)} / {q['n_by_type'].get('retweet', 0)} |",
+         f"| konta (autorzy wierszy) | {q['n_authors']} |",
+         f"| unikalne treści (kaskady) w oknie | {cc['n']} |",
+         f"| wpisy przed {s['params']['effective_start']} (okres niekompletny) | {q['rows_before_effective_start']} |",
+         f"| mediana wpisów na dzień w oknie | {q['median_daily_rows_effective']:.0f} |",
+         f"| retweety z uciętym tekstem („…”) | {_pct(q['share_truncated_rt'])} |",
+         f"| oryginały+odpowiedzi zawierające obie frazy doboru dosłownie | {_pct(q['share_topic_both_original'])} |",
+         f"| etykiety sentymentu z pewnością > 0,95 | {_pct(q['share_sentiment_score_gt_0_95'])} |",
+         f"| udział 10 najczęściej retweetowanych kont we wszystkich retweetach (§2.5) | {_pct(s['concentration']['rt_sources']['top10_share'])} |",
+         f"| udział 1% najaktywniejszych kont we wszystkich wpisach (§2.5) | {_pct(s['concentration']['authors']['top1pct_share'])} |",
+         f"| linki do rosyjskich mediów państwowych / do Telegrama | {s['ru_domain_links']} / {s['telegram_links']} |", "",
+         "## 2. Skład: ton × leksykon (§2.3–2.4)", "",
+         "Podstawa: unikalne treści w oknie. Odsetek w wierszu = udział tonu w danej grupie leksykonu.", "",
+         "| Grupa leksykonu | Udział treści | Negatywne | Neutralne | Pozytywne |", "|---|---|---|---|---|"]
+    pct = pd.DataFrame(cc["row_pct"]).fillna(0)
+    names = {"anti": "tylko anty-UA", "pro": "tylko pro-UA", "mieszane": "oba leksykony", "brak": "żaden leksykon"}
+    for k in ["anti", "pro", "mieszane", "brak"]:
+        if k in pct.index:
+            L.append(f"| {names[k]} | {_pct(cc['stance_share'].get(k, 0))} | {_pct(pct.loc[k, 'negative'], 0)} | "
+                     f"{_pct(pct.loc[k, 'neutral'], 0)} | {_pct(pct.loc[k, 'positive'], 0)} |")
+    L += ["", "| Miara (unikalne treści) | Wartość | To samo na wpisach z RT |", "|---|---|---|",
+          f"| ton negatywny | {_pct(cc['neg_share'])} | {_pct(cr['neg_share'])} |",
+          f"| ton pozytywny | {_pct(cc['pos_share'])} | {_pct(cr['pos_share'])} |",
+          f"| leksykon anty-UA (w tym „oba”) | {_pct(cc['anti_share'])} | {_pct(cr['anti_share'])} |",
+          f"| leksykon pro-UA (w tym „oba”) | {_pct(cc['pro_share'])} | {_pct(cr['pro_share'])} |",
+          f"| anty-UA **i** ton negatywny | {_pct(cc['neg_anti_share'])} | {_pct(cr['neg_anti_share'])} |",
+          f"| pro-UA **i** ton pozytywny | {_pct(cc['pos_pro_share'])} | {_pct(cr['pos_pro_share'])} |",
+          f"| P(anty-UA \\| negatywne) | {_pct(cc['anti_given_neg'])} | {_pct(cr['anti_given_neg'])} |",
+          f"| P(neutralne \\| anty-UA) | {_pct(cc['neutral_given_anti'])} | {_pct(cr['neutral_given_anti'])} |",
+          f"| P(negatywne \\| pro-UA) | {_pct(cc['neg_given_pro'])} | {_pct(cr['neg_given_pro'])} |", "",
+          "## 3. Trendy w czasie (§3.1, §3.2)", "",
+          f"Trend: korelacja rang Spearmana ρ między numerem tygodnia a udziałem (unikalne treści; liczba tygodni z ≥ 30 treściami: {s['n_weeks']}"
+          "), p dwustronne.", "",
+          "| Udział treści | ρ | p |", "|---|---|---|"]
+    labs = {"negative": "ton negatywny", "positive": "ton pozytywny", "anti": "anty-UA", "pro": "pro-UA",
+            "neg_anti": "anty-UA i negatywne", "pos_pro": "pro-UA i pozytywne"}
+    for k, lab in labs.items():
+        L.append(f"| {lab} | {_r(tr[k]['rho'])} | {_p(tr[k]['p'])} |")
+    L += ["", "Porównanie okresów: test z dla dwóch proporcji (pooled), unikalne treści, III–IV 2022 vs XI–XII 2022.", "",
+          "| Udział treści | III–IV | XI–XII | różnica (pp) | z | p |", "|---|---|---|---|---|---|"]
+    for k, lab in {"negative": "ton negatywny", "anti_ua_lexicon": "anty-UA", "neg_anti": "anty-UA i negatywne",
+                   "pro_ua_lexicon": "pro-UA"}.items():
+        e = el[k]
+        L.append(f"| {lab} | {_pct(e['p1'])} | {_pct(e['p2'])} | {e['diff_pp']:+.1f} | {e['z']:.2f} | {_p(e['p'])} |".replace(".", ","))
+    L += ["", "## 4. Związki dzienne (§3.1)", "",
+          "Korelacja rang Spearmana po dniach okna (podstawa: wpisy z retweetami), p dwustronne.", "",
+          "| Para zmiennych (dziennie) | ρ | p |", "|---|---|---|",
+          f"| liczba wpisów vs udział negatywnych | {_r(dc['volume_vs_neg']['rho'])} | {_p(dc['volume_vs_neg']['p'])} |",
+          f"| liczba wpisów vs udział anty-UA | {_r(dc['volume_vs_anti']['rho'])} | {_p(dc['volume_vs_anti']['p'])} |",
+          f"| udział anty-UA vs udział pro-UA | {_r(dc['anti_vs_pro']['rho'])} | {_p(dc['anti_vs_pro']['p'])} |",
+          f"| udział negatywnych vs udział anty-UA | {_r(dc['neg_vs_anti']['rho'])} | {_p(dc['neg_vs_anti']['p'])} |", "",
+          "## 5. Zaangażowanie oryginałów (§3.3)", "",
+          "Podstawa: tylko oryginały (bez retweetów i odpowiedzi); liczniki z chwili pobrania. Test U Manna–Whitneya, dwustronny.", "",
+          "| Porównanie | Mediana A | Mediana B | p |", "|---|---|---|---|",
+          f"| polubienia: pozytywne (A) vs negatywne (B) | {en['median_likes_by_sentiment'].get('positive', 0):.0f} | "
+          f"{en['median_likes_by_sentiment'].get('negative', 0):.0f} | {_p(en['mwu_likes_pos_vs_neg_p'])} |",
+          f"| polubienia: negatywne (A) vs neutralne (B) | {en['median_likes_by_sentiment'].get('negative', 0):.0f} | "
+          f"{en['median_likes_by_sentiment'].get('neutral', 0):.0f} | {_p(en['mwu_likes_neg_vs_neutral_p'])} |",
+          f"| retweety: anty-UA (A) vs żaden leksykon (B) | {en['median_rt_by_stance'].get('anti', 0):.0f} | "
+          f"{en['median_rt_by_stance'].get('brak', 0):.0f} | {_p(en['mwu_rt_anti_vs_none_p'])} |", "",
+          "## 6. Peaki (§2.6)", "",
+          f"Seria: liczba różnych treści dziennie. Liczba peaków przy z = 2 / 2,5 / 3: "
+          f"{s['peak_sensitivity']['2.0']['cascades']} / {s['peak_sensitivity']['2.5']['cascades']} / {s['peak_sensitivity']['3.0']['cascades']}. "
+          f"Peaki tej serii pokrywają się z peakami serii wpisów z RT w {s['peaks_overlap_rows_cascades']} z {s['n_peaks_rows']} dni.", "",
+          "| Dzień | Wpisy | Udział top konta | Udział top kaskady | Negatywne | Wydarzenie (±3 dni) |", "|---|---|---|---|---|---|"]
+    for r in sorted(s["peaks"], key=lambda r: -r["n"]):
+        L.append(f"| {r['day']} | {r['n']} | {_pct(r['top_source_share'], 0)} | {_pct(r['top_cascade_share'], 0)} | "
+                 f"{_pct(r['negative_share'], 0)} | {r['event'] or '–'} |")
+    L += ["", "## 7. Moc testu dopasowania peaków (§4.4)", "",
+          f"Symulacja (100 powtórzeń, opóźnienie 3 dni, liczba zdarzeń = liczba peaków w X = {s['n_peaks_cascades']}): "
+          f"moc przy 50% peaków X z poprzednikiem na Telegramie = {_pct(s['power_peak_lag']['0.5'], 0)}, "
+          f"przy 80% = {_pct(s['power_peak_lag']['0.8'], 0)}.", ""]
+    (config.REPORTS / "eda_results.md").write_text("\n".join(L), encoding="utf-8")
+
+
 def run(path: str, z: float) -> dict:
     df = normalize(load_raw(path))
     for p in (config.REPORTS, config.FIGURES, config.PROCESSED):
@@ -306,6 +408,7 @@ def run(path: str, z: float) -> dict:
                                  for f in (0.5, 0.8)}
     plot_overview(daily, st["_weekly"], peaks, ptab, config.FIGURES / "daily.pdf")
     write_tex(summary, ptab, st["_monthly"])
+    write_results_md(summary)
     (config.REPORTS / "eda_summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2, default=str), encoding="utf-8")
     return summary
 
