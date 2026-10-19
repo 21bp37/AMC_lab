@@ -184,17 +184,21 @@ na Telegramie, szereg bez dni ±3 od wydarzeń z `config.EVENTS` (wspólny bodzi
 
 | Miara | Definicja | Próg / użycie | Kod |
 |---|---|---|---|
-| **α Krippendorffa** | zgodność dwóch koderów skorygowana o zgodność przypadkową; 0 = losowa, 1 = pełna | ≥ 0,667 wnioski wstępne, ≥ 0,800 dane wiarygodne | `tools/agreement.py` |
-| **κ Cohena** | zgodność dwóch koderów dla etykiet nominalnych (uzupełnienie α) | raportowane z odsetkiem zgodności i zgodnością pozytywną/negatywną | `tools/agreement.py` |
+| **α Krippendorffa** | zgodność koderów skorygowana o zgodność przypadkową; 0 = losowa, 1 = pełna | opcjonalnie (standard w analizie treści: ≥ 0,667 wnioski wstępne, ≥ 0,800 wiarygodne); w projekcie wystarcza κ | `tools/agreement.py` |
+| **κ Cohena** | zgodność dwóch koderów dla etykiet nominalnych, skorygowana o zgodność przypadkową | **główna miara zgodności w projekcie**; raportowana z odsetkiem zgodności; κ < 0,4 = próba za słaba do interpretacji udziałów | `tools/agreement.py` |
 | **Precyzja P** | trafne wśród oznaczonych przez klasyfikator jako anty-UA (TP / (TP + FP)) | raport z przedziałem ufności | `tools/evaluation.py` |
 | **Czułość R** (recall) | wyłapane wśród prawdziwych anty-UA (TP / (TP + FN)) | j.w. | `tools/evaluation.py` |
 | **F1** | średnia harmoniczna P i R: 2PR / (P + R) | j.w. | `tools/evaluation.py` |
-| **Przedział Wilsona** | 95% przedział ufności dla odsetka | planowanie liczebności próby (2×300) | `tools/sample_size.py` |
+| **Przedział Wilsona** | 95% przedział ufności dla odsetka | przedziały dla próby 2×100 | `tools/sample_size.py` |
 | **Bootstrap klastrowy** | losowanie ze zwracaniem całych kont/kanałów, nie pojedynczych wpisów | przedziały ufności P/R/F1 | `tools/evaluation.py` |
 | **Estymator z próbą ekspercką** | udział z klasyfikatora korygowany o błąd zmierzony na próbie kodowanej ręcznie | końcowe udziały anty-UA | `tools/estimators.py` |
 
-Próba walidacyjna: 300 treści z X i 300 postów z Telegrama, warstwowane po grupie leksykonu i limitowane per
-konto/kanał, kodowane niezależnie przez 2 osoby. Kategorie stanowiska: anty-UA / pro-UA / neutralne / nie dotyczy.
+Próba walidacyjna (wersja dla zespołu bez eksperta od języków): po **100** losowych treści z X i z Telegramu (kanały prorosyjskie),
+kodowane niezależnie przez dwie osoby. Posty z Telegramu kodujemy **po tłumaczeniu maszynowym** na polski (DeepL/Google
+lub model językowy); to ograniczenie (tłumaczenie zniekształca ton i slang) podajemy razem z wynikami. Kategorie: anty-UA / pro-UA / inne.
+Przy próbie 100 przedział ufności dla precyzji ma szerokość rzędu ±10 pp. **Reguła:** jeśli κ < 0,4 lub precyzja słownika na Telegramie jest niska,
+nie interpretujemy udziałów narracji z Telegramu i testujemy tylko wolumen tematu (liczba postów o uchodźcach, bez oceny narracji), co jest słabszą wersją hipotezy.
+Estymator z próbą ekspercką (`tools/estimators.py`) stosujemy tylko wtedy, gdy próba jest losowa i wystarczająco duża; w przeciwnym razie raportujemy surowe udziały z zastrzeżeniem.
 
 ## 6. Ograniczenia statystyczne
 
@@ -225,7 +229,7 @@ konto/kanał, kodowane niezależnie przez 2 osoby. Kategorie stanowiska: anty-UA
 | $r$ | współczynnik korelacji Pearsona (liniowej), od −1 do 1 |
 | ρ (rho) | współczynnik korelacji rang Spearmana, od −1 do 1 |
 | p | p-value: prawdopodobieństwo wyniku co najmniej tak skrajnego, gdyby hipoteza zerowa (brak efektu) była prawdziwa |
-| α | tu: α Krippendorffa (zgodność koderów); nie mylić z poziomem istotności 0,05 |
+| κ (kappa) | κ Cohena: zgodność dwóch koderów skorygowana o zgodność przypadkową (0 = losowa, 1 = pełna); nie mylić z α Krippendorffa ani z poziomem istotności |
 | IQR | rozstęp międzykwartylowy: 75. percentyl − 25. percentyl |
 | pp | punkt procentowy |
 | mediana | wartość środkowa po posortowaniu |

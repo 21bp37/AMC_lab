@@ -38,7 +38,7 @@
       "pro-Ukrainian": 1116
     },
     "clusters_rows": 3074,
-    "post_channels_in_clusters": 0.7719461216906642,
+    "post_channels_in_clusters": 0.7747808496291302,
     "id_column": "peer_id",
     "side_column": "side"
   },
@@ -48,68 +48,71 @@
       2,
       3,
       4,
-      5
+      5,
+      6,
+      7,
+      8
     ],
-    "n_posts": 113077,
-    "n_channels": 2153,
+    "n_posts": 143675,
+    "n_channels": 2966,
     "first_day": "2022-03-04",
     "last_day": "2022-12-31",
-    "unlabeled_share": 0.11959107510811218,
-    "unique_texts": 77316
+    "unlabeled_share": 0.11553854184792066,
+    "unique_texts": 93907
   },
   "sides": {
     "Pro-Russian": {
-      "posts": 58244,
-      "channels": 971,
-      "median_daily": 159.0,
-      "mean_daily": 192.22442244224422,
+      "posts": 80712,
+      "channels": 1464,
+      "median_daily": 224.0,
+      "mean_daily": 266.3762376237624,
       "zero_days_share": 0.0,
-      "anti_posts": 10371,
-      "anti_share": 0.17806125952887852,
-      "median_views": 9521.5,
-      "median_forwards": 16.0,
-      "top10_channel_share": 0.1551576128013186,
-      "copy_share": 0.34267907423940663,
+      "anti_posts": 14771,
+      "anti_share": 0.183008722370899,
+      "median_views": 6956.0,
+      "median_forwards": 12.0,
+      "top10_channel_share": 0.1123748637129547,
+      "copy_share": 0.37460352859550006,
       "trend_anti_weekly": {
         "n_weeks": 44,
-        "rho": -0.21705426356589144,
-        "p": 0.15699138402851082
+        "rho": -0.22931642001409444,
+        "p": 0.13430037068815698
       }
     },
     "Pro-Ukrainian": {
-      "posts": 41310,
-      "channels": 691,
-      "median_daily": 110.0,
-      "mean_daily": 136.33663366336634,
+      "posts": 46363,
+      "channels": 834,
+      "median_daily": 121.0,
+      "mean_daily": 153.01320132013203,
       "zero_days_share": 0.0,
-      "anti_posts": 2024,
-      "anti_share": 0.04899540062938756,
-      "median_views": 11845.0,
+      "anti_posts": 2395,
+      "anti_share": 0.05165757177059293,
+      "median_views": 11251.0,
       "median_forwards": 14.0,
-      "top10_channel_share": 0.13928830791575889,
-      "copy_share": 0.19699830549503752,
+      "top10_channel_share": 0.1267605633802817,
+      "copy_share": 0.2033518107111274,
       "trend_anti_weekly": {
         "n_weeks": 44,
-        "rho": -0.13587033121916844,
-        "p": 0.3791822619103949
+        "rho": -0.133615221987315,
+        "p": 0.3872175146475959
       }
     },
     "unlabeled": {
-      "posts": 13523,
-      "channels": 491,
-      "median_daily": 34.0,
-      "mean_daily": 44.63036303630363,
+      "posts": 16600,
+      "channels": 668,
+      "median_daily": 41.0,
+      "mean_daily": 54.78547854785479,
       "zero_days_share": 0.0,
-      "anti_posts": 1595,
-      "anti_share": 0.11794720106485247,
-      "median_views": 386.0,
+      "anti_posts": 1857,
+      "anti_share": 0.11186746987951807,
+      "median_views": 616.0,
       "median_forwards": 1.0,
-      "top10_channel_share": 0.30947275012940917,
-      "copy_share": 0.18265177845152702,
+      "top10_channel_share": 0.2547590361445783,
+      "copy_share": 0.18355421686746987,
       "trend_anti_weekly": {
         "n_weeks": 44,
-        "rho": -0.04912082881234163,
-        "p": 0.7515154113141869
+        "rho": -0.05595489781536293,
+        "p": 0.7182784957461942
       }
     }
   },
@@ -117,44 +120,44 @@
   "peaks_ru": [
     {
       "day": "2022-04-28",
-      "n": 520,
-      "top_channel_share": 0.026923076923076925,
-      "anti_share": 0.12884615384615383,
+      "n": 731,
+      "top_channel_share": 0.019151846785225718,
+      "anti_share": 0.12038303693570451,
       "event": ""
     },
     {
       "day": "2022-06-17",
-      "n": 299,
-      "top_channel_share": 0.023411371237458192,
-      "anti_share": 0.16387959866220736,
+      "n": 426,
+      "top_channel_share": 0.02112676056338028,
+      "anti_share": 0.15258215962441316,
       "event": ""
     },
     {
       "day": "2022-07-11",
-      "n": 396,
-      "top_channel_share": 0.025252525252525252,
-      "anti_share": 0.28535353535353536,
+      "n": 538,
+      "top_channel_share": 0.01858736059479554,
+      "anti_share": 0.29182156133828996,
       "event": ""
     },
     {
       "day": "2022-11-16",
-      "n": 2207,
-      "top_channel_share": 0.01676483914816493,
-      "anti_share": 0.053919347530584506,
+      "n": 3005,
+      "top_channel_share": 0.012312811980033278,
+      "anti_share": 0.05690515806988353,
       "event": "Przewodów (+1 d)"
     },
     {
       "day": "2022-11-30",
-      "n": 432,
-      "top_channel_share": 0.020833333333333332,
-      "anti_share": 0.1412037037037037,
+      "n": 616,
+      "top_channel_share": 0.01461038961038961,
+      "anti_share": 0.1266233766233766,
       "event": ""
     },
     {
       "day": "2022-12-15",
-      "n": 292,
-      "top_channel_share": 0.0273972602739726,
-      "anti_share": 0.13356164383561644,
+      "n": 409,
+      "top_channel_share": 0.019559902200488997,
+      "anti_share": 0.1466992665036675,
       "event": ""
     }
   ],

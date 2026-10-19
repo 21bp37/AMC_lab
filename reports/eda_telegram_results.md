@@ -1,29 +1,29 @@
 # Eksploracja Telegrama (opisowa; dane mogą być niepełne)
 
-- Pliki postów uwzględnione: [1, 2, 3, 4, 5] (z 8)
-- Posty po filtrze (UA+PL, 2022-03-04..2022-12-31): 113077, kanały: 2153
-- Zakres dat: 2022-03-04 .. 2022-12-31; udział postów z kanałów bez etykiety: 12.0%
-- Unikalne teksty (80 znaków): 77316
+- Pliki postów uwzględnione: [1, 2, 3, 4, 5, 6, 7, 8] (z 8)
+- Posty po filtrze (UA+PL, 2022-03-04..2022-12-31): 143675, kanały: 2966
+- Zakres dat: 2022-03-04 .. 2022-12-31; udział postów z kanałów bez etykiety: 11.6%
+- Unikalne teksty (80 znaków): 93907
 
 | strona | kanały | posty | mediana/dzień | dni bez postu | anty-UA | wyśw. (mediana) | przek. (mediana) | top-10 kanałów | powtórzenia |
 |---|---|---|---|---|---|---|---|---|---|
-| Pro-Russian | 971 | 58244 | 159 | 0% | 17.8% | 9522 | 16 | 16% | 34% |
-| Pro-Ukrainian | 691 | 41310 | 110 | 0% | 4.9% | 11845 | 14 | 14% | 20% |
-| unlabeled | 491 | 13523 | 34 | 0% | 11.8% | 386 | 1 | 31% | 18% |
+| Pro-Russian | 1464 | 80712 | 224 | 0% | 18.3% | 6956 | 12 | 11% | 37% |
+| Pro-Ukrainian | 834 | 46363 | 121 | 0% | 5.2% | 11251 | 14 | 13% | 20% |
+| unlabeled | 668 | 16600 | 41 | 0% | 11.2% | 616 | 1 | 25% | 18% |
 
 ## Trend udziału anty-UA (Spearman, tygodnie z n>=10, opisowo)
-- Pro-Russian: rho=-0.22, p=0.157, tygodni=44
-- Pro-Ukrainian: rho=-0.14, p=0.379, tygodni=44
-- unlabeled: rho=-0.05, p=0.752, tygodni=44
+- Pro-Russian: rho=-0.23, p=0.134, tygodni=44
+- Pro-Ukrainian: rho=-0.13, p=0.387, tygodni=44
+- unlabeled: rho=-0.06, p=0.718, tygodni=44
 
 ## Peaki w szeregu prorosyjskim (z>2.5)
 
 ```
        day    n  top_channel_share  anti_share            event
-2022-04-28  520           0.026923    0.128846                 
-2022-06-17  299           0.023411    0.163880                 
-2022-07-11  396           0.025253    0.285354                 
-2022-11-16 2207           0.016765    0.053919 Przewodów (+1 d)
-2022-11-30  432           0.020833    0.141204                 
-2022-12-15  292           0.027397    0.133562                 
+2022-04-28  731           0.019152    0.120383                 
+2022-06-17  426           0.021127    0.152582                 
+2022-07-11  538           0.018587    0.291822                 
+2022-11-16 3005           0.012313    0.056905 Przewodów (+1 d)
+2022-11-30  616           0.014610    0.126623                 
+2022-12-15  409           0.019560    0.146699                 
 ```
