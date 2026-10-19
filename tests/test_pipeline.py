@@ -62,7 +62,9 @@ class TestLoad(unittest.TestCase):
         d = series.daily_series(self.df, "2022-05-08", "2022-05-12")
         self.assertEqual(len(d), 5)
         self.assertEqual(int(d.loc["2022-05-08", "rows"]), 0)
-        self.assertEqual(int(d.loc["2022-05-10", "cascades"]), 3)  # oryginał (00:30 PL) + reply + RT; dwa RT = jedna kaskada
+        self.assertEqual(int(d.loc["2022-05-10", "cascades"]), 3)
+        self.assertEqual(int(d.loc["2022-05-10", "anti_contents"]), 1)   # „500+” (00:30 czasu PL)
+        self.assertEqual(int(d.loc["2022-05-11", "anti_contents"]), 1)   # „banderowcy”  # oryginał (00:30 PL) + reply + RT; dwa RT = jedna kaskada
 
 
 class TestPeaks(unittest.TestCase):
@@ -91,6 +93,39 @@ class TestLeadLag(unittest.TestCase):
             _, y, _ = leadlag.simulate_series(n_events=12, seed=200 + s)
             ps.append(leadlag.xcorr_test(x, y, max_lag=10, n_perm=99, seed=s)["p_perm_max_abs_r"])
         self.assertLessEqual(np.mean(np.array(ps) < 0.05), 0.2)
+
+    def test_main_test_one_sided_lag_range(self):
+        x, y = leadlag.simulate_correlated(0.5, lag=2, seed=3)
+        r = leadlag.xcorr_test(x, y, max_lag=7, min_lag=0, positive=True, n_perm=199)
+        self.assertEqual(r["lag_range"], [0, 7])
+        self.assertEqual(r["best_lag"], 2)
+        self.assertLess(r["p_perm_max_abs_r"], 0.05)
+        # odwrotny kierunek (Y wcześniej o 2 dni) jest poza zakresem 0..7, więc test nie powinien go nagrodzić
+        r2 = leadlag.xcorr_test(y, x, max_lag=7, min_lag=0, positive=True, n_perm=199)
+        self.assertGreater(r2["p_perm_max_abs_r"], 0.05)
+
+    def test_weekly_trend_corr_detects_and_ignores_common_trend(self):
+        x, y = leadlag.simulate_correlated(0.6, lag=0, seed=5)
+        self.assertLess(leadlag.weekly_trend_corr(x, y, n_perm=499)["p_perm_one_sided"], 0.05)
+        # dwa niezależne szeregi z tym samym trendem spadkowym: poziomy skorelowane, przyrosty nie
+        idx = pd.date_range("2022-03-04", periods=303)
+        rng = np.random.default_rng(0)
+        trend = np.linspace(200, 50, 303)
+        a, b = pd.Series(rng.poisson(trend), idx), pd.Series(rng.poisson(trend), idx)
+        res = leadlag.weekly_trend_corr(a, b, n_perm=499)
+        self.assertGreater(res["rho_levels_no_test"], 0.8)
+        self.assertGreater(res["p_perm_one_sided"], 0.05)
+
+    def test_control_difference_and_full_test(self):
+        x_ru, y = leadlag.simulate_correlated(0.5, lag=2, seed=1)
+        _, x_ua = leadlag.simulate_correlated(0.0, lag=2, seed=9)          # niezwiązany z y
+        d = leadlag.control_difference(x_ru, x_ua, y, n_boot=300)
+        self.assertTrue(d["ci_above_zero"])
+        self.assertFalse(leadlag.control_difference(x_ua, x_ru, y, n_boot=300)["ci_above_zero"])
+        res = leadlag.test_hypothesis(x_ru, x_ua, y, n_perm=199)
+        self.assertTrue(res["supported"])
+        res0 = leadlag.test_hypothesis(x_ua, x_ru, y, n_perm=199)        # zamienione strony: H nie powinna przejść
+        self.assertFalse(res0["supported"])
 
     def test_peak_lags(self):
         xp = pd.to_datetime(["2022-03-01", "2022-03-20"])
@@ -132,6 +167,9 @@ class TestTelegram(unittest.TestCase):
         self.assertEqual(int(daily.loc[daily["side"] == "Pro-Russian", "n_posts"].sum()), 2)
         self.assertEqual(int(telegram.side_series(daily, "unlabeled").sum()), 1)  # kanał bez etykiety nie znika
         self.assertEqual(int(telegram.side_series(daily, "Pro-Ukrainian").sum()), 1)
+        # „получают пособия” = narracja anty-UA; pozostałe posty z tematem jej nie mają
+        self.assertEqual(int(telegram.side_series(daily, "Pro-Russian", col="n_topic_anti").sum()), 1)
+        self.assertEqual(int(telegram.side_series(daily, "Pro-Ukrainian", col="n_topic_anti").sum()), 0)
 
 
 if __name__ == "__main__":

@@ -27,7 +27,7 @@ import pandas as pd  # noqa: E402
 from scipy import stats  # noqa: E402
 
 from pipeline import config  # noqa: E402
-from pipeline.leadlag import power_peak_lag  # noqa: E402
+from pipeline.leadlag import power_peak_lag, power_xcorr  # noqa: E402
 from pipeline.load_twitter import load_raw, normalize, quality_report  # noqa: E402
 from pipeline.series import daily_series, detect_peaks, peak_table  # noqa: E402
 
@@ -202,6 +202,8 @@ def write_tex(s: dict, peaks: pd.DataFrame, monthly: pd.DataFrame) -> None:
         "NRuDomain": fmt_int(s["ru_domain_links"]), "NTme": fmt_int(s["telegram_links"]),
         "NegShareRetweet": fmt_pct(s["neg_by_type"]["retweet"]), "NegShareReply": fmt_pct(s["neg_by_type"]["reply"]),
         "PowerHalf": fmt_pct(s["power_peak_lag"]["0.5"], 0), "PowerHigh": fmt_pct(s["power_peak_lag"]["0.8"], 0),
+        "PowerNull": fmt_pct(s["power_xcorr"]["0.0"], 0), "PowerRhoLow": fmt_pct(s["power_xcorr"]["0.2"], 0),
+        "PowerRhoHigh": fmt_pct(s["power_xcorr"]["0.3"], 0),
         "CNeg": fmt_pct(cc["neg_share"]), "CPos": fmt_pct(cc["pos_share"]), "CAnti": fmt_pct(cc["anti_share"]),
         "CPro": fmt_pct(cc["pro_share"]), "CNegAnti": fmt_pct(cc["neg_anti_share"]), "CPosPro": fmt_pct(cc["pos_pro_share"]),
         "CNegGivenAnti": fmt_pct(cc["neg_given_anti"]), "CNeuGivenAnti": fmt_pct(cc["neutral_given_anti"]),
@@ -363,10 +365,16 @@ def write_results_md(s: dict) -> None:
     for r in sorted(s["peaks"], key=lambda r: -r["n"]):
         L.append(f"| {r['day']} | {r['n']} | {_pct(r['top_source_share'], 0)} | {_pct(r['top_cascade_share'], 0)} | "
                  f"{_pct(r['negative_share'], 0)} | {r['event'] or '–'} |")
-    L += ["", "## 7. Moc testu dopasowania peaków (§4.4)", "",
-          f"Symulacja (100 powtórzeń, opóźnienie 3 dni, liczba zdarzeń = liczba peaków w X = {s['n_peaks_cascades']}): "
-          f"moc przy 50% peaków X z poprzednikiem na Telegramie = {_pct(s['power_peak_lag']['0.5'], 0)}, "
-          f"przy 80% = {_pct(s['power_peak_lag']['0.8'], 0)}.", ""]
+    L += ["", "## 7. Moc testów (§4.4)", "",
+          "Test główny (korelacja dziennych przyrostów log(1+x), opóźnienia 0–7 dni, jednostronnie, 303 dni, 199 permutacji, "
+          "100 powtórzeń symulacji, prawdziwe opóźnienie 2 dni):", "",
+          "| Prawdziwa korelacja ρ | Odsetek wyników z p < 0,05 |", "|---|---|",
+          f"| 0 (brak efektu; powinno być ≈ 5%) | {_pct(s['power_xcorr']['0.0'], 0)} |",
+          f"| 0,2 | {_pct(s['power_xcorr']['0.2'], 0)} |",
+          f"| 0,3 | {_pct(s['power_xcorr']['0.3'], 0)} |", "",
+          f"Analiza uzupełniająca (dopasowanie peaków, {s['n_peaks_cascades']} peaków, opóźnienie 3 dni): moc "
+          f"{_pct(s['power_peak_lag']['0.5'], 0)} przy 50% peaków z poprzednikiem na Telegramie, "
+          f"{_pct(s['power_peak_lag']['0.8'], 0)} przy 80%.", ""]
     (config.REPORTS / "eda_results.md").write_text("\n".join(L), encoding="utf-8")
 
 
@@ -403,7 +411,9 @@ def run(path: str, z: float) -> dict:
         "params": {"z": z, "window": 15, "sep": 3, "lexicon_version": config.LEXICON_VERSION,
                    "effective_start": config.EFFECTIVE_START},
     }
-    # Moc testu dopasowania peaków przy liczbie peaków obserwowanej w X (symulacja, opóźnienie 3 dni)
+    # Moc testu głównego hipotezy (korelacja dziennych przyrostów, k = 0..7, jednostronnie; 303 dni, symulacja)
+    summary["power_xcorr"] = {str(r): power_xcorr(r, reps=100) for r in (0.0, 0.2, 0.3)}
+    # Moc analizy uzupełniającej (dopasowanie peaków) przy liczbie peaków obserwowanej w X
     summary["power_peak_lag"] = {str(f): power_peak_lag(max(len(peaks), 1), lag=3, follow=f, reps=100, z=z)["power"]
                                  for f in (0.5, 0.8)}
     plot_overview(daily, st["_weekly"], peaks, ptab, config.FIGURES / "daily.pdf")

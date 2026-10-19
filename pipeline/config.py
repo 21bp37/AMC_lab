@@ -71,6 +71,12 @@ NEGATED_GRATITUDE = r"(?:nie widać|nie ma|brak\w*|bez|zero) wdzięczn|niewdzię
 TELEGRAM_UA = r"(?i)(?:украин|україн)"
 TELEGRAM_PL = r"(?i)(?:польш|польщ|поляк|поляц|польськ|варшав)"
 
+# Telegram: narracje anty-UA w RU/UK (SZKIC v0.1, niezwalidowany; do przeglądu przez osobę znającą rosyjski
+# i ukraiński oraz walidacji na próbie 300 postów). Odpowiada kategoriom polskiego leksykonu.
+TELEGRAM_ANTI_UA = (r"(?i)(?:пособи|выплат|халяв|бесплатн|за счет поляков|за счёт поляков|нахлебник|паразит|"
+                    r"неблагодарн|наглост|наглы|бандер|нацист|укроп|хохл|понаех|преступн|грабе|насил|"
+                    r"утриманц|невдячн)")
+
 # Wydarzenia do opisu peaków (daty UTC; lista robocza, do weryfikacji przez analityka)
 EVENTS = {
     "2022-03-12": "ustawa o pomocy UA",

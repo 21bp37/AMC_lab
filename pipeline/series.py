@@ -9,6 +9,7 @@ Szeregi (definicje pomiarowe; „dzień” = doba kalendarzowa Europe/Warsaw):
 - pro_lex       : wiersze z trafieniem w leksykon treści proukraińskich,
 - neg_anti      : negatywny sentyment ORAZ leksykon anty-UA (przybliżenie „negatywnych wobec Ukraińców”),
 - pos_pro       : pozytywny sentyment ORAZ leksykon pro-UA,
+- anti_contents : liczba RÓŻNYCH treści (kaskad) z leksykonem anty-UA; to Y_t testu hipotezy (karta, sekcja 4),
 - *_share       : udziały w `rows`.
 
 Peak: dzień, w którym log(1+x) przekracza kroczącą medianę (okno `window`, wycentrowane)
@@ -32,11 +33,13 @@ def daily_series(df: pd.DataFrame, start: str, end: str) -> pd.DataFrame:
         "negative_authored": df[df["negative"] & (df["type"] != "retweet")].groupby("day").size(),
         "pro_lex": df[df["pro_ua_lexicon"]].groupby("day").size(),
         "neg_anti": df[df["negative"] & df["anti_ua_lexicon"]].groupby("day").size(),
+        "anti_contents": df[df["anti_ua_lexicon"]].groupby("day")["cascade_key"].nunique(),
         "pos_pro": df[df["positive"] & df["pro_ua_lexicon"]].groupby("day").size(),
     }).reindex(idx).fillna(0).astype(int)
     out.index.name = "day"
     out["negative_share"] = out["negative"] / out["rows"].replace(0, np.nan)
     out["anti_lex_share"] = out["anti_lex"] / out["rows"].replace(0, np.nan)
+    out["anti_contents_share"] = out["anti_contents"] / out["cascades"].replace(0, np.nan)   # wariant „udziały”
     return out
 
 

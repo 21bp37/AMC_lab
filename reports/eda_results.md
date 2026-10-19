@@ -102,6 +102,14 @@ Seria: liczba różnych treści dziennie. Liczba peaków przy z = 2 / 2,5 / 3: 1
 | 2022-04-17 | 289 | 27% | 25% | 11% | – |
 | 2022-07-12 | 155 | 9% | 3% | 48% | – |
 
-## 7. Moc testu dopasowania peaków (§4.4)
+## 7. Moc testów (§4.4)
 
-Symulacja (100 powtórzeń, opóźnienie 3 dni, liczba zdarzeń = liczba peaków w X = 8): moc przy 50% peaków X z poprzednikiem na Telegramie = 46%, przy 80% = 80%.
+Test główny (korelacja dziennych przyrostów log(1+x), opóźnienia 0–7 dni, jednostronnie, 303 dni, 199 permutacji, 100 powtórzeń symulacji, prawdziwe opóźnienie 2 dni):
+
+| Prawdziwa korelacja ρ | Odsetek wyników z p < 0,05 |
+|---|---|
+| 0 (brak efektu; powinno być ≈ 5%) | 5% |
+| 0,2 | 52% |
+| 0,3 | 88% |
+
+Analiza uzupełniająca (dopasowanie peaków, 8 peaków, opóźnienie 3 dni): moc 46% przy 50% peaków z poprzednikiem na Telegramie, 80% przy 80%.

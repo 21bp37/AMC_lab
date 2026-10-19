@@ -5,7 +5,7 @@ Dokument opisuje **co** liczymy, **na jakiej podstawie** i **jakim testem**, dla
 domyślnymi z kodu; ich źródło to `pipeline/config.py` i sygnatury funkcji w `pipeline/`. Numery § są używane
 w `eda_results.md`.
 
-Spis: §1 dane i jednostki · §2 miary · §3 testy eksploracyjne · §4 testy hipotez H1/H2 · §5 walidacja pomiaru ·
+Spis: §1 dane i jednostki · §2 miary · §3 testy eksploracyjne · §4 test hipotezy · §5 walidacja pomiaru ·
 §6 ograniczenia statystyczne · §7 słownik symboli i pojęć
 
 ---
@@ -114,28 +114,49 @@ p = 2·(1 − Φ(|z|)), gdzie Φ to dystrybuanta rozkładu normalnego. Hipoteza 
 obserwacja z jednej grupy jest częściej większa niż z drugiej. Właściwy dla liczników reakcji, które mają skrajnie
 skośny rozkład. Raportujemy mediany grup i p.
 
-## 4. Testy hipotez H1/H2 (X vs Telegram; gotowe w kodzie, czekają na dane Telegrama)
+## 4. Test hipotezy (X vs Telegram; gotowy w kodzie, czeka na dane Telegrama)
 
-Oznaczenia: $Y_t$ to dzienna seria w X (liczba treści o Ukraińcach w Polsce; dla H2 z narracją anty-UA).
-$X^{RU}_t$, $X^{UA}_t$ to dzienna liczba postów z tematem w kanałach Telegrama prorosyjskich i proukraińskich
-(kontrola). $k$ to opóźnienie w dniach; $k > 0$ oznacza, że Telegram wyprzedza X.
+**Hipoteza (H):** trendy w pojawianiu się negatywnych treści na temat ukraińskich uchodźców w polskich mediach
+społecznościowych są skorelowane z podobnymi trendami w źródłach prorosyjskich.
+**H₀:** po usunięciu wspólnego trendu całorocznego zmiany w obu źródłach nie są dodatnio skorelowane.
+
+Oznaczenia: $Y_t$ to dzienna liczba różnych treści w X o Ukraińcach w Polsce z narracją anty-UA.
+$X^{RU}_t$, $X^{UA}_t$ to dzienna liczba postów o Ukraińcach w Polsce z narracją anty-UA w kanałach Telegrama
+prorosyjskich i proukraińskich (kontrola). $\Delta x_t = \log(1+x_t) - \log(1+x_{t-1})$ to przyrost z dnia na dzień.
+$k$ to opóźnienie w dniach; $k > 0$ oznacza, że Telegram jest wcześniej.
+
+**Dlaczego przyrosty, a nie poziomy.** Oba szeregi mogą maleć w ciągu roku, bo słabnie zainteresowanie wojną. Korelacja
+poziomów byłaby wtedy wysoka bez żadnego związku między źródłami (korelacja pozorna). Przyrosty mierzą, czy *zmiany*
+idą w parze. Test `test_weekly_trend_corr_detects_and_ignores_common_trend` pokazuje to na danych syntetycznych:
+dwa niezależne szeregi z tym samym trendem mają ρ poziomów > 0,8, a test przyrostów nie daje istotności.
 
 | § | Test | Co mierzy | Szczegóły | Kod |
 |---|---|---|---|---|
-| 4.1 | **Dopasowanie peaków** z testem permutacyjnym | odsetek peaków $Y$, przed którymi w oknie 0–7 dni wystąpił peak $X$ | rozkład zerowy z 1000 **kołowych przesunięć** dat peaków $X$ (wszystkie przesuwamy o tę samą losową liczbę dni, z zawinięciem na początek okna; zachowuje liczbę i odstępy peaków). p = (1 + #{odsetek zerowy ≥ obserwowany}) / (1 + 1000). Raport: mediana i IQR dopasowanych opóźnień | `leadlag.peak_lag_test` |
-| 4.2 | **Korelacja krzyżowa** z testem permutacyjnym | współczynnik Pearsona $r(k)$ między $\Delta X_{t-k}$ a $\Delta Y_t$, $k = -14…14$ | $\Delta$ = przyrost $\log(1+x)$ dzień do dnia; różnicowanie usuwa wspólny trend. Statystyka: max |r(k)|. Rozkład zerowy: 500 kołowych przesunięć **przyrostów** $X$ o co najmniej 15 dni (przesunięcie poziomów z trendem dawałoby test zbyt liberalny; sprawdzone testem kalibracji) | `leadlag.xcorr_test` |
-| 4.3 | **Test przyczynowości Grangera** (test F, `statsmodels.grangercausalitytests`, statystyka `ssr_ftest`) | czy przeszłe $\Delta X$ poprawiają prognozę $\Delta Y$ ponad przeszłe $\Delta Y$ | oba kierunki ($X→Y$ i $Y→X$), opóźnienia 1–7; raportujemy najmniejsze p po opóźnieniach (uwaga: to wielokrotne porównanie, §6) | `leadlag.granger_min_p` |
-| 4.4 | **Symulacja mocy** | szansa, że test 4.1 da p < 0,05, gdy efekt istnieje | 100 par syntetycznych szeregów (300 dni, Poisson, malejący trend). W $X$ jest tyle zdarzeń, ile peaków ma X (8). Każde zdarzenie z prawdopodobieństwem 0,5 lub 0,8 pojawia się w $Y$ po 3 ± 1 dniach. Amplituda zdarzenia: 4-krotność tła. W teście 199 permutacji | `leadlag.power_peak_lag` |
+| 4.1 | **Test główny: korelacja krzyżowa przyrostów** z testem permutacyjnym | największy współczynnik Pearsona $r(k)$ między $\Delta X^{RU}_{t-k}$ a $\Delta Y_t$ dla $k = 0…7$ | p jednostronne (H: r > 0). Rozkład zerowy: 1000 kołowych przesunięć szeregu $\Delta X^{RU}$ o co najmniej 8 dni (cała seria przesunięta, koniec zawinięty na początek; niszczy związek z $Y$, zachowuje własną zmienność serii). Statystyka zerowa też jest maksimum po $k$, więc wybór najlepszego opóźnienia nie zawyża istotności. p = (1 + #{wynik zerowy ≥ obserwowany}) / (1 + 1000). Liczone osobno dla $X^{RU}$ i $X^{UA}$ | `leadlag.xcorr_test(x, y, max_lag=7, min_lag=0, positive=True)` |
+| 4.2 | **Test tygodniowy** | korelacja rang Spearmana ρ między tygodniowymi przyrostami $\log(1 + \text{suma tygodnia})$ | p jednostronne z 2000 kołowych przesunięć przyrostów $X$. Raportujemy też ρ poziomów, tylko dla porównania (bez testu) | `leadlag.weekly_trend_corr` |
+| 4.3 | **Różnica RU vs UA** (kontrola) | $\max_k r_{RU}(k) - \max_k r_{UA}(k)$, $k = 0…7$ | blokowy bootstrap dni: 2000 losowań ze zwracaniem bloków 7 kolejnych dni docelowych $t$ (wspólnie dla RU i UA); dla każdego $k$ para $(\Delta X_{t-k}, \Delta Y_t)$ pochodzi z oryginalnej serii, więc opóźnienia nie przechodzą przez granice bloków. 95% przedział percentylowy | `leadlag.control_difference` |
+| 4.4 | **Symulacja mocy** testu 4.1 | odsetek wyników z p < 0,05 przy znanej prawdziwej korelacji | 100 par syntetycznych szeregów po 303 dni. Liczności z rozkładu Poissona (średnio 60 dziennie), log-poziomy z wspólnym składnikiem o korelacji ρ i opóźnieniu 2 dni. 199 permutacji na test. Wyniki w `eda_results.md` §7: ρ = 0 → ok. 5% (kalibracja), ρ = 0,2 → ok. 50%, ρ = 0,3 → ok. 90% | `leadlag.power_xcorr` |
 
-**Reguła decyzyjna H1** (wszystkie warunki):
-1. Test 4.1 daje p < 0,05.
-2. Maksimum $r(k)$ w 4.2 wypada przy $k \in [1, 7]$ i $r > 0$.
-3. Granger $X^{RU}→Y$ ma p < 0,05, a $Y→X^{RU}$ nie.
-4. Odsetek dopasowanych peaków dla $X^{RU}$ jest wyraźnie wyższy niż dla $X^{UA}$.
+**Uruchomienie całości:** `leadlag.test_hypothesis(x_ru, x_ua, y)`, gdzie `y = series.daily_series(...)["anti_contents"]`, a `x_ru`, `x_ua` = `telegram.side_series(daily, "Pro-Russian" / "Pro-Ukrainian", col="n_topic_anti")`. Zwraca wyniki 4.1–4.3 i spełnienie kryteriów (a)–(c).
 
-**Reguła decyzyjna H2:** H1 jest spełniona, a dodatkowo mediana dopasowanych opóźnień ∈ [1, 7] dni i IQR ≤ 2 dni
-(IQR = 75. percentyl − 25. percentyl). Mediana dostanie bootstrapowy 95% przedział ufności (do dodania w `leadlag.py` po wczytaniu Telegrama). Gdy dopasowanych peaków
-jest < 8, H2 raportujemy opisowo.
+**Reguła decyzyjna.** H wspieramy, gdy:
+1. Test 4.1 dla $X^{RU}$ daje p < 0,05.
+2. Test 4.2 i wariant na udziałach (zamiast liczb) dają korelację tego samego znaku.
+3. Przedział z 4.3 dla $r_{RU} - r_{UA}$ leży powyżej 0.
+
+H₀ utrzymujemy, gdy p ≥ 0,05. Przy mocy z 4.4 oznacza to brak korelacji rzędu 0,3 lub silniejszej, ale nie wyklucza
+słabszej (ok. 0,2 lub mniej).
+
+**Warianty (wrażliwość):** udziały zamiast liczb (odporne na ogólny wzrost zainteresowania tematem), suma wyświetleń
+na Telegramie, szereg bez dni ±3 od wydarzeń z `config.EVENTS` (wspólny bodziec).
+
+### Analizy uzupełniające (kierunek; opisowo, nie rozstrzygają H)
+
+| Test | Co mierzy | Szczegóły | Kod |
+|---|---|---|---|
+| **Test przyczynowości Grangera** (test F, `statsmodels.grangercausalitytests`, statystyka `ssr_ftest`) | czy przeszłe $\Delta X$ poprawiają prognozę $\Delta Y$ ponad przeszłe $\Delta Y$ | oba kierunki ($X→Y$ i $Y→X$), opóźnienia 1–7; raportujemy najmniejsze p po opóźnieniach (wielokrotne porównanie, §6) | `leadlag.granger_min_p` |
+| **Dopasowanie peaków** z testem permutacyjnym | odsetek peaków $Y$, przed którymi w oknie 0–7 dni wystąpił peak $X$ | rozkład zerowy z 1000 kołowych przesunięć dat peaków $X$; raport: mediana i IQR opóźnień. Moc przy 8 peakach: ok. 46–80% (`eda_results.md` §7) | `leadlag.peak_lag_test`, `leadlag.power_peak_lag` |
+| **Ślad treści** | czy to samo twierdzenie pojawiło się najpierw na Telegramie | ręcznie, 5 największych peaków $Y$, tłumaczenie RU→PL | — |
 
 ## 5. Walidacja pomiaru narracji (plan)
 
@@ -156,7 +177,7 @@ konto/kanał, kodowane niezależnie przez 2 osoby. Kategorie stanowiska: anty-UA
 ## 6. Ograniczenia statystyczne
 
 - **Wielokrotne porównania:** w eksploracji jest kilkanaście testów, więc pojedyncze p z zakresu 0,01–0,05 może
-  być fałszywie istotne. Główne wyniki mają p < 0,001. W analizie H1/H2 planujemy korektę Holma.
+  być fałszywie istotne. Główne wyniki mają p < 0,001. Test hipotezy ma jeden test główny (4.1), a test 4.2 i warianty tylko potwierdzają kierunek wyniku, więc nie wymagają korekty. Przy analizach uzupełniających planujemy korektę Holma.
 - **Autokorelacja:** kolejne dni i tygodnie są do siebie podobne, a testy z §3 zakładają niezależność. Rzeczywiste
   p są przez to wyższe niż podane, więc wyniki §3 są eksploracyjne. Testy z §4 są na to odporne, bo permutacje
   kołowe zachowują strukturę czasową.
@@ -171,14 +192,14 @@ konto/kanał, kodowane niezależnie przez 2 osoby. Kategorie stanowiska: anty-UA
 |---|---|
 | $t$ | dzień (doba w czasie warszawskim) |
 | $x_t$ | dowolna dzienna liczba, np. liczba treści w dniu $t$ |
-| $Y_t$ | dzienna seria z X (zmienna zależna) |
-| $X^{RU}_t$, $X^{UA}_t$ | dzienna seria z Telegrama, kanały prorosyjskie i proukraińskie |
+| $Y_t$ | dzienna seria z X: liczba treści o Ukraińcach w Polsce z narracją anty-UA |
+| $X^{RU}_t$, $X^{UA}_t$ | dzienna seria z Telegrama (te same treści), kanały prorosyjskie i proukraińskie (kontrola) |
 | $\log(1+x)$ | logarytm naturalny z $1+x$; spłaszcza duże wartości, działa dla $x = 0$ |
 | $\Delta$ | przyrost z dnia na dzień: $\Delta x_t = \log(1+x_t) - \log(1+x_{t-1})$ |
 | $m_t$ | 15-dniowa krocząca mediana $\log(1+x)$ wokół dnia $t$ |
 | MAD | mediana bezwzględnych odchyleń od mediany |
 | $z_t$ | odporny wynik standaryzowany dnia $t$ (§2.6); osobno $z$ to statystyka testu dwóch proporcji (§3.2) |
-| $k$ | opóźnienie w dniach; $k > 0$: Telegram wyprzedza X |
+| $k$ | opóźnienie w dniach; $k > 0$: Telegram wcześniej niż X; test główny sprawdza $k = 0…7$ |
 | $r$ | współczynnik korelacji Pearsona (liniowej), od −1 do 1 |
 | ρ (rho) | współczynnik korelacji rang Spearmana, od −1 do 1 |
 | p | p-value: prawdopodobieństwo wyniku co najmniej tak skrajnego, gdyby hipoteza zerowa (brak efektu) była prawdziwa |
@@ -189,4 +210,5 @@ konto/kanał, kodowane niezależnie przez 2 osoby. Kategorie stanowiska: anty-UA
 | moc testu | prawdopodobieństwo wykrycia efektu, jeśli on istnieje |
 | rozkład zerowy | rozkład statystyki przy braku efektu, tu uzyskany z permutacji |
 | permutacja kołowa | przesunięcie całej serii lub dat peaków o tę samą liczbę dni z zawinięciem końca na początek |
-| H1, H2 | hipotezy: kolejność (Telegram prorosyjski → X) i stałe opóźnienie (karta, sekcja 1) |
+| H, H₀ | hipoteza (korelacja trendów negatywnych treści w X i w źródłach prorosyjskich) i hipoteza zerowa (brak dodatniej korelacji przyrostów) |
+| korelacja pozorna | korelacja wynikająca tylko ze wspólnego trendu lub wspólnej przyczyny, a nie ze związku między szeregami |
