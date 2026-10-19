@@ -16,31 +16,35 @@
 \titlespacing*{\section}{0pt}{6pt}{2pt}
 
 \input{eda_numbers.tex}
-\newcommand{\UZUP}[1]{\textcolor{red}{[#1]}}   % miejsca do uzupełnienia przez zespół
-\newcommand{\repo}{\url{https://github.com/21bp37/AMC_lab/tree/ukraine-source}}
+\newcommand{\repo}{\url{https://github.com/21bp37/AMC_lab}}
 
 \begin{document}
 \begin{center}
 {\large\bfseries Karta eksploracji danych (M1)}\\[2pt]
-{\bfseries Narracje o Ukraińcach w Polsce: czy prorosyjski Telegram wyprzedza polskojęzyczny X?}\\[1pt]
-\small AMC\quad·\quad repozytorium: \repo\quad·\quad 19.10.2026
+{\bfseries Jak migrują narracje o uchodźcach z Ukrainy między źródłami prorosyjskimi a mainstreamem? 
+}\\[1pt]
+\small Analiza mediów cyfrowych\quad·\quad 19.10.2026
 \end{center}
 
+\section{Skład zespołu i role}
+\begin{tabularx}{\linewidth}{@{}llX@{}}
+\toprule
+Osoba & Rola & Zakres \\
+\midrule
+Adam Broszkiewicz & Lead badawczy & pytanie badawcze, hipoteza, preprint, poster \\
+Bartosz Procki & Inżynier danych & pozyskanie X i Telegrama, licencje, decyzje D1--D3 \\
+Mateusz Wechman & Inżynier pipeline'u & \texttt{pipeline/}, testy, eksploracja, walidacja klasyfikatora \\
+\bottomrule
+\end{tabularx}\\[2pt]
+Repozytorium: \repo{}.
+
 \section{Pytanie badawcze i hipotezy}
-\textbf{Pytanie.} Czy w okresie 4.03--31.12.2022 wzrosty liczby treści o Ukraińcach w Polsce pojawiały się najpierw
-w prorosyjskich kanałach Telegrama, a dopiero później w polskojęzycznym X/Twitterze, i z jakim opóźnieniem?
+\textbf{Pytanie.} Czy w okresie marzec-grudzień 2022 wzrosty liczby treści o Ukraińcach w Polsce pojawiały się najpierw
+na prorosyjskich kanałach Telegrama, a dopiero później na polskojęzycznym X/Twitterze, i z jakim opóźnieniem?
 
-\textbf{H1 (kolejność).} Peaki dziennej liczby postów o Ukraińcach w Polsce w kanałach prorosyjskich poprzedzają peaki
-w polskojęzycznym X: odsetek peaków X, przed którymi w oknie 0--7 dni wystąpił peak prorosyjskiego Telegrama, jest wyższy
-niż przy losowym położeniu peaków, a dla kanałów proukraińskich (grupa kontrolna) efekt nie występuje albo jest słabszy.
-
-\textbf{H2 (stałe opóźnienie).} Dla peaków z narracjami antyukraińskimi opóźnienie X względem prorosyjskiego Telegrama
-jest dodatnie i w przybliżeniu stałe: mediana 1--7 dni, rozstęp międzykwartylowy (IQR: różnica między 75. a 25.~percentylem opóźnień) $\le 2$ dni.
-
-\textbf{Zawężenia wobec sformułowań roboczych.} (a) „Polskie media” mierzymy jako polskojęzyczny X, bo tylko takie dane
-mamy. (b) Mierzymy \emph{narracje antyukraińskie} (świadczenia, przestępczość, banderyzm itd.), a nie dezinformację:
-ta wymaga weryfikacji prawdziwości twierdzenia, którą możemy wykonać najwyżej dla kilku największych peaków.
-(c) Zbieżność w czasie nie dowodzi przepływu treści (zob. sekcja~5).
+\textbf{Hipoteza} Maksima dziennej liczby postów o Ukraińcach w Polsce w kanałach prorosyjskich poprzedzają maksima
+na polskojęzycznym X/Twitterze: odsetek maksimumów na X/Twitterze, przed którymi w oknie 0-7 dni wystąpiło maksimum prorosyjskiego Telegrama, jest wyższy
+niż przy losowym położeniu maksimów, a dla kanałów proukraińskich (grupa kontrolna) efekt nie występuje albo jest słabszy. Opóźnienie polskiego X/Twittera względem prorosyjskiego Telegrama jest dodatnie i w przybliżeniu stałe.
 
 \section{Źródła danych i zakres próby}
 \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{2.3cm}X>{\raggedright\arraybackslash}p{3.3cm}@{}}
@@ -170,17 +174,4 @@ Zajęcia 5 & H2 (lub opis, jeśli za mało peaków), wyniki i ograniczenia do pr
 dzienna liczba postów z tematem w kanałach prorosyjskich okaże się bliska zera, H1 i H2 są nietestowalne i zawężamy
 projekt do dynamiki narracji w X wokół wydarzeń. H1 na poziomie wolumenu tematu jest realna; H2 prawdopodobnie tylko
 opisowo.
-
-\section{Skład zespołu i role}
-\begin{tabularx}{\linewidth}{@{}llX@{}}
-\toprule
-Osoba & Rola & Zakres \\
-\midrule
-\UZUP{Adam Broszkiewicz} & Lead & pytanie, hipotezy, reguły decyzyjne, preprint \\
-\UZUP{Bartosz Procki} & Inżynier danych & pozyskanie X i Telegrama, licencje, decyzje D1--D3 \\
-\UZUP{Mateusz Wechman} & Inżynier pipeline'u & \texttt{pipeline/}, testy, eksploracja, walidacja klasyfikatora \\
-\bottomrule
-\end{tabularx}\\[2pt]
-Repozytorium: \repo{}.\\ Wyniki odtwarza \texttt{python -m pipeline.eda\_twitter}; użycie AI opisuje
-\texttt{09\_ujawnienie\_AI\_i\_wklad.md}.
 \end{document}
