@@ -114,6 +114,28 @@ p = 2·(1 − Φ(|z|)), gdzie Φ to dystrybuanta rozkładu normalnego. Hipoteza 
 obserwacja z jednej grupy jest częściej większa niż z drugiej. Właściwy dla liczników reakcji, które mają skrajnie
 skośny rozkład. Raportujemy mediany grup i p.
 
+### 3.4 Telegram (eksploracja opisowa; `pipeline/eda_telegram.py`)
+
+Bez testów hipotezy. Dane: posty z plików `post_texts_part_N.csv`, **przefiltrowane przy pobraniu** do 2022 r. i tematu
+„Ukraina **i** Polska” (wyrażenia RU/UK w `config.TELEGRAM_UA` i `TELEGRAM_PL`: np. украин-/україн- oraz польш-/поляк-/варшав-).
+Pliki są **niepełne** (raport podaje, które części uwzględniono) i nie stanowią próby losowej kanałów, bo każdy plik zawiera całe kanały.
+
+| Miara | Definicja |
+|---|---|
+| **strona kanału** | z `leiden_clusters.csv`, kolumna `side`: *pro-Russian* (1 958 kanałów), *pro-Ukrainian* (1 116); kanały bez etykiety (z 4 687 jest ich 1 613) = `unlabeled`. Strony „neutralnej” w danych nie ma |
+| **dzień** | doba w strefie Europe/Warsaw (czas posta z pliku jest w UTC) |
+| **post z narracją anty-UA** | post tematyczny pasujący do szkicu `config.TELEGRAM_ANTI_UA` (v0.1, niezwalidowany; zawiera też hasła wojennej retoryki, np. „нацист”, „бандер”) |
+| **dni bez postu** | odsetek dni okna (303), w których dana strona ma 0 postów tematycznych; pokazuje, czy szereg dzienny w ogóle da się zbudować |
+| **top-10 kanałów** | udział 10 najaktywniejszych kanałów strony w jej postach (koncentracja) |
+| **powtórzony tekst** | udział postów, których pierwsze 80 znaków (małe litery, znormalizowane spacje) wystąpiło już w innym poście strony (kopiowanie między kanałami) |
+| **trend udziału anty-UA** | korelacja rang Spearmana między numerem tygodnia a tygodniowym udziałem postów anty-UA, tygodnie z ≥ 10 postami (tu próg jest niższy niż w X, bo to liczność postów, nie treści); opisowo |
+| **peak** | ta sama definicja co §2.6, na dziennej liczbie postów prorosyjskich; `top_channel_share` to udział najaktywniejszego kanału w tym dniu |
+| **zestawienie z X** (rys. 2C) | tygodniowe sumy postów prorosyjskich i treści anty-UA w X, każde skalowane do swojego maksimum; wyłącznie wizualne, bez korelacji i testu |
+
+**Granica interpretacji.** Temat „Ukraina i Polska” obejmuje wojnę i geopolitykę (np. Przewodów), nie tylko uchodźców,
+więc obecny szereg nie mierzy jeszcze zjawiska z hipotezy. Zawężenie do uchodźców (słowa typu беженц-, біженц-,
+„украинцы в Польше”) to następny krok.
+
 ## 4. Test hipotezy (X vs Telegram; gotowy w kodzie, czeka na dane Telegrama)
 
 **Hipoteza (H):** trendy w pojawianiu się negatywnych treści na temat ukraińskich uchodźców w polskich mediach

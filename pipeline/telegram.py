@@ -32,7 +32,8 @@ WITH posts AS (
     WHERE CAST(date AS TIMESTAMP) BETWEEN CAST(? AS TIMESTAMP) AND CAST(? AS TIMESTAMP) + INTERVAL 1 DAY
 ),
 labelled AS (
-    SELECT p.*, COALESCE(c.side, 'unlabeled') AS side
+    SELECT p.*, CASE WHEN lower(c.side) LIKE '%russ%' THEN 'Pro-Russian'
+                         WHEN lower(c.side) LIKE '%ukr%' THEN 'Pro-Ukrainian' ELSE 'unlabeled' END AS side
     FROM posts p LEFT JOIN read_csv_auto(?) c ON p.peer_id = c.peer_id
 ),
 flagged AS (

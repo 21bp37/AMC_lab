@@ -6,7 +6,7 @@ Dane mogą być NIEPEŁNE (tylko część z 8 plików): skrypt zawsze raportuje,
 
 Co liczymy (wszystko opisowo; żadnych testów hipotezy):
 - pokrycie: pliki, kanały, posty, zakres dat, udział kanałów bez etykiety strony,
-- na stronę kanału (Pro-Russian / Pro-Ukrainian / Neutral / unlabeled): posty, kanały, mediana postów dziennie,
+- na stronę kanału (Pro-Russian / Pro-Ukrainian / unlabeled): posty, kanały, mediana postów dziennie,
   odsetek dni bez postu (czy szereg dzienny w ogóle da się zbudować), udział narracji anty-UA (szkic leksykonu RU/UK),
   mediany wyświetleń i przekazań, koncentracja na 10 największych kanałach, udział powtórzeń tego samego tekstu,
 - trend udziału anty-UA w tygodniach (Spearman, opisowo), peaki w szeregu prorosyjskim,
@@ -37,8 +37,8 @@ from pipeline import config  # noqa: E402
 from pipeline.eda_twitter import AQUA, BLUE, GRID, INK, MUTED, ORANGE, fmt_int, fmt_pct  # noqa: E402
 from pipeline.series import detect_peaks  # noqa: E402
 
-SIDES = ["Pro-Russian", "Pro-Ukrainian", "Neutral", "unlabeled"]
-SIDE_PL = {"Pro-Russian": "prorosyjskie", "Pro-Ukrainian": "proukraińskie", "Neutral": "neutralne", "unlabeled": "bez etykiety"}
+SIDES = ["Pro-Russian", "Pro-Ukrainian", "unlabeled"]   # w leiden_clusters.csv są tylko dwie strony
+SIDE_PL = {"Pro-Russian": "prorosyjskie", "Pro-Ukrainian": "proukraińskie", "unlabeled": "bez etykiety"}
 
 
 def load_posts(pattern: str) -> tuple[pd.DataFrame, list[int]]:
@@ -62,8 +62,6 @@ def _norm_side(v) -> str:
         return "Pro-Russian"
     if "ukr" in t or t in ("ua", "pro-ua"):
         return "Pro-Ukrainian"
-    if "neutral" in t or "neutr" in t:
-        return "Neutral"
     return "unlabeled"
 
 
@@ -170,16 +168,27 @@ def peaks_ru(df: pd.DataFrame, daily: pd.DataFrame, z: float = 2.5) -> pd.DataFr
 def plot(daily: pd.DataFrame, df: pd.DataFrame, x_daily: pd.DataFrame | None, peaks: pd.DataFrame, out) -> None:
     plt.rcParams.update({"font.size": 8, "axes.edgecolor": GRID, "axes.labelcolor": MUTED, "xtick.color": MUTED, "ytick.color": MUTED})
     fig, ax = plt.subplots(3, 1, figsize=(7.2, 4.4), sharex=True, constrained_layout=True)
-    cols = {"Pro-Russian": ORANGE, "Pro-Ukrainian": BLUE, "Neutral": AQUA}
+    cols = {"Pro-Russian": ORANGE, "Pro-Ukrainian": BLUE}
+    raw = daily[("Pro-Russian", "n")]
+    ax[0].plot(raw.index, raw, color=ORANGE, lw=0.5, alpha=0.35)
     for s, c in cols.items():
         x = daily[(s, "n")]
-        ax[0].plot(x.index, x.rolling(7, min_periods=1).mean(), color=c, lw=1.2, label=f"{SIDE_PL[s]}")
+        ax[0].plot(x.index, x.rolling(7, min_periods=1).mean(), color=c, lw=1.2, label=f"{SIDE_PL[s]} (śr. 7 dni)")
     if len(peaks):
         pd_ = pd.to_datetime(peaks["day"])
-        ax[0].scatter(pd_, daily.loc[pd_, ("Pro-Russian", "n")].values, s=16, color=ORANGE, edgecolor=INK, zorder=3, label="peak (prorosyjskie)")
-    ax[0].set_ylabel("posty o UA+PL / dzień\n(śr. 7 dni)")
-    ax[0].legend(frameon=False, fontsize=7, ncol=4, loc="upper left")
-    ax[0].text(0.0, 1.02, "A", transform=ax[0].transAxes, fontweight="bold", color=INK)
+        ax[0].scatter(pd_, raw.loc[pd_].values, s=14, color=ORANGE, edgecolor=INK, zorder=3, label="peak: surowa liczba z dnia")
+        for d in pd_:
+            ax[0].annotate(d.strftime("%d.%m"), (d, raw.loc[d]), textcoords="offset points", xytext=(0, 4), ha="center", fontsize=6, color=INK)
+    ymax = float(raw.max()) if len(raw) else 1.0
+    for k, v in config.EVENTS.items():
+        t = pd.Timestamp(k)
+        if daily.index[0] <= t <= daily.index[-1]:
+            ax[0].axvline(t, color=MUTED, lw=0.7, ls=":")
+            ax[0].text(t, 0.97, v + " ", rotation=90, va="top", ha="right", fontsize=6, color=MUTED, transform=ax[0].get_xaxis_transform())
+    ax[0].set_ylabel("posty o UA+PL / dzień")
+    ax[0].set_ylim(0, ymax * 1.15)
+    ax[0].legend(frameon=False, fontsize=6, ncol=3, loc="lower left", bbox_to_anchor=(0.03, 1.0))
+    ax[0].text(-0.005, 1.02, "A", transform=ax[0].transAxes, fontweight="bold", color=INK)
     for s, c in {"Pro-Russian": ORANGE, "Pro-Ukrainian": BLUE}.items():
         d = df[df["side"] == s]
         if d.empty:
@@ -234,21 +243,27 @@ def section_tex(s: dict) -> str:
         verdict = (f"Szereg prorosyjski ma medianę {ru['median_daily']:.0f} postów dziennie i {fmt_pct(ru['zero_days_share'], 0)} dni bez postu, "
                    "więc szereg dzienny da się zbudować.")
     tr = ru["trend_anti_weekly"]
+    pl = sorted(s.get("peaks_ru", []), key=lambda r: -r["n"])[:6]
+    peaks_txt = "" if not pl else " (" + "; ".join(
+        f"{r['day'][8:10]}.{r['day'][5:7]}: {fmt_int(r['n'])} postów" + (f", {r['event'].split(' (')[0]}" if r["event"] else "") for r in pl) + ")"
     trend = ("" if tr["rho"] is None else
              f" Trend udziału anty-UA w kanałach prorosyjskich (Spearman, {tr['n_weeks']} tyg. z $n\\ge10$): "
-             f"$\\rho={str(round(tr['rho'], 2)).replace('.', '{,}')}$ (opisowo).")
+             f"$\\rho={str(round(tr['rho'], 2)).replace('.', '{,}')}$ "
+             f"($p={str(round(tr['p'], 3)).replace('.', '{,}')}$), w X: $\\rho=\\EdaTrAntiRho$ (\\EdaTrAntiP); "
+             "zgodnego trendu rocznego więc nie widać, co nie przesądza o korelacji \\emph{zmian} dzień do dnia (sekcja~6).")
     return (
         "\\section{Wstępna eksploracja Telegrama (dane niepełne, opisowo)}\n"
-        f"\\textbf{{Pokrycie.}} Uwzględniono pliki postów nr {parts} z 8 (kolejne pliki zmienią liczby, nie metodę). Po filtrze (Ukraina i Polska, 4.03--31.12.2022): {fmt_int(cov['n_posts'])} postów z {fmt_int(cov['n_channels'])} kanałów; "
+        f"\\textbf{{Pokrycie.}} Uwzględniono pliki postów nr {parts} z 8 (kolejne pliki zmienią liczby, nie metodę; to \\emph{{nie}} jest próba losowa kanałów). Po filtrze (Ukraina i Polska, 4.03--31.12.2022): {fmt_int(cov['n_posts'])} postów z {fmt_int(cov['n_channels'])} kanałów; "
         f"{fmt_pct(cov['unlabeled_share'], 0)} postów pochodzi z kanałów bez etykiety strony. "
+        "\\textbf{Uwaga o temacie:} filtr „Ukraina i Polska” łapie głównie wojnę i geopolitykę (np. Przewodów), a nie uchodźców; filtr uchodźczy (rosyjskie i ukraińskie odpowiedniki słów „uchodźca” i „Ukraińcy w Polsce”) dodajemy w następnym etapie. "
         "\n\n"
         "\\begin{center}\\footnotesize\\setlength{\\tabcolsep}{3pt}\n" + _tex_table(ss) + "\n\\end{center}\n"
         "{\\footnotesize\\textbf{Tab. 3.} Posty o Ukrainie i Polsce według strony kanału; „anty-UA” = udział postów trafionych szkicem "
         "leksykonu RU/UK (v0.1, niezwalidowany); „top-10 kanałów” = udział 10 najaktywniejszych kanałów w postach strony.}\\\\[2pt]\n"
         f"{verdict}{trend} Powtórzony tekst (te same 80 znaków w innym poście) dotyczy {fmt_pct(ru['copy_share'] or 0, 0)} postów prorosyjskich; "
-        f"peaków w szeregu prorosyjskim: {s['n_peaks_ru']}.\n\n"
-        "{\\centering\\includegraphics[width=0.52\\linewidth]{figures/telegram.pdf}\\par}\n"
-        "{\\footnotesize\\textbf{Rys. 2.} A: dzienna liczba postów (średnia 7 dni) według strony; B: tygodniowy udział narracji anty-UA; "
+        f"peaków w szeregu prorosyjskim: {s['n_peaks_ru']}{peaks_txt}.\n\n"
+        "{\\centering\\includegraphics[width=0.8\\linewidth]{figures/telegram.pdf}\\par}\n"
+        "{\\footnotesize\\textbf{Rys. 2.} A: dzienna liczba postów według strony (linie: średnia 7 dni; cienka linia i kropki: surowa liczba w kanałach prorosyjskich; kropkowane: wydarzenia z listy); B: tygodniowy udział narracji anty-UA; "
         "C: zestawienie wzrokowe tygodniowych liczb z Telegramu prorosyjskiego i z X, każda skalowana do swojego maksimum "
         "(bez korelacji i bez testu; hipotezy w M1 nie testujemy).\\par}\n"
     )
@@ -301,7 +316,8 @@ def run(posts: str, clusters: str, twitter_daily: str, z: float) -> dict:
                      "first_day": str(df["day"].min().date()) if len(df) else None, "last_day": str(df["day"].max().date()) if len(df) else None,
                      "unlabeled_share": float((df["side"] == "unlabeled").mean()) if len(df) else 0.0,
                      "unique_texts": int(df["copy_key"].nunique())},
-        "sides": ss, "n_peaks_ru": int(len(pk)), "params": {"z": z, "anti_lexicon": "TELEGRAM_ANTI_UA v0.1"},
+        "sides": ss, "n_peaks_ru": int(len(pk)),
+        "peaks_ru": [] if pk.empty else pk.assign(day=pk["day"].astype(str)).to_dict(orient="records"), "params": {"z": z, "anti_lexicon": "TELEGRAM_ANTI_UA v0.1"},
         "twitter_comparison_included": x_daily is not None,
     }
     plot(daily, df, x_daily, pk, config.FIGURES / "telegram.pdf")

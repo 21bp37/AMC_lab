@@ -49,7 +49,7 @@ i silniej niż z kanałami proukraińskimi (grupa kontrolna). \textbf{H$_0$:} po
 zmiany w obu źródłach nie są dodatnio skorelowane.
 
 \textbf{Zakres M1: tylko eksploracja.} Hipotezy nie testujemy; X analizujemy w całości, Telegram tylko na pobranej części
-(bez wniosków o hipotezie). Sekcja~4 to plan testu na kolejne etapy.
+(bez wniosków o hipotezie). Sekcja~6 to plan testu na kolejne etapy.
 
 \textbf{Zawężenia.} (a) „Polskie media społecznościowe” = polskojęzyczny X. (b) „Negatywne treści” = narracje antyukraińskie
 (świadczenia, przestępczość, banderyzm itd.), a nie ton wypowiedzi (E2) ani dezinformacja. (c) „Trend” = zmiany natężenia dzień do dnia i tydzień do tygodnia,
@@ -62,12 +62,12 @@ nie wspólny spadek w roku. (d) Korelacja nie dowodzi przepływu ani wpływu.
 \midrule
 X/Twitter, PL (zmienna zależna) & API v2 for Academic Research (dostęp sprzed zmian z II 2023), import do NodeXL;
 posty po polsku z frazami „Ukraińcy” i „w Polsce”, 24.02--31.12.2022. \EdaNRows{} wpisów: \EdaNOrig{} oryginałów,
-\EdaNReply{} odpowiedzi, \EdaNRt{} retweetów; \EdaNAuthors{} kont; \EdaNContents{} unikalnych treści. Pola: czas, tekst,
+\EdaNReply{} odpowiedzi, \EdaNRt{} retweetów; \EdaNAuthors{} kont; \EdaNContents{} unikalnych treści w oknie od 4.03. Pola: czas, tekst,
 typ relacji, liczniki interakcji, domeny, grupa NodeXL, etykieta i pewność sentymentu. & w repozytorium; przeanalizowane (M1) \\
 Telegram (zmienna niezależna) & Kyrychenko R., \emph{Russian and Ukrainian War-related Telegram Channels}, Zenodo 2025,
 doi:10.5281/zenodo.16949193, CC BY 4.0. 79,6\,mln postów z 4\,687 kanałów (2015--2024), 18,2\,mln przekazań, strona
-kanału (\emph{Pro-Russian / Pro-Ukrainian / Neutral}) dla 3\,074 kanałów. Pola posta: kanał, czas, tekst, wyświetlenia,
-przekazania. & otwarty, 49\,GB (8 plików postów); \textbf{dane niepełne}: pobrane i przefiltrowane tylko wybrane pliki; eksploracja opisowa; filtr gotowy \\
+kanału (\emph{pro-Russian} 1\,958, \emph{pro-Ukrainian} 1\,116) dla 3\,074 kanałów. Pola posta: kanał, czas, tekst, wyświetlenia,
+przekazania. & otwarty, 49\,GB (8 plików postów); \textbf{dane niepełne}: część plików postów (liczba w sekcji~5), nie próba losowa; eksploracja opisowa; filtr gotowy \\
 \bottomrule
 \end{tabularx}
 
@@ -105,7 +105,7 @@ z nich zawiera narrację anty-UA; reszta to m.in. krytyka Rosji i polityków. Tr
 \item \textbf{Model sentymentu nie mierzy stosunku do Ukraińców.} \EdaCNeuGivenAnti{} treści z narracją anty-UA dostało
 etykietę neutralną (także jawnie wrogie), a \EdaCNegGivenPro{} treści pro-UA negatywną (obrona Ukraińców przed atakami).
 Nie wiemy, jakim modelem nadano etykiety w pliku (nazwa, wersja, dane treningowe; D2), a \EdaShareScoreHigh{} etykiet ma deklarowaną pewność (\texttt{Sentiment\_Score}, prawdopodobieństwo przypisane etykiecie przez model) $>0{,}95$ mimo tak częstych pomyłek. Potrzebna klasyfikacja stanowiska, nie tonu.
-\item \textbf{Dyskurs w 2022 r. powoli się zaostrzał.} Trend: korelacja rang Spearmana $\rho$ między numerem tygodnia a udziałem treści danego typu (\EdaNWeeks{} tyg.; $\rho$ od $-1$ do $1$: $>0$ udział rośnie w czasie, $<0$ maleje; $p$ to prawdopodobieństwo takiego lub silniejszego wyniku, gdyby zależności nie było, za istotne uznajemy $p<0{,}05$): negatywne
+\item \textbf{Dyskurs w 2022 r. powoli się zaostrzał.} Trend: korelacja rang Spearmana $\rho$ między numerem tygodnia a udziałem treści danego typu (\EdaNWeeks{} tyg.; $\rho$ od $-1$ do $1$: $>0$ udział rośnie w czasie, $<0$ maleje; $p$ to prawdopodobieństwo takiego lub silniejszego wyniku, gdyby zależności nie było, za istotne uznajemy $p<0{,}05$; wpisy tych samych kont nie są niezależne, więc $p$ są orientacyjne): negatywne
 $\rho=\EdaTrNegRho$ (\EdaTrNegP), anty-UA $\rho=\EdaTrAntiRho$ (\EdaTrAntiP), anty-UA i negatywne $\rho=\EdaTrNegAntiRho$
 (\EdaTrNegAntiP), pro-UA $\rho=\EdaTrProRho$ (\EdaTrProP). III--IV vs XI--XII: anty-UA \EdaElAntiA{}$\to$\EdaElAntiB,
 pro-UA \EdaElProA{}$\to$\EdaElProB, negatywne \EdaElNegA{}$\to$\EdaElNegB{} (test $z$ dla dwóch proporcji, $z$ = różnica odsetków podzielona przez jej błąd standardowy: \EdaElAntiP, \EdaElProP, \EdaElNegP). Zmiana jest
@@ -142,23 +142,22 @@ z newsów, a nie z powiązania źródeł. Ograniczamy to kontrolą proukraińsk�
 przy braku efektu daje fałszywy alarm w \EdaPowerNull{} prób. Słabszej korelacji możemy nie wykryć; dopasowanie peaków (\EdaNPeaks{} peaków) ma moc tylko \EdaPowerHalf--\EdaPowerHigh.
 \item \textbf{Dobór X:} nieznane zapytanie (obie frazy dosłownie zawiera tylko \EdaShareBothOrig{} oryginałów i odpowiedzi), luka 24.02--3.03,
 \EdaShareTrunc{} retweetów z uciętym tekstem, koncentracja na kilku kontach, brak kont usuniętych; grupy NodeXL to klastry sieci, nie ideologie.
-\item \textbf{Telegram:} dane niepełne (część plików); etykieta strony tylko dla 3\,074 z 4\,687 kanałów i na poziomie kanału; posty już przefiltrowane
-tematem (brak ruchu całkowitego); wyświetlenia z dnia pobrania; filtr może łapać wzmianki niezwiązane z uchodźcami.
-\item \textbf{Pomiar narracji:} leksykony bez walidacji (fałszywe trafienia, np. kontrargumenty pro-UA z hasłem „socjal”); PL i RU wymagają wspólnych kategorii,
+\item \textbf{Telegram:} dane niepełne (część plików, nie próba losowa); etykieta strony tylko dla 3\,074 z 4\,687 kanałów i na poziomie kanału, bez strony neutralnej; posty już przefiltrowane
+tematem (brak ruchu całkowitego); wyświetlenia z dnia pobrania; \textbf{temat „Ukraina i Polska” to głównie wojna i geopolityka, nie uchodźcy} (największy peak, 16.11, to Przewodów), więc obecny szereg nie mierzy jeszcze zjawiska z hipotezy.
+\item \textbf{Pomiar narracji:} leksykony bez walidacji (fałszywe trafienia, np. kontrargumenty pro-UA z hasłem „socjal”); szkic RU/UK zawiera hasła wojennej retoryki (o „nazistach”, „banderowcach”), więc odsetek anty-UA na Telegramie (17,8\,\% vs 4,7\,\%) może odzwierciedlać styl kanałów, a nie narrację o uchodźcach; PL i RU wymagają wspólnych kategorii,
 nie tłumaczenia słów; obie platformy agregujemy do doby czasu warszawskiego.
 \item \textbf{Etyka i licencje:} plik X z treściami i loginami jest w publicznym repozytorium; zalecamy zostawić tylko ID postów (D1 w \texttt{CLEANUP.md}).
 \end{itemize}
 
 \section{Wykonalność do 5. zajęć}
 \textbf{Gotowe w M1:} pipeline X (kaskady, szeregi, peaki, wykres, liczby do karty), filtr i opisowa eksploracja Telegrama (DuckDB, strumieniowo),
-test hipotezy i symulacja mocy; 28 testów na danych syntetycznych.\\[1pt]
+test hipotezy i symulacja mocy (gotowe, niewykonane na prawdziwych danych); 28 testów na danych syntetycznych.\\[1pt]
 \begin{tabularx}{\linewidth}{@{}lX@{}}
 \toprule
-Zajęcia 2--3 & Dokończenie pobrania Telegrama (49\,GB; \textbf{punkt krytyczny}: liczności tematu per strona), leksykon RU/UK, próba walidacyjna 2×300, $\alpha$. \\
+Zajęcia 2--3 & Dokończenie pobrania Telegrama (49\,GB), \textbf{filtr uchodźczy RU/UK (punkt krytyczny: czy po nim szereg dzienny jest dość gęsty)}, leksykon RU/UK, próba walidacyjna 2×300, $\alpha$. \\
 Zajęcia 4 & Test główny i tygodniowy dla $X^{RU}$ i $X^{UA}$, warianty (udziały, wyświetlenia, bez dni wydarzeń). \\
 Zajęcia 5 & Analizy kierunku (Granger, peaki, ślad treści), wyniki i ograniczenia do preprintu. \\
 \bottomrule
 \end{tabularx}\\[2pt]
-\textbf{Wprost:} na samych danych z X hipotezy nie da się zmierzyć (E5), a w M1 jej nie testujemy; bez postów prorosyjskich z narracją anty-UA
-szeregu $X^{RU}_t$ nie zbudujemy i zawężamy projekt do dynamiki narracji w X.
+\textbf{Wprost:} na samych danych z X hipotezy nie da się zmierzyć (E5), a w M1 jej nie testujemy. Telegram ma dziś dość postów dziennie (sekcja~5), ale o temacie szerszym niż uchodźcy; jeśli po filtrze uchodźczym kanały prorosyjskie będą miały prawie zero postów z narracją anty-UA, szeregu $X^{RU}_t$ nie zbudujemy i zawężamy projekt do dynamiki narracji w X.
 \end{document}

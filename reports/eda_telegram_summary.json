@@ -1,0 +1,166 @@
+{
+  "diagnostics": {
+    "clusters_columns": [
+      "peer_id",
+      "cluster",
+      "war",
+      "svo",
+      "na_ukraine",
+      "v_ukraine",
+      "oppo",
+      "slava",
+      "sila",
+      "title",
+      "date",
+      "fake",
+      "username",
+      "about",
+      "pts",
+      "participants_count",
+      "pinned_msg_id",
+      "linked_chat_id",
+      "posts_count",
+      "posts_count_wartime",
+      "last_post",
+      "ua_symbol",
+      "ru_symbol",
+      "uk",
+      "ru",
+      "antirus",
+      "antiukr",
+      "war_engagement",
+      "toxic",
+      "score",
+      "side"
+    ],
+    "clusters_side_values": {
+      "pro-Russian": 1958,
+      "pro-Ukrainian": 1116
+    },
+    "clusters_rows": 3074,
+    "post_channels_in_clusters": 0.7719461216906642,
+    "id_column": "peer_id",
+    "side_column": "side"
+  },
+  "coverage": {
+    "parts": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "n_posts": 113077,
+    "n_channels": 2153,
+    "first_day": "2022-03-04",
+    "last_day": "2022-12-31",
+    "unlabeled_share": 0.11959107510811218,
+    "unique_texts": 77316
+  },
+  "sides": {
+    "Pro-Russian": {
+      "posts": 58244,
+      "channels": 971,
+      "median_daily": 159.0,
+      "mean_daily": 192.22442244224422,
+      "zero_days_share": 0.0,
+      "anti_posts": 10371,
+      "anti_share": 0.17806125952887852,
+      "median_views": 9521.5,
+      "median_forwards": 16.0,
+      "top10_channel_share": 0.1551576128013186,
+      "copy_share": 0.34267907423940663,
+      "trend_anti_weekly": {
+        "n_weeks": 44,
+        "rho": -0.21705426356589144,
+        "p": 0.15699138402851082
+      }
+    },
+    "Pro-Ukrainian": {
+      "posts": 41310,
+      "channels": 691,
+      "median_daily": 110.0,
+      "mean_daily": 136.33663366336634,
+      "zero_days_share": 0.0,
+      "anti_posts": 2024,
+      "anti_share": 0.04899540062938756,
+      "median_views": 11845.0,
+      "median_forwards": 14.0,
+      "top10_channel_share": 0.13928830791575889,
+      "copy_share": 0.19699830549503752,
+      "trend_anti_weekly": {
+        "n_weeks": 44,
+        "rho": -0.13587033121916844,
+        "p": 0.3791822619103949
+      }
+    },
+    "unlabeled": {
+      "posts": 13523,
+      "channels": 491,
+      "median_daily": 34.0,
+      "mean_daily": 44.63036303630363,
+      "zero_days_share": 0.0,
+      "anti_posts": 1595,
+      "anti_share": 0.11794720106485247,
+      "median_views": 386.0,
+      "median_forwards": 1.0,
+      "top10_channel_share": 0.30947275012940917,
+      "copy_share": 0.18265177845152702,
+      "trend_anti_weekly": {
+        "n_weeks": 44,
+        "rho": -0.04912082881234163,
+        "p": 0.7515154113141869
+      }
+    }
+  },
+  "n_peaks_ru": 6,
+  "peaks_ru": [
+    {
+      "day": "2022-04-28",
+      "n": 520,
+      "top_channel_share": 0.026923076923076925,
+      "anti_share": 0.12884615384615383,
+      "event": ""
+    },
+    {
+      "day": "2022-06-17",
+      "n": 299,
+      "top_channel_share": 0.023411371237458192,
+      "anti_share": 0.16387959866220736,
+      "event": ""
+    },
+    {
+      "day": "2022-07-11",
+      "n": 396,
+      "top_channel_share": 0.025252525252525252,
+      "anti_share": 0.28535353535353536,
+      "event": ""
+    },
+    {
+      "day": "2022-11-16",
+      "n": 2207,
+      "top_channel_share": 0.01676483914816493,
+      "anti_share": 0.053919347530584506,
+      "event": "Przewodów (+1 d)"
+    },
+    {
+      "day": "2022-11-30",
+      "n": 432,
+      "top_channel_share": 0.020833333333333332,
+      "anti_share": 0.1412037037037037,
+      "event": ""
+    },
+    {
+      "day": "2022-12-15",
+      "n": 292,
+      "top_channel_share": 0.0273972602739726,
+      "anti_share": 0.13356164383561644,
+      "event": ""
+    }
+  ],
+  "params": {
+    "z": 2.5,
+    "anti_lexicon": "TELEGRAM_ANTI_UA v0.1"
+  },
+  "twitter_comparison_included": true
+}
