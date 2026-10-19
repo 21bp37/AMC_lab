@@ -95,18 +95,18 @@ z nich zawiera narrację anty-UA; reszta to m.in. krytyka Rosji i polityków. Tr
 \EdaCNegAnti; pro-UA: \EdaCPro, pozytywne pro-UA tylko \EdaCPosPro.
 \item \textbf{Model sentymentu nie mierzy stosunku do Ukraińców.} \EdaCNeuGivenAnti{} treści z narracją anty-UA dostało
 etykietę neutralną (także jawnie wrogie), a \EdaCNegGivenPro{} treści pro-UA negatywną (obrona Ukraińców przed atakami).
-Model jest nieopisany, \EdaShareScoreHigh{} etykiet ma pewność $>0{,}95$. Potrzebna klasyfikacja stanowiska, nie tonu.
-\item \textbf{Dyskurs w 2022 r. powoli się zaostrzał.} Trend tygodniowy (Spearman, \EdaNWeeks{} tyg.): negatywne
+Nie wiemy, jakim modelem nadano etykiety w pliku (nazwa, wersja, dane treningowe; D2), a \EdaShareScoreHigh{} etykiet ma deklarowaną pewność $>0{,}95$ mimo tak częstych pomyłek. Potrzebna klasyfikacja stanowiska, nie tonu.
+\item \textbf{Dyskurs w 2022 r. powoli się zaostrzał.} Trend: korelacja rang Spearmana $\rho$ między numerem tygodnia a udziałem treści danego typu (\EdaNWeeks{} tyg.): negatywne
 $\rho=\EdaTrNegRho$ (\EdaTrNegP), anty-UA $\rho=\EdaTrAntiRho$ (\EdaTrAntiP), anty-UA i negatywne $\rho=\EdaTrNegAntiRho$
 (\EdaTrNegAntiP), pro-UA $\rho=\EdaTrProRho$ (\EdaTrProP). III--IV vs XI--XII: anty-UA \EdaElAntiA{}$\to$\EdaElAntiB,
-pro-UA \EdaElProA{}$\to$\EdaElProB, negatywne \EdaElNegA{}$\to$\EdaElNegB{} (wszystkie \EdaElAntiP). Zmiana jest
+pro-UA \EdaElProA{}$\to$\EdaElProB, negatywne \EdaElNegA{}$\to$\EdaElNegB{} (test $z$ dla dwóch proporcji: \EdaElAntiP, \EdaElProP, \EdaElNegP). Zmiana jest
 istotna, ale umiarkowana (kilka punktów procentowych).
-\item \textbf{Dni o dużym wolumenie są mniej negatywne} ($\rho=\EdaCorVolNegRho$, \EdaCorVolNegP): peaki wynikają z newsów
+\item \textbf{Dni o dużym wolumenie są mniej negatywne} (Spearman po 303 dniach, liczba wpisów vs udział negatywnych: $\rho=\EdaCorVolNegRho$, \EdaCorVolNegP): peaki wynikają z newsów
 i solidarności, a tło jest bardziej wrogie. Udziały anty-UA i pro-UA w dniu nie są skorelowane ($\rho=\EdaCorAntiProRho$,
 \EdaCorAntiProP).
 \item \textbf{Zaangażowanie:} oryginały pozytywne mają medianę \EdaLikesPos{} polubień, negatywne \EdaLikesNeg, neutralne
-\EdaLikesNeu{} (\EdaLikesPosNegP); narracje anty-UA nie są istotnie częściej retweetowane (mediana \EdaRtAnti{} vs
-\EdaRtNone, \EdaRtAntiP).
+\EdaLikesNeu{} (test U Manna--Whitneya, pozytywne vs negatywne: \EdaLikesPosNegP); narracje anty-UA nie są istotnie
+częściej retweetowane (mediana \EdaRtAnti{} vs \EdaRtNone, ten sam test: \EdaRtAntiP).
 \item \textbf{Peaki i źródła:} \EdaNPeaks{} peaków w 303 dniach, 3 z polskim bodźcem (Eurowizja, farba na ambasadorze
 Rosji, Przewodów); 10 kont daje \EdaTopTenSources{} retweetów. W linkach jest \EdaNRuDomain{} odwołań do rosyjskich
 mediów państwowych i \EdaNTme{} do Telegrama, więc źródła prorosyjskiego nie widać w samym X.
