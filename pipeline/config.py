@@ -77,6 +77,25 @@ TELEGRAM_ANTI_UA = (r"(?i)(?:пособи|выплат|халяв|бесплат
                     r"неблагодарн|наглост|наглы|бандер|нацист|укроп|хохл|понаех|преступн|грабе|насил|"
                     r"утриманц|невдячн)")
 
+# Telegram: FILTR UCHODŹCZY RU/UK (SZKIC v0.1, układany bez znajomości języków: tłumaczenia kluczowych słów + przegląd ręczny).
+# Zasada: filtr mówi KTO jest tematem (uchodźcy, migranci, Ukraińcy mieszkający w Polsce), a NIE CO się o nich mówi.
+# Dlatego nie zawiera słów z narracji (świadczenia, przestępczość...), które są w TELEGRAM_ANTI_UA; inaczej udział „anty”
+# w przefiltrowanych postach rósłby mechanicznie. Pełny opis i procedura sprawdzania: reports/FILTR_UCHODZCZY.md.
+# Pomijamy rdzenie dające dużo szumu (np. „убежище” = także schron, „допомога” = także pomoc wojskowa).
+TELEGRAM_REFUGEE_VERSION = "0.1"
+TELEGRAM_REFUGEE_TERMS = {
+    # status uchodźcy / ochrona czasowa / wysiedleńcy (rdzenie łapią wszystkie odmiany)
+    "uchodzcy": ["беженц", "беженк", "беженств", "беженск", "переселенц", "вынужденн\\w* переселен", "временн\\w* защит",
+                 "просител\\w* убежищ",
+                 "біженц", "біженк", "біженств", "біженськ", "вимушен\\w* переселен", "тимчасов\\w* захист", "шукач\\w* притулку"],
+    # migranci / emigranci / pracownicy sezonowi
+    "migranci": ["мигрант", "миграци", "гастарбайтер", "мігрант", "міграці", "заробітчан"],
+    # „Ukraińcy w Polsce” w jednym wyrażeniu: Ukrainiec/Ukrainka + najwyżej 1 słowo + „w/do Polski” (bez przekraczania kropki) (RU / UK)
+    "ukraincy_w_polsce": ["украин[цк]\\w*(?:[\\s,]+[^\\W\\d_]+)?[\\s,]+(?:в|во)\\s+польш",
+                          "україн[цк]\\w*(?:[\\s,]+[^\\W\\d_]+)?[\\s,]+(?:в|у|до)\\s+польщ"],
+}
+TELEGRAM_REFUGEE = {k: r"(?i)(?:" + "|".join(v) + ")" for k, v in TELEGRAM_REFUGEE_TERMS.items()}
+
 # Wydarzenia do opisu peaków (daty UTC; lista robocza, do weryfikacji przez analityka)
 EVENTS = {
     "2022-03-12": "ustawa o pomocy UA",
