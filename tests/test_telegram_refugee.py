@@ -49,6 +49,42 @@ class TestTerms(unittest.TestCase):
         self.assertTrue(tr.flag(pd.Series(["беженцы"]))["is_refugee"].iloc[0])
 
 
+class TestV03(unittest.TestCase):
+    def test_phrase_allows_up_to_three_words_between(self):
+        yes = ["Більше 2млн українців були змушені евакуюватись до Польщі через напад", "Украинцы, живущие в Польше, жалуются",
+               "Украинцы получившие статус беженцев в Польше"]
+        no = ["Украинцы отбили атаку, в Польше новости", "Украинцы победили. В Польше праздник",
+              "Украинцы воюют на востоке страны, а в Польше выборы"]
+        for t in yes:
+            self.assertTrue(tr.flag(pd.Series([t]))["ukraincy_w_polsce"].iloc[0], t)
+        for t in no:
+            self.assertFalse(tr.flag(pd.Series([t]))["ukraincy_w_polsce"].iloc[0], t)
+
+
+class TestV02(unittest.TestCase):
+    FILLER = "Слово и ещё слово про погоду и футбол. " * 20          # ~760 znaków bez słów filtra
+
+    def test_single_mention_deep_in_long_post_is_not_refugee(self):
+        f = tr.flag(pd.Series([self.FILLER + "Беженцы получили помощь."]))
+        self.assertTrue(f.loc[0, "refugee_weak"])
+        self.assertFalse(f.loc[0, "is_refugee"])
+
+    def test_two_mentions_or_lead_mention_is_refugee(self):
+        two = tr.flag(pd.Series([self.FILLER + "Беженцы получили помощь. " + self.FILLER + "Беженцы уехали."]))
+        lead = tr.flag(pd.Series(["Беженцы получили помощь. " + self.FILLER]))
+        self.assertTrue(two.loc[0, "is_refugee"])
+        self.assertTrue(lead.loc[0, "is_refugee"])
+
+    def test_phrase_ukrainians_in_poland_is_always_strong(self):
+        f = tr.flag(pd.Series([self.FILLER + "Украинцы в Польше открыли бизнес."]))
+        self.assertTrue(f.loc[0, "is_refugee"])
+
+    def test_migration_stems_do_not_match_inside_words(self):
+        for t in ["иммиграцию в Турции", "Українська еміграція 1930 року", "міграційний тиск на Європу", "миграционная политика ЕС"]:
+            self.assertFalse(tr.flag(pd.Series([t]))["refugee_weak"].iloc[0], t)
+        self.assertTrue(tr.flag(pd.Series(["Мигранты на границе"]))["is_refugee"].iloc[0])
+
+
 class TestStats(unittest.TestCase):
     def test_density_verdict(self):
         ok = {"median_day": 8, "zero_days": 0.1, "mean_week": 56}
@@ -117,14 +153,30 @@ class TestEndToEnd(unittest.TestCase):
             finally:
                 tr.REPORTS, config.PROCESSED = old
 
+    def test_reflag_fn_maps_master_rows_to_new_flags(self):
+        with tempfile.TemporaryDirectory() as d:
+            d = Path(d)
+            synth_posts(d)
+            posts, clusters = str(d / "posts_2022_part_*.csv"), str(d / "leiden_clusters.csv")
+            df = tr.load(posts, clusters)
+            pick = df.sample(20, random_state=1)
+            master = pd.DataFrame({"platform": "Telegram", "source_id": (pick["peer_id"].astype(str) + "/" + pick["id"].astype(str)).to_numpy(),
+                                   "refugee_filter": "nie", "refugee_hits": ""}, index=[f"P{i:03d}" for i in range(20)])
+            new = tr.reflag_fn(posts, clusters)(master)
+            self.assertEqual(list(new.index), list(master.index))
+            self.assertEqual(new["refugee_filter"].eq("tak").tolist(), pick["is_refugee"].tolist())
+
     def test_xlsx_review_sheet_has_dropdown(self):
         import openpyxl
         with tempfile.TemporaryDirectory() as d:
             p = Path(d) / "r.xlsx"
             tr.write_review_xlsx(p, pd.DataFrame({"id": ["R001"], "tekst_pl": ["x"], "tekst_oryg": ["y"], "o_uchodzcach": [""],
                                                   "tlumaczenie": [""], "komentarz": [""]}))
-            ws = openpyxl.load_workbook(p)["Przeglad"]
-            self.assertIn("tak,nie,niejasne", ws.data_validations.dataValidation[0].formula1)
+            wb = openpyxl.load_workbook(p)
+            try:
+                self.assertIn("tak,nie,niejasne", wb["Przeglad"].data_validations.dataValidation[0].formula1)
+            finally:
+                wb.close()
 
 
 if __name__ == "__main__":

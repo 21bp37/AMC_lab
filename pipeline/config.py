@@ -48,11 +48,11 @@ TOPIC_PL = r"w polsce|polsk|polak|polacy|polek"
 
 # Leksykon narracji antyukraińskich (wersja eksploracyjna, do walidacji na gold standardzie).
 # Narracje odpowiadają kategoriom znanym z raportów o dezinformacji wobec uchodźców w PL.
-LEXICON_VERSION = "0.2"
+LEXICON_VERSION = "0.3"
 ANTI_UA_NARRATIVES = {
     "swiadczenia": r"800\s?\+|500\s?\+|świadcze|zasiłk|socjal|za darmo|na nasz koszt|utrzym|podatnik",
     "praca_mieszkania": r"zabier\w* (?:nam )?(?:prac|mieszka)|podwyż\w* czynsz|kolejk\w* do lekarz",
-    "przestepczosc": r"gwałt|morderst|bandy[tc]|napad|przestęp|kradzie",
+    "przestepczosc": r"gwałt|morderst|bandy[tc]|napad(?!\w*\s+(?:rosj|rosyj|putin|na\s+ukrain))|przestęp|kradzie",
     "banderyzm": r"bandero|banderow|upa\b|wołyń|ukrainizac|ukropol",
     "roszczeniowosc": r"roszczeni|niewdzięcz|(?:nie widać|brak\w*|bez) wdzięczn|bezczeln|panosz",
     "zagrozenie_zdrowie": r"gruźlic|choroby|epidemi|szczepi",
@@ -82,17 +82,21 @@ TELEGRAM_ANTI_UA = (r"(?i)(?:пособи|выплат|халяв|бесплат
 # Dlatego nie zawiera słów z narracji (świadczenia, przestępczość...), które są w TELEGRAM_ANTI_UA; inaczej udział „anty”
 # w przefiltrowanych postach rósłby mechanicznie. Pełny opis i procedura sprawdzania: reports/FILTR_UCHODZCZY.md.
 # Pomijamy rdzenie dające dużo szumu (np. „убежище” = także schron, „допомога” = także pomoc wojskowa).
-TELEGRAM_REFUGEE_VERSION = "0.1"
+TELEGRAM_REFUGEE_VERSION = "0.3"
+# Post uchodźczy = „mocne” trafienie: fraza „Ukraińcy w Polsce” ALBO >= MIN_HITS trafień ALBO pierwsze trafienie w pierwszych LEAD_CHARS znaków
+# (w długich postach pojedyncza wzmianka w środku zwykle nie oznacza, że post jest o uchodźcach)
+TELEGRAM_REFUGEE_LEAD_CHARS = 400
+TELEGRAM_REFUGEE_MIN_HITS = 2
 TELEGRAM_REFUGEE_TERMS = {
     # status uchodźcy / ochrona czasowa / wysiedleńcy (rdzenie łapią wszystkie odmiany)
     "uchodzcy": ["беженц", "беженк", "беженств", "беженск", "переселенц", "вынужденн\\w* переселен", "временн\\w* защит",
                  "просител\\w* убежищ",
                  "біженц", "біженк", "біженств", "біженськ", "вимушен\\w* переселен", "тимчасов\\w* захист", "шукач\\w* притулку"],
     # migranci / emigranci / pracownicy sezonowi
-    "migranci": ["мигрант", "миграци", "гастарбайтер", "мігрант", "міграці", "заробітчан"],
+    "migranci": ["(?<!\\w)мигрант", "гастарбайтер", "(?<!\\w)мігрант", "заробітчан"],
     # „Ukraińcy w Polsce” w jednym wyrażeniu: Ukrainiec/Ukrainka + najwyżej 1 słowo + „w/do Polski” (bez przekraczania kropki) (RU / UK)
-    "ukraincy_w_polsce": ["украин[цк]\\w*(?:[\\s,]+[^\\W\\d_]+)?[\\s,]+(?:в|во)\\s+польш",
-                          "україн[цк]\\w*(?:[\\s,]+[^\\W\\d_]+)?[\\s,]+(?:в|у|до)\\s+польщ"],
+    "ukraincy_w_polsce": ["украин[цк]\\w*(?:[\\s,]+[^\\W\\d_]+){0,3}?\\s+(?:в|во)\\s+польш",
+                          "україн[цк]\\w*(?:[\\s,]+[^\\W\\d_]+){0,3}?\\s+(?:в|у|до)\\s+польщ"],
 }
 TELEGRAM_REFUGEE = {k: r"(?i)(?:" + "|".join(v) + ")" for k, v in TELEGRAM_REFUGEE_TERMS.items()}
 

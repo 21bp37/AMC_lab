@@ -1,6 +1,6 @@
 # Filtr uchodźczy RU/UK (Telegram): opis działania i sprawdzanie
 
-Wersja słów: **0.1** (szkic, `TELEGRAM_REFUGEE_VERSION` w `pipeline/config.py`). Kod: `pipeline/telegram_refugee.py`.
+Wersja słów: **0.3** (szkic, `TELEGRAM_REFUGEE_VERSION` w `pipeline/config.py`). Kod: `pipeline/telegram_refugee.py`.
 
 ## 1. Po co
 
@@ -29,9 +29,12 @@ Rdzenie słów, bez końcówek, więc łapią wszystkie odmiany (w rosyjskim i u
 |---|---|---|
 | `uchodzcy` | RU: `беженц`, `беженк`, `беженств`, `беженск`, `переселенц`, `вынужденн* переселен`, `временн* защит`, `просител* убежищ`; UK: `біженц`, `біженк`, `біженств`, `біженськ`, `вимушен* переселен`, `тимчасов* захист`, `шукач* притулку` | status uchodźcy, ochrona czasowa, wysiedleńcy |
 | `migranci` | RU: `мигрант`, `миграци`, `гастарбайтер`; UK: `мігрант`, `міграці`, `заробітчан` | migranci, emigranci, pracownicy sezonowi („мигрант” zawiera się w „эмигрант”, „иммигрант”) |
-| `ukraincy_w_polsce` | RU: `украин[цк]*` + najwyżej 1 słowo + `в/во польш`; UK: `україн[цк]*` + najwyżej 1 słowo + `в/у/до польщ` | „Ukraińcy w Polsce” jako jedno wyrażenie; wzorzec nie przekracza kropki ani nie łapie „Ukraińcy odbili atak, w Polsce…” |
+| `ukraincy_w_polsce` | RU: `украин[цк]*` + do 3 słów + `в/во польш`; UK: `україн[цк]*` + do 3 słów + `в/у/до польщ` | „Ukraińcy w Polsce” jako jedno wyrażenie; wzorzec nie przekracza kropki ani nie łapie „Ukraińcy odbili atak, w Polsce…” |
 
-Post przechodzi, jeśli pasuje **którakolwiek** kategoria.
+Post przechodzi (od wersji 0.2), jeśli pasuje którakolwiek kategoria **i** trafienie jest „mocne”: fraza „Ukraińcy w Polsce” **albo** co najmniej 2 trafienia
+**albo** pierwsze trafienie w pierwszych 400 znakach (`TELEGRAM_REFUGEE_LEAD_CHARS`, `TELEGRAM_REFUGEE_MIN_HITS` w `config.py`).
+Pojedyncza wzmianka w środku długiego posta zwykle nie znaczy, że post jest o uchodźcach. Kolumna `refugee_weak` zachowuje wynik „jakiekolwiek trafienie” (jak w 0.1).
+Rdzenie migracyjne (`мигрант`, `мігрант`) dopasowują się tylko na początku wyrazu (nie łapią „иммиграцию”, „еміграції”), a rzeczowniki `миграци` / `міграці` zostały usunięte.
 
 **Celowo pominięte** (zbyt wiele szumu): `убежище` (to także schron), `допомога` (to także pomoc wojskowa), `украинцы` samo (dominuje w wiadomościach z frontu),
 `выплаты`, `пособия` (to narracja, nie temat).
@@ -121,3 +124,5 @@ i jest szacunkiem zgrubnym; wynik rozsądniej czytać razem z przykładami z `bl
 | wersja | zmiana |
 |---|---|
 | 0.1 | pierwszy szkic: 3 kategorie (uchodźcy, migranci, „Ukraińcy w Polsce”); bez słów narracji |
+| 0.2 | po próbie 100 postów (precyzja 0,48, 13 FP z 30 przepuszczonych): reguła „mocnego” trafienia (fraza / ≥2 trafienia / początek posta), rdzenie migracyjne tylko od początku wyrazu, usunięte `миграци` / `міграці`. **Nieoceniona**: trzeba ją sprawdzić na NOWEJ próbie |
+| 0.3 | fraza „Ukraińcy w Polsce” dopuszcza do 3 słów pomiędzy (było 1), ostatni separator tylko spacja (nie przecinek, nie kropka); po FN P016 (kursy polskiego dla Ukraińców, pojedyncze „мігрант” w środku). **Nieoceniona** |

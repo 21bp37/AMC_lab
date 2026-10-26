@@ -50,19 +50,26 @@ REVIEW_RULES = [
 
 # --------------------------------------------------------------------------- filtr
 def flag(msg: pd.Series) -> pd.DataFrame:
-    """Flagi kategorii filtra uchodźczego i trafione rdzenie (do diagnostyki fałszywych trafień)."""
+    """Flagi kategorii filtra uchodźczego i trafione rdzenie (do diagnostyki fałszywych trafień).
+
+    refugee_weak = jakiekolwiek trafienie (wersja 0.1); is_refugee = „mocne” trafienie (od 0.2):
+    fraza „Ukraińcy w Polsce” ALBO >= TELEGRAM_REFUGEE_MIN_HITS trafień ALBO pierwsze trafienie w pierwszych TELEGRAM_REFUGEE_LEAD_CHARS znaków."""
     m = msg.fillna("").astype(str)
     out = pd.DataFrame({k: m.str.contains(v, regex=True) for k, v in config.TELEGRAM_REFUGEE.items()}).astype(bool)
-    out["is_refugee"] = out.any(axis=1)
+    weak = out.any(axis=1)
+    strong = pd.Series(False, index=m.index)
     hits = pd.Series("", index=m.index, dtype=object)
-    for i in out.index[out["is_refugee"]]:
-        found = []
+    for i in out.index[weak]:
+        spans = []
         for k, rx in COMPILED.items():
             for mt in rx.finditer(m.at[i]):
-                found.append(mt.group(0).lower()[:40])
-                if len(found) >= 6:
-                    break
-        hits.at[i] = "; ".join(dict.fromkeys(found))
+                spans.append((mt.start(), mt.group(0).lower()[:40]))
+        spans.sort()
+        strong.at[i] = bool(out.at[i, "ukraincy_w_polsce"] or len(spans) >= config.TELEGRAM_REFUGEE_MIN_HITS
+                            or spans[0][0] < config.TELEGRAM_REFUGEE_LEAD_CHARS)
+        hits.at[i] = "; ".join(list(dict.fromkeys(t for _, t in spans))[:6])
+    out["refugee_weak"] = weak
+    out["is_refugee"] = strong
     out["refugee_hits"] = hits
     return out
 
@@ -167,6 +174,25 @@ def pools(df: pd.DataFrame) -> dict:
             for side in SIDES for grp in ("przepuszczony", "odrzucony")}
 
 
+def reflag_fn(posts_glob: str, clusters_csv: str):
+    """Funkcja master -> nowe flagi filtra dla wierszy Telegrama (klucz: peer_id/id), liczone na pełnych tekstach z danych."""
+    def fn(master: pd.DataFrame) -> pd.DataFrame:
+        tg = master[master["platform"] == "Telegram"]
+        df = load(posts_glob, clusters_csv)
+        key = df["peer_id"].astype(str) + "/" + df["id"].astype(str)
+        by_key = pd.DataFrame({"refugee_filter": np.where(df["is_refugee"], "tak", "nie"), "refugee_hits": df["refugee_hits"].to_numpy()},
+                              index=key.to_numpy())
+        by_key = by_key[~by_key.index.duplicated()]
+        found = tg["source_id"].isin(by_key.index)
+        if not found.all():
+            sm.log(f"UWAGA: {int((~found).sum())} postów z próby nie znaleziono w danych; zostaje ich stary wynik filtra")
+        tg = tg[found]
+        out = by_key.loc[tg["source_id"].to_numpy()].copy()
+        out.index = tg.index
+        return out
+    return fn
+
+
 def draw_review(df: pd.DataFrame, n_pass: int, n_rej: int, seed: int) -> pd.DataFrame:
     parts = []
     for (side, grp), pool in pools(df).items():
@@ -265,8 +291,8 @@ def recall_ci(n_pass_pool: float, k_pass: int, n_pass: int, n_rej_pool: float, k
 
 def read_reviewed(path: Path) -> pd.DataFrame:
     if path.suffix.lower() in (".xlsx", ".xls"):
-        xl = pd.ExcelFile(path)
-        d = xl.parse("Przeglad" if "Przeglad" in xl.sheet_names else xl.sheet_names[0], dtype=str)
+        with pd.ExcelFile(path) as xl:                      # zamykamy plik (Windows blokuje otwarty xlsx)
+            d = xl.parse("Przeglad" if "Przeglad" in xl.sheet_names else xl.sheet_names[0], dtype=str)
     else:
         d = pd.read_csv(path, sep=None, engine="python", encoding="utf-8-sig", dtype=str)
     d.columns = [str(c).strip().lower() for c in d.columns]

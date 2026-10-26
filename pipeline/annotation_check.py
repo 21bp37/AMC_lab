@@ -68,8 +68,8 @@ def collapse3(l):
 # --------------------------------------------------------------------------- wczytanie
 def read_table(path: Path) -> pd.DataFrame:
     if path.suffix.lower() in (".xlsx", ".xlsm", ".xls"):
-        xl = pd.ExcelFile(path)
-        return xl.parse("Anotacja" if "Anotacja" in xl.sheet_names else xl.sheet_names[0], dtype=str)
+        with pd.ExcelFile(path) as xl:                      # zamykamy plik (Windows blokuje otwarty xlsx)
+            return xl.parse("Anotacja" if "Anotacja" in xl.sheet_names else xl.sheet_names[0], dtype=str)
     return pd.read_csv(path, sep=None, engine="python", encoding="utf-8-sig", dtype=str)
 
 
@@ -250,8 +250,15 @@ def filter_eval(D: pd.DataFrame, boot: int, seed: int = 0) -> list[dict]:
 
 # --------------------------------------------------------------------------- główny przebieg
 def run(master_csv: Path, ann_paths: list[Path], names: list[str] | None, classifiers: list[str], resolved: Path | None,
-        out: Path, boot: int, kappa_min: float, prec_min: float, recall_min: float = 0.5) -> str:
+        out: Path, boot: int, kappa_min: float, prec_min: float, recall_min: float = 0.5, refilter=None) -> str:
     master = pd.read_csv(master_csv, encoding="utf-8-sig", dtype={"item_id": str}).set_index("item_id")
+    refilter_note = ""
+    if refilter is not None:
+        new = refilter(master)                               # DataFrame indexed by item_id: refugee_filter (tak / nie), refugee_hits
+        master.loc[new.index, "refugee_filter"] = new["refugee_filter"]
+        master.loc[new.index, "refugee_hits"] = new["refugee_hits"]
+        refilter_note = (f"Filtr uchodźczy PRZELICZONY aktualnymi regułami ({len(new)} postów Telegrama), na tych samych etykietach. "
+                         "Wagi zostają z losowania (domena filtra jest podzbiorem warstw), ale to jest ocena na zbiorze, na którym poprawiano listę: zawyżona.")
     names = names or [re.sub(r"^anotacja_", "", p.stem) for p in ann_paths]
     if len(set(names)) != len(names):
         raise SystemExit(f"Powtórzone nazwy koderów: {names}")
@@ -274,6 +281,8 @@ def run(master_csv: Path, ann_paths: list[Path], names: list[str] | None, classi
              f"Treści w próbie: {len(master)} (X {int((plat == 'X').sum())}, Telegram {int((plat == 'Telegram').sum())}). "
              f"Koderzy wzorca: {', '.join(ref_coders)}" + (f"; oceniani jak klasyfikator: {', '.join(classifiers)}" if classifiers else "") + ".",
              "Braki etykiet: " + ", ".join(f"{n}: {int(missing[n])}" for n in names) + ".", ""]
+    if refilter_note:
+        lines += ["> " + refilter_note, ""]
 
     # 1. zgodność
     agr, min_k3 = agreement_table(L, ref_coders, plat, boot)
@@ -304,7 +313,11 @@ def run(master_csv: Path, ann_paths: list[Path], names: list[str] | None, classi
                                   if i in wide.index and str(wide.at[i, f'{n}__komentarz']).strip()) for i in disputed]
     q["etykieta_final"] = ""
     out.mkdir(parents=True, exist_ok=True)
-    q.reset_index().to_csv(out / "do_rozstrzygniecia.csv", index=False, encoding="utf-8-sig")
+    target = out / "do_rozstrzygniecia.csv"
+    if resolved is not None and Path(resolved).resolve() == target.resolve():
+        target = out / "do_rozstrzygniecia_pozostale.csv"          # nie nadpisujemy pliku, z którego właśnie wczytaliśmy rozstrzygnięcia
+    if len(q) or target.name == "do_rozstrzygniecia.csv":
+        q.reset_index().to_csv(target, index=False, encoding="utf-8-sig")
     lines += ["## 2. Etykieta referencyjna", "",
               f"Ustalona dla {int(ref.notna().sum())} z {len(ref)} treści; do rozstrzygnięcia: {len(disputed)} "
               f"(plik do_rozstrzygniecia.csv: uzupełnij etykieta_final i uruchom ponownie z --resolved). "
@@ -459,11 +472,17 @@ def main(argv=None) -> None:
     ap.add_argument("--kappa-min", type=float, default=0.4)
     ap.add_argument("--precision-min", type=float, default=0.7)
     ap.add_argument("--recall-min", type=float, default=0.5, help="próg czułości filtra uchodźczego")
+    ap.add_argument("--refilter", action="store_true",
+                    help="przelicz filtr uchodźczy aktualnymi regułami na pełnych tekstach z danych (wolne, ok. minut) i oceń go na tych samych etykietach; "
+                         "użyj z osobnym --out, żeby nie nadpisać pierwszego raportu")
+    ap.add_argument("--posts", default=str(config.ROOT / "data" / "telegram" / "posts_2022_part_*.csv"))
+    ap.add_argument("--clusters", default=str(config.ROOT / "data" / "telegram" / "leiden_clusters.csv"))
     args = ap.parse_args(argv)
     from pipeline.annotation_sample import use_utf8_console
     use_utf8_console()
     rep = run(Path(args.master), [Path(p) for p in args.annotations], args.names, args.classifier,
-              Path(args.resolved) if args.resolved else None, Path(args.out), args.boot, args.kappa_min, args.precision_min, args.recall_min)
+              Path(args.resolved) if args.resolved else None, Path(args.out), args.boot, args.kappa_min, args.precision_min, args.recall_min,
+              refilter=(__import__("pipeline.telegram_refugee", fromlist=["x"]).reflag_fn(args.posts, args.clusters) if args.refilter else None))
     print(rep)
     print(f"Zapisano w {args.out}: wyniki_anotacji.md, do_rozstrzygniecia.csv, etykiety_referencyjne.csv, bledy_leksykonu.csv")
 

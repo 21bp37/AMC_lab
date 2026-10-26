@@ -4,3 +4,5 @@ matplotlib>=3.8
 statsmodels>=0.14
 duckdb>=1.0
 scipy>=1.11
+openpyxl
+requests

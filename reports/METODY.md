@@ -35,7 +35,7 @@ wiersz tabeli) są liczone na wpisach. W tabelach zawsze podajemy, która podsta
 - **Model nie jest opisany** (nazwa, wersja, dane treningowe, pole wejściowe). To decyzja D2 w `CLEANUP.md`.
 - Ton mówi, czy *język* jest negatywny, ale **nie mówi, wobec kogo**: krytyka Rosji też jest „negative”.
 
-### 2.2 Leksykony (wersja 0.2, eksploracyjna)
+### 2.2 Leksykony (wersja 0.3, eksploracyjna)
 Leksykon to lista wyrażeń regularnych dopasowywanych do tekstu małymi literami (bez prefiksu RT).
 Wpis „trafia” w leksykon, gdy pasuje choć jedno wyrażenie z dowolnej kategorii.
 
@@ -43,6 +43,8 @@ Wpis „trafia” w leksykon, gdy pasuje choć jedno wyrażenie z dowolnej kateg
 |---|---|
 | anty-UA (`ANTI_UA_NARRATIVES`) | `swiadczenia` (500+/800+, zasiłki, socjal, „za darmo”, podatnik), `praca_mieszkania`, `przestepczosc`, `banderyzm` (bandera, UPA, Wołyń, ukrainizacja), `roszczeniowosc` (w tym negacja wdzięczności), `zagrozenie_zdrowie` |
 | pro-UA (`PRO_UA_NARRATIVES`) | `pomoc`, `solidarnosc`, `wdziecznosc` |
+
+**Zmiana 0.3:** `napad` w kategorii `przestepczosc` nie liczy się w zwrotach typu „napad Rosji / Putina na Ukrainę” (2 fałszywe trafienia, 0 trafnych w próbie 50 treści X). Weryfikacja na nowej próbie jest jeszcze do zrobienia.
 
 **Reguła negacji:** jeśli tekst pasuje do `NEGATED_GRATITUDE` („nie widać / brak / bez / zero wdzięczności”,
 „niewdzięczni”), flaga pro-UA jest zerowana. Wpis liczy się wtedy jako anty-UA (`roszczeniowosc`).
@@ -193,9 +195,16 @@ na Telegramie, szereg bez dni ±3 od wydarzeń z `config.EVENTS` (wspólny bodzi
 | **Bootstrap klastrowy** | losowanie ze zwracaniem całych kont/kanałów, nie pojedynczych wpisów | przedziały ufności P/R/F1 | `tools/evaluation.py` |
 | **Estymator z próbą ekspercką** | udział z klasyfikatora korygowany o błąd zmierzony na próbie kodowanej ręcznie | końcowe udziały anty-UA | `tools/estimators.py` |
 
-Próba walidacyjna (wersja dla zespołu bez eksperta od języków): po **100** losowych treści z X i z Telegramu (kanały prorosyjskie),
-kodowane niezależnie przez dwie osoby. Posty z Telegramu kodujemy **po tłumaczeniu maszynowym** na polski (DeepL/Google
-lub model językowy); to ograniczenie (tłumaczenie zniekształca ton i slang) podajemy razem z wynikami. Kategorie: anty-UA / pro-UA / inne.
+Próba walidacyjna (wersja dla zespołu bez eksperta od języków): po **100** treści z X i z Telegramu, **losowanie warstwowe**
+(`pipeline/annotation_sample.py`): X wg wyniku słownika (anty / pro / oba / brak), Telegram wg strony kanału × flagi słownika RU/UK;
+warstwy „brak / inne” są potrzebne do pomiaru czułości i do zobaczenia treści neutralnych. Limit 3 treści z jednego konta / kanału w warstwie,
+wagi = 1 / prawdopodobieństwo włączenia. Kodowane niezależnie przez dwie osoby (opcjonalnie trzeci koder: model językowy), w osobnej kolejności,
+bez informacji o warstwie i słowniku; loginy i adresy są zamaskowane. Posty z Telegramu kodujemy **po tłumaczeniu maszynowym** na polski
+(DeepL/Google); to ograniczenie (tłumaczenie zniekształca ton i slang) podajemy razem z wynikami. Etykiety: anty / pro / neutralne /
+nie_dotyczy / niejasne; do κ3 i precyzji zwijane do anty / pro / inne. Wzorzec = większość głosów, spory rozstrzygamy wspólnie.
+Ta sama anotacja ocenia też filtr uchodźczy RU/UK (etykieta „nie_dotyczy” = post poza tematem; sekcja 3b raportu), bo próba z Telegramu zawiera posty przepuszczone i odrzucone przez filtr (opis: `FILTR_UCHODZCZY.md`).
+Weryfikacja: `pipeline/annotation_check.py` (κ, α, precyzja i czułość słownika z wagami i bootstrapem w warstwach, lista fałszywych trafień ze słowami).
+Jeśli model językowy jest wyraźnie lepszy od słownika, oceniamy go jak klasyfikator (`--classifier`), a nie jak część wzorca.
 Przy próbie 100 przedział ufności dla precyzji ma szerokość rzędu ±10 pp. **Reguła:** jeśli κ < 0,4 lub precyzja słownika na Telegramie jest niska,
 nie interpretujemy udziałów narracji z Telegramu i testujemy tylko wolumen tematu (liczba postów o uchodźcach, bez oceny narracji), co jest słabszą wersją hipotezy.
 Estymator z próbą ekspercką (`tools/estimators.py`) stosujemy tylko wtedy, gdy próba jest losowa i wystarczająco duża; w przeciwnym razie raportujemy surowe udziały z zastrzeżeniem.

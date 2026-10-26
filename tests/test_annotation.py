@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from pipeline import annotation_check as ck  # noqa: E402
+from pipeline import config  # noqa: E402
 from pipeline import annotation_sample as sm  # noqa: E402
 
 
@@ -201,6 +202,13 @@ class TestTranslation(unittest.TestCase):
             else:
                 os.environ["DEEPL_API_KEY"] = old
 
+    def test_napad_lexicon_ignores_invasion(self):
+        import re
+        rx = re.compile(config.ANTI_UA_NARRATIVES["przestepczosc"])
+        self.assertIsNone(rx.search("napad rosji na ukrainę to zbrodnia"))
+        self.assertIsNone(rx.search("napad putina na ukrainę"))
+        self.assertTrue(rx.search("ukrainiec dokonał napadu na sklep") or rx.search("kolejny napad w warszawie"))
+
     def test_detect_lang(self):
         self.assertEqual(sm.detect_lang("Україна їде"), "uk")
         self.assertEqual(sm.detect_lang("Украина едет"), "ru")
@@ -271,6 +279,18 @@ class TestCheck(unittest.TestCase):
         rep = self._run(sheets, resolved=self.d / "res.csv")
         self.assertIn("do rozstrzygnięcia: 0", rep)
 
+    def test_resolved_file_is_not_overwritten(self):
+        _, sheets = simulate(self.master, ["A", "B"], noise=0.3, seed=3)
+        self._run(sheets)
+        q = pd.read_csv(self.d / "do_rozstrzygniecia.csv", encoding="utf-8-sig")
+        q["etykieta_final"] = "neutralne"
+        q.to_csv(self.d / "do_rozstrzygniecia.csv", index=False, encoding="utf-8-sig")
+        rep = self._run(sheets, resolved=self.d / "do_rozstrzygniecia.csv")      # ten sam plik co wynik
+        self.assertIn("do rozstrzygnięcia: 0", rep)
+        again = pd.read_csv(self.d / "do_rozstrzygniecia.csv", encoding="utf-8-sig")
+        self.assertEqual(len(again), len(q))
+        self.assertTrue((again["etykieta_final"] == "neutralne").all())
+
     def test_low_agreement_triggers_warning(self):
         _, sheets = simulate(self.master, ["A", "B"], noise=0.95, seed=4)
         rep = self._run(sheets)
@@ -317,6 +337,25 @@ class TestCheck(unittest.TestCase):
         self.assertIn(f"{prec:.2f} [", rep)
         self.assertIn(f"{tp / (tp + fn):.2f} [", rep)
         self.assertTrue((self.d / "bledy_filtra.csv").exists())
+
+    def test_refilter_replaces_filter_flags_and_notes_it(self):
+        truth, sheets = simulate(self.master, ["A", "B"], noise=0.0, seed=8)
+        paths = []
+        for c, df in sheets.items():
+            p = self.d / f"anotacja_{c}.csv"
+            df.to_csv(p, index=False, sep=";", encoding="utf-8-sig")
+            paths.append(p)
+
+        def nothing_passes_but_truth(master):          # filtr idealny: przepuszcza dokładnie posty on-topic
+            t = master[master["platform"] == "Telegram"]
+            on = t.index.map(lambda i: truth[i] in ("anty", "pro", "neutralne"))
+            return pd.DataFrame({"refugee_filter": np.where(on, "tak", "nie"), "refugee_hits": ""}, index=t.index)
+
+        rep = ck.run(self.d / "proba_master.csv", paths, None, [], None, self.d, boot=200, kappa_min=0.4, prec_min=0.7,
+                     refilter=nothing_passes_but_truth)
+        self.assertIn("PRZELICZONY", rep)
+        sec = rep.split("## 3b.")[1].split("##")[0]
+        self.assertIn("1.00 [", sec)                   # precyzja idealnego filtra
 
     def test_classifier_not_in_reference(self):
         truth, sheets = simulate(self.master, ["A", "B", "C"], noise=0.0, seed=6)
