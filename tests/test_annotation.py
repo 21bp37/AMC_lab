@@ -13,6 +13,7 @@ sys.path.insert(0, str(ROOT))
 from pipeline import annotation_check as ck  # noqa: E402
 from pipeline import config  # noqa: E402
 from pipeline import annotation_sample as sm  # noqa: E402
+from pipeline import anty_score  # noqa: E402
 
 
 def synth_x(n_per=None, seed=0):
@@ -37,6 +38,38 @@ def synth_tg(seed=0):
                              "stratum": f"{side}|{kind}|{ref}", "lexicon_label": "anti" if kind == "anti" else "brak", "truncated": False,
                              "refugee_filter": "tak" if ref == "uch" else "nie", "refugee_hits": "беженц" if ref == "uch" else ""})
     return pd.DataFrame(rows)
+
+
+class TestAntyScore(unittest.TestCase):
+    def test_score_orders_texts_and_ignores_handles_and_links(self):
+        hostile = "@jan Ci Ukraińcy to dzicz, biorą socjal i 500+ [link]"
+        pro = "Ukraińcy są wdzięczni za pomoc, dziękujemy Polsce"
+        neutral = "Pogoda dziś w Warszawie jest ładna"
+        self.assertGreaterEqual(anty_score.score(hostile), anty_score.THRESH_HIGH)
+        self.assertLess(anty_score.score(pro), anty_score.THRESH_MID)
+        self.assertEqual(anty_score.score(neutral), 0.0)
+        self.assertEqual(anty_score.score("@ktoś https://t.co/abc " + hostile), anty_score.score(hostile))
+
+    def test_gate_and_strata(self):
+        self.assertTrue(anty_score.gate("Ukraińcy w Polsce biorą 500+"))
+        self.assertFalse(anty_score.gate("Wojsko ruszyło na front pod Charków"))
+        self.assertEqual(anty_score.stratum("Ci Ukraińcy to dzicz, biorą socjal"), "A_wysoka")
+        self.assertEqual(anty_score.stratum("Wojsko ruszyło na front pod Charków"), "D_niska_bez_bramki")
+        self.assertEqual(anty_score.stratum("Uchodźcy dostali PESEL"), "C_niska_bramka")
+
+    def test_build_master_with_score_strata(self):
+        rows = []
+        for st, n in (("A_wysoka", 60), ("B_srednia", 80), ("C_niska_bramka", 300), ("D_niska_bez_bramki", 3000)):
+            for i in range(n):
+                rows.append({"platform": "X", "source_id": f"{st}{i}", "source_group": f"u{i % 90}", "date": "2022-05-01", "side": "",
+                             "text_original": f"treść {st} {i}", "stratum": st, "lexicon_label": "brak", "truncated": False,
+                             "anty_score": 1.0})
+        m = sm.build_master(pd.DataFrame(rows), pd.DataFrame(), 100, 0, cap=3, seed=5, x_alloc=sm.X_ALLOC_SCORE)
+        self.assertEqual(len(m), 100)
+        self.assertEqual(set(m["stratum"]), set(anty_score.STRATA))
+        self.assertTrue((m.groupby("stratum").size() == 25).all())
+        view = sm.coder_view(m, 1)
+        self.assertNotIn("anty_score", view.columns)
 
 
 class TestAllocation(unittest.TestCase):
@@ -208,6 +241,19 @@ class TestTranslation(unittest.TestCase):
         self.assertIsNone(rx.search("napad rosji na ukrainę to zbrodnia"))
         self.assertIsNone(rx.search("napad putina na ukrainę"))
         self.assertTrue(rx.search("ukrainiec dokonał napadu na sklep") or rx.search("kolejny napad w warszawie"))
+
+    def test_exclude_used_and_id_prefix(self):
+        x, tg = synth_x(), synth_tg()
+        m1 = sm.build_master(x, tg, 30, 30, cap=3, seed=1)
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d) / "proba_master.csv"
+            m1.to_csv(p, index=False, encoding="utf-8-sig")
+            x2, tg2 = sm.exclude_used(x, [p], "X"), sm.exclude_used(tg, [p], "Telegram")
+        self.assertFalse(set(x2["source_id"]) & set(m1.loc[m1["platform"] == "X", "source_id"]))
+        self.assertFalse(set(tg2["source_id"]) & set(m1.loc[m1["platform"] == "Telegram", "source_id"]))
+        m2 = sm.build_master(x2, tg2, 30, 30, cap=3, seed=2, id_prefix="R2P")
+        self.assertTrue(m2["item_id"].str.startswith("R2P").all())
+        self.assertFalse(set(m1["source_id"]) & set(m2["source_id"]))
 
     def test_detect_lang(self):
         self.assertEqual(sm.detect_lang("Україна їде"), "uk")

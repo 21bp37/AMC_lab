@@ -38,7 +38,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from pipeline import config
+from pipeline import anty_score, config
 
 sys.path.insert(0, str(config.ROOT / "tools"))
 import sampling  # noqa: E402
@@ -64,6 +64,9 @@ RULES = [
 
 # Liczebności warstw przy n = 100 (skalowane, gdy podasz inne --n-x / --n-tg)
 X_ALLOC = {"anti": 30, "pro": 25, "mieszane": 10, "brak": 35}
+# X, warstwy wg punktacji „anty” (pipeline/anty_score.py; --x-strata score): wysoka / średnia / niska z bramką / niska bez bramki.
+# Niskie warstwy są potrzebne do oceny czułości (ile „anty” punktacja gubi).
+X_ALLOC_SCORE = {k: 25 for k in anty_score.STRATA}
 # Telegram: strona x flaga słownika anty-UA x filtr uchodźczy (uch = przepuszczony, bez = odrzucony). Więcej z „uch”, bo test hipotezy
 # będzie liczony na postach po filtrze; „bez” potrzebne do oceny, ile postów uchodźczych filtr gubi.
 TG_ALLOC = {f"{side}|{a}|{u}": n for side in ("Pro-Russian", "Pro-Ukrainian")
@@ -167,7 +170,7 @@ def lex_hits(low_text: str, patterns: dict, limit: int = 8) -> str:
     return "; ".join(out)
 
 
-def x_frame(path) -> pd.DataFrame:
+def x_frame(path, x_strata: str = "lex") -> pd.DataFrame:
     """Unikalne treści z X w oknie analizy (jak w EDA): jedna reprezentacja na kaskadę, preferujemy pełny tekst oryginału."""
     from pipeline import load_twitter
     log(f"X: wczytuję {Path(path).name} ...")
@@ -178,11 +181,18 @@ def x_frame(path) -> pd.DataFrame:
     df["_pref"] = df["truncated"].astype(int) * 2 + (df["type"] != "original").astype(int)
     df = df.sort_values(["_pref", "ts"]).drop_duplicates("cascade_key")
     df = df[df["clean_text"].map(content_len) >= MIN_CHARS_X]
-    log(f"X: {num(len(df))} unikalnych treści w oknie; warstwy: " +
-        ", ".join(f"{k} {v}" for k, v in df["stance_lex"].value_counts().items()))
+    if x_strata == "score":
+        stratum = df["clean_text"].map(anty_score.stratum)
+        scores = df["clean_text"].map(anty_score.score)
+    else:
+        stratum = df["stance_lex"]
+        scores = pd.Series(np.nan, index=df.index)
+    log(f"X: {num(len(df))} unikalnych treści w oknie; warstwy ({x_strata}): " +
+        ", ".join(f"{k} {v}" for k, v in stratum.value_counts().items()))
     return pd.DataFrame({
         "platform": "X", "source_id": df["cascade_key"], "source_group": df["source_author"], "date": df["day"].dt.date.astype(str),
-        "side": "", "text_original": df["clean_text"], "stratum": df["stance_lex"], "lexicon_label": df["stance_lex"],
+        "side": "", "text_original": df["clean_text"], "stratum": stratum, "lexicon_label": df["stance_lex"],
+        "anty_score": scores, 
         "truncated": df["truncated"], "refugee_filter": "", "refugee_hits": "",
     }).reset_index(drop=True)
 
@@ -382,10 +392,11 @@ def write_xlsx(path: Path, view: pd.DataFrame, coder: str) -> None:
 
 
 # --------------------------------------------------------------------------- główny przebieg
-def build_master(x_df: pd.DataFrame, tg_df: pd.DataFrame, n_x: int, n_tg: int, cap: int, seed: int) -> pd.DataFrame:
+def build_master(x_df: pd.DataFrame, tg_df: pd.DataFrame, n_x: int, n_tg: int, cap: int, seed: int, id_prefix: str = "P",
+                 x_alloc: dict | None = None) -> pd.DataFrame:
     parts = []
     if len(x_df) and n_x:
-        s = draw(x_df, scale_alloc(X_ALLOC, n_x), "source_group", cap, seed)
+        s = draw(x_df, scale_alloc(x_alloc or X_ALLOC, n_x), "source_group", cap, seed)
         low = s["text_original"].str.lower()
         s["lex_hits"] = [lex_hits(t, {**config.ANTI_UA_NARRATIVES, **{"pro_" + k: v for k, v in config.PRO_UA_NARRATIVES.items()}}) for t in low]
         parts.append(s)
@@ -398,11 +409,24 @@ def build_master(x_df: pd.DataFrame, tg_df: pd.DataFrame, n_x: int, n_tg: int, c
     m = pd.concat(parts, ignore_index=True)
     m["text_original"] = m["text_original"].map(lambda t: clip(anonymize(t)))   # trafienia słownika policzone wcześniej na surowym tekście
     m = m.sample(frac=1.0, random_state=seed + 2).reset_index(drop=True)
-    m.insert(0, "item_id", [f"P{i:03d}" for i in range(1, len(m) + 1)])
+    m.insert(0, "item_id", [f"{id_prefix}{i:03d}" for i in range(1, len(m) + 1)])
     m["text_pl"] = np.where(m["platform"] == "X", m["text_original"], "")
     m["translation_status"] = np.where(m["platform"] == "X", "nie dotyczy", "brak")
     m["lexicon_version"] = config.LEXICON_VERSION
     return m
+
+
+def exclude_used(df: pd.DataFrame, master_paths: list, label: str) -> pd.DataFrame:
+    """Usuwa z puli treści, które już były w poprzedniej próbie (druga tura nie może powtarzać postów z pierwszej)."""
+    if df.empty or not master_paths:
+        return df
+    used = set()
+    for p in master_paths:
+        m = pd.read_csv(p, encoding="utf-8-sig", dtype=str, keep_default_na=False)
+        used |= set(m.loc[m["platform"] == df["platform"].iloc[0], "source_id"])
+    keep = ~df["source_id"].isin(used)
+    log(f"{label}: wykluczam {int((~keep).sum())} treści z poprzednich prób (z {len(used)} użytych id)")
+    return df[keep].reset_index(drop=True)
 
 
 def main(argv=None) -> None:
@@ -417,6 +441,10 @@ def main(argv=None) -> None:
     ap.add_argument("--translator", choices=["google", "deepl", "argos", "none"], default="google")
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--out", default=str(ANNOT_DIR))
+    ap.add_argument("--exclude", nargs="*", default=[], help="proba_master.csv z poprzednich tur: te treści nie wejdą do nowej próby")
+    ap.add_argument("--id-prefix", default="P", help="prefiks id treści (np. R2P w drugiej turze, żeby id się nie powtarzały)")
+    ap.add_argument("--x-strata", choices=["lex", "score"], default="lex",
+                    help="warstwy X: lex = wynik leksykonu (tury 1-2); score = punktacja anty z pipeline/anty_score.py (tura 3)")
     ap.add_argument("--from-master", action="store_true",
                     help="pomiń kroki 1-3: weź próbę z istniejącego proba_master.csv (np. po naprawie tłumacza) i tylko przetłumacz / zapisz arkusze")
     args = ap.parse_args(argv)
@@ -434,11 +462,14 @@ def main(argv=None) -> None:
         master["text_pl"] = np.where(master["platform"] == "X", master["text_original"], master["text_pl"])
     else:
         log("Krok 1/5: dane z X")
-        x_df = x_frame(args.twitter) if args.n_x and Path(args.twitter).exists() else pd.DataFrame()
+        x_df = x_frame(args.twitter, args.x_strata) if args.n_x and Path(args.twitter).exists() else pd.DataFrame()
         log("Krok 2/5: dane z Telegrama")
         tg_df = tg_frame(args.posts, args.clusters) if args.n_tg else pd.DataFrame()
         log("Krok 3/5: losowanie warstwowe")
-        master = build_master(x_df, tg_df, args.n_x, args.n_tg, args.cap, args.seed)
+        x_df = exclude_used(x_df, args.exclude, "X")
+        tg_df = exclude_used(tg_df, args.exclude, "Telegram")
+        master = build_master(x_df, tg_df, args.n_x, args.n_tg, args.cap, args.seed, args.id_prefix,
+                              x_alloc=X_ALLOC_SCORE if args.x_strata == "score" else None)
         log(f"  wylosowano {len(master)} treści (X {int((master['platform'] == 'X').sum())}, Telegram {int((master['platform'] == 'Telegram').sum())})")
         master.to_csv(out / "proba_master.csv", index=False, encoding="utf-8-sig")      # zapis przed tłumaczeniem
 
