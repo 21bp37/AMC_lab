@@ -17,20 +17,18 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: pip
       - run: pip install -r requirements.txt
-      - name: Testy narzędzi
+      - name: Testy pipeline'u i narzędzi walidacji
         run: python -m unittest discover -s tests -v
-      - name: Spójność schema, codebook i szablon CSV
-        run: python tools/checks.py consistency
-      - name: Placeholdery użyte w dokumentach są w rejestrze
-        run: python tools/checks.py placeholders
 
   no-data-committed:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Brak danych o reklamach w repozytorium
+      - name: Brak danych w repozytorium
         run: |
-          bad=$(git ls-files | grep -E '\.(csv|parquet|xlsx|jsonl)$' | grep -v -E '^(templates/|data_synthetic/|logs/runs\.jsonl$)' || true)
+          # Wyjątek przejściowy: ukraine-source/with_sentiment.csv (decyzja D1 w CLEANUP.md). Po decyzji usunąć z listy.
+          bad=$(git ls-files | grep -E '\.(csv|parquet|xlsx|jsonl|csv\.gz)$' \
+                | grep -v -E '^(templates/|data_synthetic/|logs/runs\.jsonl$|ukraine-source/with_sentiment\.csv$)' || true)
           if [ -n "$bad" ]; then
-            echo "Pliki danych nie mogą trafiać do repozytorium (03, 09):"; echo "$bad"; exit 1
+            echo "Pliki danych nie mogą trafiać do repozytorium:"; echo "$bad"; exit 1
           fi

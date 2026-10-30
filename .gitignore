@@ -1,14 +1,15 @@
-# Dane o reklamach NIE trafiają do repozytorium (legalność, dane osobowe, licencje; zob. 03, 09)
+# Dane NIE trafiają do repozytorium (regulamin X/API, dane osobowe autorów postów, licencja zbioru Telegram)
 data/
 data_raw/
 data_private/
 *.parquet
 *.xlsx
-# CSV dozwolone tylko w templates/ i data_synthetic/
+*.csv.gz
+# CSV dozwolone tylko w templates/ i data_synthetic/; wyjątek przejściowy: ukraine-source/ (zob. CLEANUP.md, decyzja D1)
 *.csv
 !templates/*.csv
 !data_synthetic/*.csv
-# Pole celeb_id i arkusze robocze annotatorów
+!ukraine-source/with_sentiment.csv
 annotation_work/
 # Środowisko i pliki tymczasowe
 __pycache__/
@@ -16,9 +17,14 @@ __pycache__/
 .venv/
 venv/
 .pytest_cache/
+.ipynb_checkpoints/
 .DS_Store
-# Wynik składania dokumentów (nie wersjonujemy; zawsze do odtworzenia)
-build/*.docx
-build/*.pdf
-build/*.jpg
-build/*.tar.gz
+# Kompilacja LaTeX (PDF karty budujemy lokalnie, nie wersjonujemy)
+reports/*.aux
+reports/*.log
+reports/*.out
+reports/*.fls
+reports/*.fdb_latexmk
+reports/*.synctex.gz
+reports/*.pdf
+build/
