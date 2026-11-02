@@ -28,3 +28,6 @@ reports/*.fdb_latexmk
 reports/*.synctex.gz
 reports/*.pdf
 build/
+
+# Zmienne środowiskowe i klucze API
+.env
