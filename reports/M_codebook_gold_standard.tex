@@ -1,0 +1,126 @@
+% Codebook i gold standard; walidacja instrumentu. Kompilacja: latexmk -pdf M_codebook_gold_standard.tex  (w katalogu reports/)
+% Liczby pochodzą z raportów generowanych przez pipeline: annotation_work/refilter_v03/wyniki_anotacji.md, annotation_work/tura2/wyniki_anotacji.md oraz reports/filtr_uchodzczy_wyniki.md
+\documentclass[10pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[polish]{babel}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage[margin=1.6cm,top=1.2cm,bottom=1.3cm]{geometry}
+\usepackage{booktabs,tabularx,array,xcolor,enumitem}
+\usepackage[hidelinks]{hyperref}
+\setlist{nosep,leftmargin=*}
+\setlength{\parskip}{3pt}\setlength{\parindent}{0pt}
+\usepackage{titlesec}
+\titleformat{\section}{\normalsize\bfseries}{\thesection.}{0.4em}{}
+\titlespacing*{\section}{0pt}{6pt}{2pt}
+\newcommand{\ci}[3]{#1\,\mbox{\scriptsize[#2;\,#3]}}
+\renewcommand{\arraystretch}{1.08}
+
+\begin{document}
+\small
+\begin{center}
+{\large\bfseries Codebook i gold standard; walidacja instrumentu}\\[1pt]
+Negatywne treści o ukraińskich uchodźcach (X i prorosyjski Telegram), 2022 \quad·\quad Analiza mediów cyfrowych \quad·\quad wersja 1.1, 26.10.2026
+\end{center}
+
+\section{Instrumenty i cel walidacji}
+Sprawdzamy na etykietach ludzkich (gold standard) trzy instrumenty automatyczne: (I1) \textbf{słownik anty/pro-UA dla X} (PL; tura 1 oceniła wersję 0.2, tura 2 wersję 0.3, w której zmieniono tylko słowo \emph{napad});
+(I2) \textbf{słownik anty-UA dla Telegramu} (RU/UK, v0.1);
+(I3) \textbf{filtr uchodźczy RU/UK} (Telegram: post o uchodźcach / Ukraińcach w Polsce; wersje 0.1--0.3 poprawiane na turze 1, wersja 0.3 sprawdzona na nowej turze 2).
+Cel: ustalić, czy mierzą to, co deklarujemy, i na tej podstawie zdecydować, co wchodzi do testu hipotezy. Progi decyzyjne przyjęte przez zespół: $\kappa_3\ge 0{,}4$, precyzja $\ge 0{,}7$, czułość $\ge 0{,}5$.
+
+\section{Codebook (v1.1; pełna wersja dla koderów: \texttt{reports/WYTYCZNE\_ANOTATORZY\_v1.1.md})}
+\textbf{Jednostka kodowania:} unikalna treść (X: kaskada retweetów liczona raz; Telegram: unikalny tekst). \textbf{Pytanie:} jaki obraz Ukraińców i uchodźców \emph{w Polsce} wyniesie czytelnik z posta? Koduje się tekst (Telegram: tłumaczenie maszynowe, w razie wątpliwości oryginał), nie autora ani kanał.
+
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+Etykieta & Definicja \\
+\midrule
+\texttt{anty} & wyraźnie negatywny wydźwięk wobec Ukraińców / uchodźców w Polsce: problem, zagrożenie, obciążenie, roszczeniowość, przeciwstawienie Polakom, uogólnienie pojedynczego zdarzenia na grupę \\
+\texttt{pro} & obrona lub poparcie tej grupy, apel o pomoc, sprzeciw wobec wrogości wobec niej \\
+\texttt{neutralne} & post \emph{o} tej grupie, bez oceny (informacja, komunikat, sucha relacja) \\
+\texttt{nie\_dotyczy} & post nie jest o Ukraińcach / uchodźcach jako ludziach w Polsce (front, polityka, gospodarka), także gdy pada „Ukraina” i „Polska” \\
+\texttt{niejasne} & nie da się rozstrzygnąć (urwany tekst, zniekształcone tłumaczenie, niezrozumiała ironia); używać rzadko \\
+\bottomrule
+\end{tabularx}
+
+\textbf{Reguły rozstrzygania.} (R1) Sama forma „relacji” nie decyduje; liczy się wydźwięk: sucha relacja $\to$ \texttt{neutralne}, dobór faktów lub słów kreujący negatywny (pozytywny) obraz grupy $\to$ \texttt{anty} (\texttt{pro}).
+(R2) Wzmianka mimochodem w poście o czymś innym $\to$ \texttt{nie\_dotyczy}.
+(R3) Krytyka lub poparcie wyłącznie dla państwa i armii ukraińskiej, bez odniesienia do ludności w Polsce $\to$ \texttt{nie\_dotyczy}.
+(R4) Cytat: oceniamy stanowisko autora posta. (R5) Ironia: zamierzony sens; przy niepewności \texttt{niejasne}.
+(R6) Post mieszany: ton dominujący; brak dominującego lub wątpliwość, czy wydźwięk jest wyraźny $\to$ \texttt{neutralne}.
+(R7) Krytyka Polski lub Polaków z perspektywy prorosyjskiej, bez oceny uchodźców $\to$ \texttt{nie\_dotyczy}; z oceną uchodźców $\to$ \texttt{anty}/\texttt{pro}. (R8) Pytanie retoryczne zachęcające do zgody pod relacją o wrogiej reakcji na uchodźców $\to$ \texttt{anty}. (R9) Wojna, Rosja, Wołyń, historia, kultura bez wątku uchodźców w Polsce $\to$ \texttt{nie\_dotyczy}. (R10) \texttt{niejasne} tylko gdy dwie interpretacje są równie prawdopodobne, nie zamiast \texttt{nie\_dotyczy}. R7--R10 (v1.1) doprecyzowano po analizie sporów tury 1.
+\textbf{Jedna etykieta, dwa cele:} $\kappa_3$ używa zwinięcia anty / pro / inne (inne = neutralne + nie\_dotyczy + niejasne); „o uchodźcach” (do oceny filtra) = anty, pro lub neutralne.
+
+\section{Gold standard}
+\textbf{Próba.} Dwie tury po 50 treści z X i 50 z Telegramu (razem 200), losowanie warstwowe z wagami $1/\pi$; w turze 2 wykluczono treści z tury 1. Tura 1 służyła też do poprawiania filtra i słownika (\emph{zbiór rozwojowy}), tura 2 to \emph{nowa próba walidacyjna} dla wersji 0.3. Pule: X 19\,983 unikalnych treści (warstwy wg słownika: anti / pro / mieszane / brak), Telegram 85\,499 unikalnych tekstów kanałów o znanej stronie (8 warstw: strona $\times$ anty-UA $\times$ przepuszczony przez filtr uchodźczy). Limit 3 treści z jednego konta lub kanału na warstwę; próba celowo wzbogacona w rzadkie klasy, więc $\kappa$ opisuje próbę, a precyzję i czułość liczymy z wagami.
+\textbf{Kodowanie.} Dwóch niezależnych koderów (A, B), ślepo, w losowej kolejności; teksty zanonimizowane (loginy, linki); Telegram przetłumaczony maszynowo (DeepL, do 1200 znaków).
+\textbf{Etykieta referencyjna} = zgodna etykieta A i B; spory (27 w turze 1, 34 w turze 2) rozstrzygnął jeden członek zespołu według codebooka (to nie jest niezależny trzeci koder).
+
+\begin{tabularx}{\linewidth}{@{}llXXXXXr@{}}
+\toprule
+Platforma & tura & anty & pro & neutralne & nie\_dotyczy & niejasne & razem \\
+\midrule
+X & 1 / 2 & 15 / 13 & 5 / 8 & 6 / 7 & 21 / 19 & 3 / 3 & 50 / 50 \\
+Telegram & 1 / 2 & 4 / 5 & 1 / 1 & 13 / 19 & 32 / 25 & 0 / 0 & 50 / 50 \\
+Razem 200 & 1+2 & 37 & 15 & 45 & 97 & 6 & 200 \\
+\bottomrule
+\end{tabularx}
+Każda klasa występuje, ale w Telegramie \texttt{pro} tylko dwa razy, a \texttt{anty} dziewięć: ocena narracji na Telegramie jest statystycznie słaba. Etykieta \texttt{niejasne} jest rzadka (6 z 200), więc nie ogranicza próby.
+
+\section{Wyniki walidacji (przedziały 95\%, bootstrap w warstwach)}
+\textbf{Zgodność koderów A--B.} Tura 1 (100 treści): zgodność 73\%, $\kappa_5=\ci{0{,}61}{0{,}49}{0{,}73}$, $\kappa_3=\ci{0{,}60}{0{,}42}{0{,}75}$. Tura 2 (100): 66\%, $\kappa_5=\ci{0{,}53}{0{,}40}{0{,}64}$, $\kappa_3=\ci{0{,}70}{0{,}54}{0{,}83}$, $\alpha=0{,}52$. W turze 2 koder B częściej wybierał \texttt{nie\_dotyczy} (43 vs 31), a A częściej \texttt{niejasne} (9 vs 0).
+
+\begin{tabularx}{\linewidth}{@{}llrXXX@{}}
+\toprule
+Zbiór & tura & zgodność & $\kappa_5$ (= $\alpha$) & $\kappa_3$ & decyzja \\
+\midrule
+X & 1 & 74\% & \ci{0{,}64}{0{,}47}{0{,}80} & \ci{0{,}67}{0{,}47}{0{,}85} & $\ge 0{,}4$ \\
+X & 2 & 62\% & \ci{0{,}51}{0{,}34}{0{,}66} & \ci{0{,}71}{0{,}50}{0{,}88} & $\ge 0{,}4$: wystarczająca \\
+Telegram & 1 & 72\% & \ci{0{,}55}{0{,}38}{0{,}71} & \ci{0{,}35}{-0{,}05}{0{,}67} & $<0{,}4$, przedział szeroki \\
+Telegram & 2 & 70\% & \ci{0{,}49}{0{,}26}{0{,}69} & \ci{0{,}52}{0{,}00}{0{,}85} & $\ge 0{,}4$, przedział bardzo szeroki \\
+\bottomrule
+\end{tabularx}
+
+\textbf{Słowniki względem etykiety referencyjnej (klasa \texttt{anty}, jeśli nie podano inaczej; wagi z losowania).}
+
+\begin{tabularx}{\linewidth}{@{}lXXXX@{}}
+\toprule
+Instrument & precyzja, tura 1 (rozw.) & czułość, tura 1 & precyzja, tura 2 (nowa) & czułość, tura 2 \\
+\midrule
+I1 X, \texttt{anty} & \ci{0{,}51}{0{,}28}{0{,}74} & \ci{0{,}28}{0{,}12}{0{,}69} & \ci{0{,}44}{0{,}24}{0{,}69} & \ci{0{,}32}{0{,}16}{0{,}80} \\
+I1 X, \texttt{pro} & \ci{0{,}13}{0{,}00}{0{,}33} & \ci{0{,}12}{0{,}00}{1{,}00} & \ci{0{,}25}{0{,}07}{0{,}46} & \ci{0{,}29}{0{,}09}{1{,}00} \\
+I2 Telegram, \texttt{anty} & \ci{0{,}07}{0{,}00}{0{,}16} & \ci{0{,}39}{0{,}00}{1{,}00} & \ci{0{,}03}{0{,}01}{0{,}08} & \ci{0{,}34}{0{,}08}{1{,}00} \\
+I2 Telegram po filtrze & \ci{0{,}30}{0{,}00}{0{,}60} & \ci{0{,}39}{0{,}00}{1{,}00} & \ci{0{,}22}{0{,}06}{0{,}46} & \ci{0{,}34}{0{,}07}{1{,}00} \\
+\bottomrule
+\end{tabularx}
+Wynik tury 2 potwierdza turę 1: żaden słownik nie spełnia progów. Najczęstsze fałszywe trafienia: X --- \emph{napad}, \emph{ukrainizac}, \emph{za darmo}; Telegram --- rdzenie świadczeń (\emph{besplatn-}, \emph{vyplat-}, \emph{posobi-}), które łapią neutralne wiadomości o zasiłkach i przejazdach, oraz \emph{bander-}, \emph{nacist-} (propaganda wojenna). Najczęstsze braki X: posty \texttt{anty} bez żadnego słowa ze słownika.
+
+\textbf{Filtr uchodźczy (I3), Telegram.} „O uchodźcach” = anty / pro / neutralne; \texttt{niejasne} liczone na niekorzyść filtra.
+
+\begin{tabularx}{\linewidth}{@{}lXXX@{}}
+\toprule
+Wersja (próba) & precyzja & czułość & przepuszczone / odrzucone \\
+\midrule
+0.1 (jakiekolwiek trafienie; tura 1) & \ci{0{,}48}{0{,}27}{0{,}78} & \ci{0{,}47}{0{,}21}{1{,}00} & 30 / 20 \\
+0.2 (trafienie „mocne”; tura 1) & \ci{0{,}63}{0{,}35}{0{,}96} & \ci{0{,}42}{0{,}18}{1{,}00} & 20 / 30 \\
+0.3 (szersza fraza; tura 1, rozwojowa) & \ci{0{,}66}{0{,}39}{0{,}96} & \ci{0{,}47}{0{,}21}{1{,}00} & 21 / 29 \\
+0.3 (\textbf{tura 2, nowa próba}) & \ci{0{,}66}{0{,}46}{0{,}88} & \ci{0{,}95}{0{,}86}{1{,}00} & 30 / 20 \\
+\bottomrule
+\end{tabularx}
+Na nowej próbie precyzja filtra 0.3 jest taka sama jak na rozwojowej (0,66), czyli poprawki nie były przeuczone, ale nadal leży pod progiem 0,7. Czułość różni się silnie między turami (0,47 vs 0,95): oba szacunki opierają się na kilku postach „o uchodźcach” wśród odrzuconych, więc nie rozstrzygają. Podział na strony kanałów nie powtórzył się (tura 2: prorosyjskie $\ci{0{,}88}{0{,}70}{1{,}00}$, proukraińskie $\ci{0{,}42}{0{,}16}{0{,}88}$; w turze 1 odwrotnie), więc nie wnioskujemy o różnicy między stronami. Błędy tury 2: wzorzec \emph{wymuszeni przesiedlency} (przesiedleńcy wewnętrzni na Ukrainie), pojedyncze wzmianki w rankingach i komunikatach.
+
+\textbf{Decyzje dla projektu.}
+(1) \emph{X:} zgodność koderów wystarczająca, ale słownik jest poniżej progów w obu turach (precyzja 0,44--0,51, czułość 0,28--0,32): używamy go jako zaszumionego wskaźnika, podajemy niepewność i porównujemy z klasyfikatorem modelowym względem gold standardu.
+(2) \emph{Telegram:} narracji nie interpretujemy (precyzja słownika 0,03--0,07, $\kappa_3$ niestabilne); do testu wchodzi \textbf{wolumen tematu} po filtrze uchodźczym (prorosyjskie: 7\,463 posty z 847 kanałów, mediana 16 dziennie, 0\% dni z zerem; 31\% kopii; największy dzień 2.06.2022 wymaga wariantu bez niego).
+(3) \emph{Filtr:} precyzja 0,66 na nowej próbie (próg 0,7 niespełniony, przedział [0,46; 0,88] obejmuje próg); używamy go do wolumenu i podajemy wariant bez filtra jako kontrolny. Poprawki wzorców (usunięcie wzorca o przesiedleńcach wewnętrznych, zawężenie rdzeni świadczeń) zapisano jako kandydatów na v0.4 i \emph{nie} wdrożono ich, aby nie zużyć próby walidacyjnej.
+
+\section{Ograniczenia i dalsze kroki}
+\textbf{Ograniczenia.} $n=100$ na turę i szerokie przedziały; tura 1 użyta także do poprawek (zawyżone liczby), tura 2 nie; granica \texttt{anty}/\texttt{neutralne} jest subiektywna (zgodność 73\%); tłumaczenie maszynowe może zmienić etykietę (obraźliwe „bieszency” (gra słów z „bieżency”, uchodźcy) zostało przetłumaczone jako „szaleńcy”); granica \texttt{nie\_dotyczy}/\texttt{neutralne} dla postów o wojnie z wątkiem uchodźców zostaje sporna mimo R7--R10.
+\textbf{Dalej:} (a) wyniki zbiorcze 200 treści (połączone wagi obu tur), (b) walidacja filtra v0.4 na nowej próbie, ze zwiększoną liczbą odrzuconych i warstwą proukraińską, (c) dla X warstwy wg pomocniczego klasyfikatora (np. LLM), by w próbie było więcej \texttt{anty} i \texttt{pro} przy zachowanych wagach, (d) model językowy jako klasyfikator oceniany względem gold standardu (nie jako wzorzec).
+
+\section{Architektura i użycie AI (do omówienia na zajęciach)}
+\textbf{Przepływ:} dane X / Telegram $\to$ okno analizy i filtr Ukraina+Polska $\to$ filtr uchodźczy $\to$ losowanie warstwowe z wagami $\to$ arkusze dla koderów (XLSX z listą wyboru) $\to$ \texttt{annotation\_check} (zgodność, etykieta referencyjna, jakość instrumentów) $\to$ test hipotezy. Słowniki są wersjonowane (zmiana = nowa wersja z wpisem w changelogu), kod pokrywa 69 testów na danych syntetycznych, raporty generuje pipeline.
+\textbf{Użycie AI (jawnie):} asystent AI (Claude) był wykorzystywany przy pisaniu kodu pipeline'u, testów i dokumentacji oraz jako pomoc przy weryfikacji rozstrzygnięć sporów (decyzje podjął człowiek); ludzie ustalili pytanie badawcze i hipotezę, kodowali dane, zatwierdzali decyzje. Liczby w dokumencie pochodzą z uruchomień pipeline'u na naszych danych.
+\end{document}

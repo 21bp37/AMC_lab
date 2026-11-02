@@ -1,25 +1,22 @@
 # WORKFLOW: praca w repozytorium
 
 ## Gałęzie i commity
-- `main` jest chroniona: zmiany przez pull request z jednym przeglądem (inna osoba niż autor).
-- Gałąź: `<rola>/<temat>`, np. `pipeline/pilot-celeb-mention`.
-- Commit: małe zmiany, wiadomość w trybie rozkazującym i z odwołaniem do ID (np. `P13`, `R05`, `D3`). Commity są oceniane jako dowód wkładu, więc każdy commit opisuje to, co zrobiła osoba, która go tworzy.
-
-## Własność miejsc
-Placeholdery `{{Pnn}}` ma prawo wypełnić tylko właściciel z rejestru (00). Pipeline nie uzupełnia miejsc leada, inżyniera danych ani analityka. Po wypełnieniu usuń klamry, zmień status w 00 i uruchom `python tools/checks.py placeholders`.
+- `main` chroniona: zmiany przez pull request z jednym przeglądem (inna osoba niż autor).
+- Gałąź: `<rola>/<temat>`, np. `pipeline/ukraine-eda`.
+- Commit: małe zmiany, opis w trybie rozkazującym. Commity są dowodem wkładu, więc każdy opisuje pracę osoby, która go tworzy.
 
 ## Dane
-- Dane o reklamach nie wchodzą do repozytorium (`.gitignore`, kontrola w CI). Przechowuje je i udostępnia inżynier danych w uzgodnionym miejscu, zgodnie z macierzą legalności (03, P07).
-- Pole `celeb_id` istnieje tylko w plikach roboczych poza repozytorium (`annotation_work/`).
-- Do repozytorium wchodzą: dokumenty, kod, testy, szablony, dane syntetyczne (`is_synthetic=1`), `logs/runs.jsonl` (hashe, bez danych).
+- Dane (X/Twitter, Telegram) nie wchodzą do repozytorium; lokalnie trzymamy je w `data/` (w `.gitignore`). Wyjątek przejściowy: `ukraine-source/with_sentiment.csv` (CLEANUP.md, D1).
+- Do repozytorium wchodzą: kod, testy, dokumenty, raporty z liczbami i wykresami (`reports/`), bez treści postów.
 
-## Codebook i prompty
-1. Zmiana codebooka: nowa wersja + wpis w `templates/codebook_changelog.md`; po zamrożeniu tylko przez PR z powtórną oceną na próbie kontrolnej.
-2. Prompt: nowy plik `prompts/prompt_<zmienna>_v<N>.txt`, nigdy nadpisanie.
-3. Każde uruchomienie annotatora ocenianego: wpis w `logs/runs.jsonl` (`tools/run_log.py`).
+## Odtwarzanie wyników
+```
+pip install -r requirements.txt
+python -m unittest discover -s tests
+python -m pipeline.eda_twitter                 # reports/eda_summary.json, eda_numbers.tex, peaks_table.tex, figures/
+python -m pipeline.telegram --posts '…/post_texts_part_*.csv' --clusters '…/leiden_clusters.csv'
+cd reports && latexmk -pdf M1_karta_eksploracji.tex
+```
 
-## Sesje z AI
-Logi sesji z agentem przechowujemy poza `main` (lokalizacja w P22) i opisujemy wkład w 09. Redakcja logu tylko jawna i uzgodniona z prowadzącym.
-
-## Kontrola jakości (CI)
-`.github/workflows/ci.yml` uruchamia testy, kontrole spójności i sprawdza, że w repozytorium nie ma plików danych.
+## Pomiar
+Zmiana leksykonu, progu peaku lub klasyfikatora = nowa wersja w `pipeline/config.py` + wpis w `templates/codebook_changelog.md`. Prompty: `prompts/`, uruchomienia: `logs/runs.jsonl`.

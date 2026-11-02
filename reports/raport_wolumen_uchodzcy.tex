@@ -1,0 +1,64 @@
+% Raport roboczy: test hipotezy na wolumenie tematu. Kompilacja: latexmk -pdf raport_wolumen_uchodzcy.tex (katalog reports/)
+% Liczby: reports/wolumen_uchodzcy_wyniki.md (python -m pipeline.refugee_volume test). Miejsca oznaczone [DO UZUPEŁNIENIA] czekają na kolejne uruchomienie.
+\documentclass[10pt,a4paper]{article}
+\usepackage[T1]{fontenc}\usepackage[utf8]{inputenc}\usepackage[polish]{babel}\usepackage{lmodern,microtype}
+\usepackage[margin=1.6cm,top=1.2cm,bottom=1.3cm]{geometry}
+\usepackage{booktabs,tabularx,array,xcolor,enumitem}\usepackage[hidelinks]{hyperref}
+\setlist{nosep,leftmargin=*}\setlength{\parskip}{3pt}\setlength{\parindent}{0pt}
+\usepackage{titlesec}\titleformat{\section}{\normalsize\bfseries}{\thesection.}{0.4em}{}\titlespacing*{\section}{0pt}{6pt}{2pt}
+\newcommand{\todo}[1]{\textcolor{red}{[DO UZUPEŁNIENIA: #1]}}
+\renewcommand{\arraystretch}{1.08}
+\begin{document}\small
+\begin{center}{\large\bfseries Test hipotezy na wolumenie tematu „o uchodźcach”: wynik roboczy}\\[1pt]
+X (polskojęzyczny) i prorosyjski Telegram, 4.03--31.12.2022 \quad·\quad Analiza mediów cyfrowych \quad·\quad wersja robocza, 30.10.2026\end{center}
+
+\section{Co testujemy i dlaczego wariant słabszy}
+Hipoteza z karty M1 dotyczy \emph{negatywnych} treści o ukraińskich uchodźcach. Walidacja instrumentów (codebook v1.1) pokazała, że słowniki i prosty score postawy nie spełniają progów (precyzja \textgreater 0,7, czułość \textgreater 0,5; X: precyzja 0,44--0,51, Telegram: 0,03--0,22), a na Telegramie nie interpretujemy narracji. Zgodnie z kartą (sekcja 4, pkt 2) testujemy więc \textbf{słabszą wersję: wolumen tematu} „o uchodźcach / Ukraińcach w Polsce”, bez oceny wydźwięku. Wynik mówi o wspólnej \emph{uwadze do tematu}, nie o negatywnych treściach.
+
+\section{Dane i pomiar}
+Jednostka: doba $\times$ platforma $\times$ strona kanału. X: liczba różnych treści (kaskady retweetów liczone raz), 20\,tys.\ treści w oknie, z czego bramka v0.4 przepuszcza 9\,901. Telegram: unikalne teksty z kanałów o znanej stronie, po bramce v0.4 prorosyjskie 4\,788, proukraińskie 2\,653. Bramka (\texttt{pipeline/refugee\_gate.py}) działa na oryginale RU/UK i polskim tekście z X i nie ocenia postawy.
+Jakość bramki (gold standard, 150 treści): Telegram precyzja 0,83--0,89, czułość 0,83--0,96 (wybrana po obejrzeniu tury 2, nie jest czystym testem); X precyzja 0,75--0,80, czułość 0,71--0,86, ale \textbf{ważona precyzja ok.\ 0,53}, bo w populacji X tylko ok.\ 32\% treści jest „o uchodźcach”. Szum pomiarowy osłabia korelacje.
+Gęstość szeregów wystarcza do testu dziennego: mediana dziennie 27 (X), 11 (RU), 6 (UA); dni z zerem 0--3\%.
+
+\section{Wynik testu}
+Reguła decyzyjna zamrożona w karcie: (a) $p<0{,}05$ dla RU (korelacja przyrostów $\Delta\log(1+x)$, $k=0\ldots7$, test permutacyjny), (b) test tygodniowy ma ten sam znak, (c) RU większe od UA (przedział różnicy bez 0). H wspieramy tylko przy spełnieniu wszystkich trzech.
+
+\begin{tabularx}{\linewidth}{@{}lccccX@{}}
+\toprule
+Wariant & $r_{RU}$ ($k$) & $p_{RU}$ & $r_{UA}$ & $\rho$ tyg. & RU$-$UA [95\%] \\
+\midrule
+główny (unikalne, bramka v0.4) & 0,05 (4) & 0,89 & 0,07 & $-0{,}03$ & $-0{,}03$ [$-0{,}13$; 0,11] \\
+z kopiami & 0,07 (4) & 0,67 & 0,15 & 0,48 & $-0{,}07$ [$-0{,}19$; 0,09] \\
+bez filtra (cały temat UA+PL) & 0,09 (0) & 0,64 & 0,15 ($p=0{,}03$) & 0,08 & $-0{,}05$ [$-0{,}13$; 0,05] \\
+udziały & 0,08 (0) & 0,71 & 0,08 & 0,03 & 0,00 [$-0{,}13$; 0,11] \\
+Telegram: filtr v0.3 & 0,07 (4) & 0,67 & 0,11 & $-0{,}01$ & $-0{,}05$ [$-0{,}15$; 0,11] \\
+bez 2.06.2022 & 0,07 (6) & 0,65 & 0,07 & 0,03 & 0,00 [$-0{,}12$; 0,14] \\
+bez dni wydarzeń $\pm1$ & 0,05 (6) & 0,92 & 0,06 & $-0{,}09$ & $-0{,}01$ [$-0{,}13$; 0,13] \\
+ścisła bramka (tylko rzeczownik uchodźczy)$^\dagger$ & 0,11 (5) & 0,29 & 0,18 ($p=0{,}03$) & 0,09 & $-0{,}07$ [$-0{,}18$; 0,07] \\
+\bottomrule
+\end{tabularx}
+
+{\footnotesize $^\dagger$ Wariant zapowiedziany przed uruchomieniem. X po ścisłej bramce ma 1\,287 treści (mediana 3 dziennie, 8\% dni z zerem), więc szereg dzienny jest za rzadki i wiarygodniejszy jest test tygodniowy (ρ = 0,09).}\\[2pt]
+\textbf{Wniosek:} we wszystkich ośmiu wariantach kryterium (a) i (c) nie jest spełnione, więc \textbf{utrzymujemy $H_0$}: nie ma dowodu, że wolumen tematu w X idzie w parze z prorosyjskim Telegramem. Korelacje są małe ($r\le 0{,}09$) i podobne dla kanałów proukraińskich, więc nie wskazują na specyficzny związek z kanałami prorosyjskimi. Jedyne $p<0{,}05$ (UA, bez filtra oraz ścisła bramka) to jeden z ok.\ 16 testów, więc go nie interpretujemy. Tygodniowe $\rho=0{,}48$ w wariancie z kopiami liczy kopie wielokrotnie, a kryterium (a) tam nie przechodzi.
+
+\section{Ograniczenia (co ten wynik znaczy i czego nie)}
+\begin{itemize}
+\item \textbf{Brak dowodu to nie dowód braku.} Moc testu w symulacji: ok.\ 50\% dla $r=0{,}2$ i ok.\ 90\% dla $r=0{,}3$. Wykluczamy raczej korelacje rzędu 0,3 i większe, słabszych nie.
+\item \textbf{Szum bramki (X).} Ważona precyzja bramki X ok.\ 0,53 osłabia korelację. Przegląd szczytów pokazuje przykłady przecieku: 15.05 (Eurowizja, „Ukraińcy nie dali Polsce punktów”) i 5.03 (cytat Tuska) to nie posty o uchodźcach.
+\item \textbf{Szczyty w X i na Telegramie to różne zjawiska} (ręczny przegląd 20 najczęstszych treści na szczyt; ocena jednej osoby, do weryfikacji przez drugą).
+ \emph{X, 9.05} (189 treści): ok.\ 18 z 20 najczęstszych treści dotyczy oblania farbą ambasadora Rosji i uogólnia to na Ukraińców w Polsce („Ukraińcy w Polsce są bezkarni”, „traktowani jak święte krowy”). To prawdziwa antyukraińska narracja o Ukraińcach w Polsce, wywołana wydarzeniem niezwiązanym ze statusem uchodźców, a nie szum bramki. Ścisła bramka jej nie przepuszcza (brak rzeczownika uchodźczego).
+ \emph{Telegram RU, 2.06} (152 treści), \emph{1.07} i \emph{30.11}: prawie wyłącznie przedruki i przeróbki jednej wiadomości o polityce wobec uchodźców (koniec dziennego świadczenia od 1 lipca, wypowiedź Szefernakera; 30.11 wzrost zachorowań na HIV i opłaty za zakwaterowanie), często z antyuchodźczą oprawą („nachlebniki”, „lafa się skończyła”). To rzeczywiste zdarzenia z tematu, nie artefakt filtra. Ten sam dzień 9.05 jest w Telegramie niewielki (7 treści; „napadnięcie przez ukraińskich uchodźców na ambasadora”).
+ \emph{Wniosek z przeglądu:} szeregi mierzą różne rzeczy. Telegram RU to cykl wiadomości o polityce wobec uchodźców (świadczenia, zdrowie), X to reakcje na wydarzenia z frazą „Ukraińcy w Polsce”. W X te wiadomości o świadczeniach nie dają szczytu (1.07: 29 treści, 30.11: 29, przy medianie 27).
+\item \textbf{Dobór X ogranicza trafność.} Zapytanie wymagało fraz „Ukraińcy” i „w Polsce”, więc dyskurs o świadczeniach i uchodźcach pisany innymi słowami (np. „uchodźcy”, „40 zł dziennie”) jest w X niedoreprezentowany. Brak korelacji może więc odzwierciedlać brak związku \emph{albo} to, że X nie obejmuje tego, co dominuje na Telegramie; tych dwóch wyjaśnień ten test nie rozróżnia.
+\item \textbf{Dane Telegramu niepełne} (nie próba losowa), strona znana na poziomie kanału, część kanałów bez strony.
+\item \textbf{Wspólny bodziec} (wydarzenia) pozostaje główną alternatywą dla ewentualnej korelacji; wariant bez dni wydarzeń to tylko częściowa kontrola.
+\item \textbf{Liczba testów.} Osiem wariantów to analiza odporności, nie siedem niezależnych testów. Wariant ścisły był zapowiedziany przed uruchomieniem, bramki nie stroiliśmy po obejrzeniu wyniku.
+\item Wynik dotyczy wolumenu tematu, \textbf{nie} negatywnych treści. Hipoteza o negatywnych treściach pozostaje nietestowana (brak walidowanego klasyfikatora postawy).
+\end{itemize}
+
+\section{Dalsze kroki}
+(1) Weryfikacja przeglądu szczytów przez drugą osobę. (2) Analiza zdarzeniowa: czy szczyty Telegramu o polityce uchodźczej (2.06, 1.07, 30.11, 25.10, 27.11) mają odpowiedź w X w oknie 0--7 dni (dopasowanie peaków, \texttt{leadlag.peak\_lag\_test}), z dobraną ręcznie listą słów dla X. (3) Decyzja zespołu, czy klasyfikator LLM dla \texttt{anty} na X (ocena względem 300 etykiet, ujawnienie AI); wtedy test na estymowanym udziale \texttt{anty} z korektą błędu pomiaru i bootstrapowym przedziałem. (4) Świeża próba walidacyjna Telegramu (ok.\ 60 postów) dla bramki v0.4.
+
+\section*{Użycie AI}
+Kod i szkic raportu powstały z pomocą asystenta AI (Claude); uruchomienia na pełnych danych i decyzje o wariantach podjął człowiek.
+\end{document}

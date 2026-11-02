@@ -6,7 +6,7 @@ konfiguracji [@baumann2025]; odtwarzalność wymaga zapisu pełnej konfiguracji 
 Użycie:
     python tools/run_log.py --log runs/runs.jsonl --who imie --model NAZWA --version WERSJA \
         --params '{"temperature":0}' --prompt prompts/prompt_v1.txt --input dane/proba.csv \
-        --seed 42 --codebook 02_codebook_v0.1.md --notes "pilotaż"
+        --seed 42 --codebook templates/codebook_changelog.md --notes "pilotaż"
 """
 from __future__ import annotations
 

@@ -4,31 +4,29 @@ Zasady kursu: oceniane są logi sesji z agentami, historia commitów, wykrywanie
 
 ## 1. Oświadczenie o przygotowaniu materiałów M1
 
-Materiały tego repozytorium (dokumenty 00–10, narzędzia w `tools/`, testy) zostały **przygotowane przy użyciu asystenta AI (Claude)** w sesji roboczej na podstawie poleceń autora. Obejmuje to: szkice dokumentów, kod narzędzi i testów, wyszukiwanie literatury. Wszystkie dokumenty są szkicami do redakcji przez autora; autor odpowiada za ich treść po weryfikacji.
+Materiały tego repozytorium (pipeline w `pipeline/`, narzędzia w `tools/`, testy, karta M1 w `reports/`) zostały **przygotowane przy użyciu asystenta AI (Claude)** w sesji roboczej na podstawie poleceń autora. Obejmuje to: szkice dokumentów, kod narzędzi i testów, wyszukiwanie literatury. Wszystkie dokumenty są szkicami do redakcji przez autora; autor odpowiada za ich treść po weryfikacji.
 
 Wpisz po swojej stronie:
 
-- Autor materiałów (rola: inżynier pipelinu): {{P21: imię i nazwisko | zależy od: zespół | domyślnie: brak}}
-- Sesje z agentami, logi: {{P22: lokalizacja logów sesji i commit z materiałami | zależy od: repozytorium | domyślnie: brak}}
+- Autor materiałów (rola: inżynier pipeline'u): UZUPEŁNIJ imię i nazwisko
+- Sesje z agentami, logi: UZUPEŁNIJ lokalizację logów sesji i commit z materiałami
 
 ## 2. Tabela wkładu (uzupełniaj na bieżąco)
 
 | Element | Wygenerowane przez AI (co) | Zmienione/dopisane przez autora (co) | Zweryfikowane przez (kto, jak) | Commit / log sesji |
 |---|---|---|---|---|
-| Codebook v0.1 | szkic zmiennych, definicji, przypadków granicznych | | | |
-| Plan pomiaru (01) | szkic | | | |
-| Plan annotatora ocenianego (04) | szkic | | | |
-| Rejestr placeholderów i punktów decyzyjnych (00), specyfikacja interfejsu (03) | szkic | | | |
-| Plan gold standardu (05) | szkic, obliczenia z narzędzi | | | |
-| Rejestr ryzyk (06) | szkic | | | |
-| Bibliografia (07) | wyszukanie i opis źródeł | | otwarcie oryginałów (statusy w 07) | |
-| Narzędzia i testy | kod | | uruchomienie testów; przegląd kodu | |
+| Pipeline eksploracji X (`pipeline/load_twitter.py`, `series.py`, `eda_twitter.py`) | kod, wybór miar (kaskady, odporny z-score) | | uruchomienie, przegląd kodu | |
+| Filtr Telegrama i testy opóźnień (`pipeline/telegram.py`, `leadlag.py`) | kod, symulacja mocy | | testy syntetyczne | |
+| Leksykon narracji 0.1 (`pipeline/config.py`) | szkic wzorców | | walidacja na gold standardzie (do zrobienia) | |
+| Karta M1 (`reports/M1_karta_eksploracji.tex`) | szkic tekstu; liczby z `eda_numbers.tex` | | | |
+| Sprzątanie repozytorium (`CLEANUP.md`) | lista i zmiany | | | |
+| Narzędzia walidacji (`tools/`) | kod z poprzedniego tematu, przeniesiony | | testy | |
 
 ## 3. Co autor musi zrobić, żeby obronić te materiały
 
-1. Przeczytać i zrozumieć każdy dokument; potrafić wyjaśnić, **dlaczego** każdy próg i wybór jest taki, a nie inny (źródło albo „heurystyka własna" według 05, sekcja 7).
+1. Przeczytać i zrozumieć każdy dokument; potrafić wyjaśnić, **dlaczego** każdy próg i wybór jest taki, a nie inny (źródło albo „heurystyka własna" „heurystyka własna”).
 2. Otworzyć źródła oznaczone „do sprawdzenia" w 07 i poprawić dane bibliograficzne. **Nie wpisywać do preprintu źródeł, których się nie otworzyło.**
-3. Uruchomić testy (`python -m unittest discover -s tests`) i przeczytać kod narzędzi, których użyje w analizie.
+3. Uruchomić testy (`python -m unittest discover -s tests`) i przeczytać kod narzędzi oraz pipeline'u, których użyje w analizie.
 4. Zmienić materiały tam, gdzie się nie zgadza (zespół, dane, decyzje); same commity bez własnej pracy nie dowodzą wkładu.
 
 ## 4. Szablon wpisu do preprintu (sekcja „Użycie AI")

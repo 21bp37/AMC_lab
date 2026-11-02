@@ -1,0 +1,220 @@
+{
+  "density": {
+    "x_about": {
+      "median_day": 27.0,
+      "zero_days": 0.0,
+      "mean_week": 225.02272727272728,
+      "n": 9901,
+      "peak_day": "2022-05-09",
+      "peak_n": 189,
+      "verdict": "dzienny szereg wystarczająco gęsty"
+    },
+    "x_about_strict": {
+      "median_day": 3.0,
+      "zero_days": 0.07590759075907591,
+      "mean_week": 29.25,
+      "n": 1287,
+      "peak_day": "2022-03-17",
+      "peak_n": 33,
+      "verdict": "za rzadki na test dzienny; wystarczy test tygodniowy"
+    },
+    "tg_ru_about": {
+      "median_day": 11.0,
+      "zero_days": 0.006600660066006601,
+      "mean_week": 108.81818181818181,
+      "n": 4788,
+      "peak_day": "2022-06-02",
+      "peak_n": 152,
+      "verdict": "dzienny szereg wystarczająco gęsty"
+    },
+    "tg_ru_about_strict": {
+      "median_day": 10.0,
+      "zero_days": 0.013201320132013201,
+      "mean_week": 101.93181818181819,
+      "n": 4485,
+      "peak_day": "2022-06-02",
+      "peak_n": 152,
+      "verdict": "dzienny szereg wystarczająco gęsty"
+    },
+    "tg_ua_about": {
+      "median_day": 6.0,
+      "zero_days": 0.0297029702970297,
+      "mean_week": 60.29545454545455,
+      "n": 2653,
+      "peak_day": "2022-03-25",
+      "peak_n": 73,
+      "verdict": "dzienny szereg wystarczająco gęsty"
+    },
+    "tg_ua_about_strict": {
+      "median_day": 5.0,
+      "zero_days": 0.04950495049504951,
+      "mean_week": 51.09090909090909,
+      "n": 2248,
+      "peak_day": "2022-03-26",
+      "peak_n": 71,
+      "verdict": "dzienny szereg wystarczająco gęsty"
+    }
+  },
+  "tests": {
+    "główny: unikalne, bramka v0.4": {
+      "supported": false,
+      "criteria": {
+        "a_main_p_lt_005": false,
+        "b_weekly_same_sign": false,
+        "c_ru_gt_ua": false
+      },
+      "r_ru": 0.050349111645522804,
+      "lag_ru": 4,
+      "p_ru": 0.8871128871128872,
+      "r_ua": 0.07409897398581278,
+      "p_ua": 0.7232767232767233,
+      "weekly_rho": -0.03307157958320749,
+      "weekly_p": 0.5832083958020989,
+      "ru_minus_ua": -0.025187853978736192,
+      "ru_minus_ua_ci": [
+        -0.1263590904514009,
+        0.11426588244538487
+      ]
+    },
+    "z kopiami (nie tylko unikalne)": {
+      "supported": false,
+      "criteria": {
+        "a_main_p_lt_005": false,
+        "b_weekly_same_sign": true,
+        "c_ru_gt_ua": false
+      },
+      "r_ru": 0.07408035460353696,
+      "lag_ru": 4,
+      "p_ru": 0.6683316683316683,
+      "r_ua": 0.14746772926531318,
+      "p_ua": 0.1918081918081918,
+      "weekly_rho": 0.475838115372999,
+      "weekly_p": 0.0004997501249375312,
+      "ru_minus_ua": -0.06914355076671327,
+      "ru_minus_ua_ci": [
+        -0.18615229295006258,
+        0.0869084150798673
+      ]
+    },
+    "bez filtra (cały temat UA+PL)": {
+      "supported": false,
+      "criteria": {
+        "a_main_p_lt_005": false,
+        "b_weekly_same_sign": true,
+        "c_ru_gt_ua": false
+      },
+      "r_ru": 0.0862442287236604,
+      "lag_ru": 0,
+      "p_ru": 0.6413586413586414,
+      "r_ua": 0.14766205683614858,
+      "p_ua": 0.03496503496503497,
+      "weekly_rho": 0.07746904258532165,
+      "weekly_p": 0.3103448275862069,
+      "ru_minus_ua": -0.04767449515670805,
+      "ru_minus_ua_ci": [
+        -0.1342460459997649,
+        0.05399807116356898
+      ]
+    },
+    "udziały (o uchodźcach / temat)": {
+      "supported": false,
+      "criteria": {
+        "a_main_p_lt_005": false,
+        "b_weekly_same_sign": true,
+        "c_ru_gt_ua": false
+      },
+      "r_ru": 0.08315486841985494,
+      "lag_ru": 0,
+      "p_ru": 0.7122877122877123,
+      "r_ua": 0.08089076874394244,
+      "p_ua": 0.5834165834165834,
+      "weekly_rho": 0.02959830866807611,
+      "weekly_p": 0.39080459770114945,
+      "ru_minus_ua": 0.0006891658455679406,
+      "ru_minus_ua_ci": [
+        -0.1269060044239435,
+        0.10540065039526746
+      ]
+    },
+    "ścisła bramka (tylko rzeczownik uchodźczy)": {
+      "supported": false,
+      "criteria": {
+        "a_main_p_lt_005": false,
+        "b_weekly_same_sign": true,
+        "c_ru_gt_ua": false
+      },
+      "r_ru": 0.11435351631542025,
+      "lag_ru": 5,
+      "p_ru": 0.2887112887112887,
+      "r_ua": 0.18240414887771073,
+      "p_ua": 0.029970029970029972,
+      "weekly_rho": 0.09098803192953517,
+      "weekly_p": 0.17091454272863568,
+      "ru_minus_ua": -0.06775399935782926,
+      "ru_minus_ua_ci": [
+        -0.17842039726412068,
+        0.06596255819346102
+      ]
+    },
+    "Telegram: filtr v0.3": {
+      "supported": false,
+      "criteria": {
+        "a_main_p_lt_005": false,
+        "b_weekly_same_sign": false,
+        "c_ru_gt_ua": false
+      },
+      "r_ru": 0.06696355794619128,
+      "lag_ru": 4,
+      "p_ru": 0.6653346653346653,
+      "r_ua": 0.11270357088716697,
+      "p_ua": 0.2987012987012987,
+      "weekly_rho": -0.0073998565386675895,
+      "weekly_p": 0.4757621189405297,
+      "ru_minus_ua": -0.047007948402300076,
+      "ru_minus_ua_ci": [
+        -0.14600532206473704,
+        0.1107967379934758
+      ]
+    },
+    "bez 2.06.2022": {
+      "supported": false,
+      "criteria": {
+        "a_main_p_lt_005": false,
+        "b_weekly_same_sign": true,
+        "c_ru_gt_ua": false
+      },
+      "r_ru": 0.07021769354167381,
+      "lag_ru": 6,
+      "p_ru": 0.6463536463536463,
+      "r_ua": 0.06833147397905709,
+      "p_ua": 0.7662337662337663,
+      "weekly_rho": 0.03095741467834491,
+      "weekly_p": 0.3458270864567716,
+      "ru_minus_ua": 0.0009965467634320269,
+      "ru_minus_ua_ci": [
+        -0.11802997593883234,
+        0.1414459458600281
+      ]
+    },
+    "bez dni wydarzeń ±1": {
+      "supported": false,
+      "criteria": {
+        "a_main_p_lt_005": false,
+        "b_weekly_same_sign": false,
+        "c_ru_gt_ua": false
+      },
+      "r_ru": 0.05059571014897423,
+      "lag_ru": 6,
+      "p_ru": 0.9200799200799201,
+      "r_ua": 0.06136061598692917,
+      "p_ua": 0.8361638361638362,
+      "weekly_rho": -0.09045605557233465,
+      "weekly_p": 0.7266366816591704,
+      "ru_minus_ua": -0.008965184647395298,
+      "ru_minus_ua_ci": [
+        -0.13387032350394396,
+        0.13222789234368118
+      ]
+    }
+  }
+}

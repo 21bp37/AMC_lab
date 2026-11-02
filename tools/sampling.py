@@ -1,4 +1,4 @@
-"""Losowanie warstwowe do gold standardu z limitem na reklamodawcę i zapisem prawdopodobieństw włączenia.
+"""Losowanie warstwowe do gold standardu z limitem na klaster (dawniej reklamodawca; tu: konto źródłowe) i zapisem prawdopodobieństw włączenia.
 
 Dlaczego zapis prawdopodobieństw: metody korygujące błąd klasyfikatora w analizie końcowej
 (design-based supervised learning) wymagają, by próba z etykietami eksperckimi była losowana
